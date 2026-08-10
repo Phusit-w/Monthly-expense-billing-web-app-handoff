@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log
+.env
+.env.*
+!.env.example
+lib/generated
+*.md
+.claude
+skills-lock.json

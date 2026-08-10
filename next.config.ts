@@ -1,7 +1,49 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Produces a self-contained `.next/standalone` build (minimal node_modules
+  // traced in) so the Docker image doesn't need to `npm install` at runtime.
+  output: "standalone",
+
+  // Baseline security headers on every response. This app is entirely
+  // first-party (no third-party scripts, fonts, or embeds anywhere), so a
+  // plain same-origin CSP is enough without needing per-request nonce
+  // plumbing through every Server Component. 'unsafe-inline' is kept on
+  // style-src (this app styles almost everything via inline `style` props)
+  // and script-src (Next's own hydration bootstrap injects inline
+  // scripts) — a nonce-based CSP would tighten this further but is a
+  // separate, more invasive change.
+  async headers() {
+    // 'unsafe-eval' is added to script-src ONLY in development — Next's
+    // Fast Refresh/HMR runtime calls eval() internally to re-execute
+    // changed modules on every save, and a strict CSP blocking that
+    // doesn't just log a warning: it throws on every reload, which leaves
+    // the page half-hydrated and breaks client-side interactivity
+    // entirely under the stricter policy (confirmed — every onClick
+    // handler in the app, e.g. RecordsTable's แก้ไข/ทำซ้ำ/ลบ buttons,
+    // silently stopped working). Production builds never include that
+    // dev-only code at all (verified: `react-refresh-utils` isn't present
+    // anywhere in a `next build` output), so this widens the policy for
+    // local `npm run dev` only — the actual deployed app keeps the
+    // stricter policy.
+    const isDev = process.env.NODE_ENV !== "production";
+    const scriptSrc = isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval';" : "script-src 'self' 'unsafe-inline';";
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Content-Security-Policy",
+            value: `default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; ${scriptSrc} frame-ancestors 'none';`,
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

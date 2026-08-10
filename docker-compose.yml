@@ -1,0 +1,81 @@
+# On-prem/intranet deployment: app + postgres, no external services.
+# See DEPLOY.md for setup instructions.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: expense_billing
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in a .env file next to docker-compose.yml}
+      POSTGRES_DB: expense_billing
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U expense_billing -d expense_billing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Uncomment to allow direct DB access from the host (e.g. for backups
+    # with a local psql/pg_dump) — not needed for the app itself.
+    # ports:
+    #   - "5432:5432"
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://expense_billing:${POSTGRES_PASSWORD}@db:5432/expense_billing
+      AUTH_USERNAME: ${AUTH_USERNAME:?set AUTH_USERNAME in a .env file next to docker-compose.yml}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:?set AUTH_PASSWORD in a .env file next to docker-compose.yml}
+    # Not published to the host directly — only the caddy service below is,
+    # reaching this one over the compose network by service name. Basic
+    # Auth (proxy.ts) sends credentials as unencrypted base64, so exposing
+    # this port straight to the host/network would let anyone bypass
+    # caddy's HTTPS and leak the password in plain HTTP.
+    expose:
+      - "3000"
+
+  # Terminates HTTPS in front of `app` using a self-signed certificate from
+  # Caddy's own local CA (`tls internal` in Caddyfile) — appropriate for an
+  # intranet/VPN-only deployment with no public DNS name, per the app's
+  # deployment model (see DEPLOY.md). Browsers will show a "not trusted"
+  # warning the first time until that CA is installed on client machines
+  # (Caddy prints the cert path in its logs); swap in a real internal CA or
+  # public cert here later with zero changes to the app itself.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+  # Dumps the database once a day and prunes anything older than
+  # BACKUP_RETENTION_DAYS — see backup.sh and DEPLOY.md's "Backup" section.
+  # Backups land in ./backups on the host (bind mount, not a named volume)
+  # specifically so they're trivial to copy off the server with a plain
+  # file-copy tool, independent of Docker entirely.
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in a .env file next to docker-compose.yml}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - ./backups:/backups
+      - ./backup.sh:/backup.sh:ro
+    entrypoint: ["/bin/sh", "/backup.sh"]
+
+volumes:
+  db_data:
+  caddy_data:

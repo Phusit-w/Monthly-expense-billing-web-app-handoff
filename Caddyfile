@@ -1,0 +1,12 @@
+# HTTPS termination for the intranet/VPN-only deployment described in
+# DEPLOY.md. `tls internal` uses Caddy's own local CA instead of trying to
+# get a public certificate (there's no public DNS name for an internal
+# app) — browsers will show a "not trusted" warning until that CA is
+# installed on client machines. If the organization already has its own
+# internal CA or a real certificate, replace `tls internal` with
+# `tls /path/to/cert.pem /path/to/key.pem` and mount those files in
+# instead — nothing else in this file or the app needs to change.
+:443 {
+	tls internal
+	reverse_proxy app:3000
+}

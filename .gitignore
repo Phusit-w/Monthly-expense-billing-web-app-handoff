@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!.env.production.example
 
 # vercel
 .vercel
@@ -39,3 +41,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma's generated client — prisma/schema.prisma's `output` points here,
+# not app/generated/prisma (that path never matched anything real, so
+# lib/generated/prisma was being committed wholesale — a regeneratable
+# build artifact, same category as node_modules, not meant for version
+# control; run `npx prisma generate` to recreate it after cloning).
+/lib/generated/prisma
+
+# Skill/reference-doc caches for various AI coding tools — local tooling
+# metadata, not application code, and not something this project's own
+# contributors need in version control.
+/.claude/
+/.agents/
+/.windsurf/
+
+# native-Windows deploy (run-loop.ps1 / install-service.ps1 output)
+/logs
+
+# database backups (docker-compose's `backup` service / backup-postgres.ps1)
+# — real financial/employee data, never commit these
+/backups

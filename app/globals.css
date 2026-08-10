@@ -1,26 +1,181 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Base reset ported from the design source's <helmet> block. This app is a
+   fixed light-themed paper-forms tool (see plan) — no Tailwind, no dark mode. */
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+a {
+  color: #1a56db;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+a:hover {
+  color: #1e429f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Uniform hover/press feedback for every button in the app, per request:
+   white (or whatever each component already sets) while idle, solid black
+   with white text the moment the mouse is over it OR it's actively being
+   clicked. Every button in this app sets its own colors as an inline
+   `style` prop, which always wins over a plain stylesheet rule regardless
+   of selector specificity — !important here is what actually lets this
+   single site-wide rule override all of them rather than being silently
+   ignored. Buttons already black by default (primary actions, active
+   tabs/nav) are a no-op under this rule since they already satisfy it.
+   :disabled is excluded — a disabled button shouldn't look clickable.
+   .nav-btn covers Header.tsx's top-nav items specifically: those are
+   Next.js <Link>s styled to look like buttons (so page navigation doesn't
+   trigger a full reload), not real <button> elements, so the plain `button`
+   selector alone can't reach them — every other button-styled element in
+   the app is an actual <button>, already covered without needing a class. */
+button:not(:disabled):hover,
+button:not(:disabled):active,
+.nav-btn:hover,
+.nav-btn:active {
+  background: #1c1c1c !important;
+  color: #fff !important;
+  border-color: #1c1c1c !important;
+}
+
+/* Delete/remove-row buttons (RecordsTable's "ลบ", EditorToolbar's
+   "− ลบแถว", EntryFormFA017/018's "− ลบรายการ") — red instead of the
+   generic black above, matching their idle red border/text so hovering
+   reads as "this removes something" rather than a plain action button.
+   `button.btn-danger` (element + class) is more specific than the plain
+   `button` selector above, so this wins regardless of source order even
+   though both use !important. */
+button.btn-danger:not(:disabled):hover,
+button.btn-danger:not(:disabled):active {
+  background: #b3261e !important;
+  color: #fff !important;
+  border-color: #b3261e !important;
+}
+
+/* The white "paper" sheet a form sits on. Centered with a drop shadow on
+   screen (ported from paperMargin/paperShadow in the design source); flush
+   to the page with no shadow when printed, replacing the original's
+   isPrinting-driven inline style toggle with a plain print media query. */
+.paper {
+  margin: 0 auto;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  background: #fff;
+  color: #111;
+}
+
+@media print {
+  .paper {
+    margin: 0 !important;
+    box-shadow: none !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Continuation pages — FA017Form/FA018Form render one .paper per physical
+   A4 sheet when content overflows one page (see lib/pagination.ts). A
+   sibling selector rather than a class toggled from JSX: it applies
+   automatically whenever more than one .paper is rendered and has zero
+   effect on the (overwhelmingly common) single-page case. */
+.paper + .paper {
+  margin-top: 24px;
+}
+
+@media print {
+  .paper + .paper {
+    /* .paper is already sized to the full physical page, so each
+       continuation page becomes its own printed A4 sheet. */
+    break-before: page;
+    margin-top: 0;
+  }
+}
+
+/* Elements the user shouldn't see on a printed page (nav, editor toolbar,
+   add/remove-row buttons). Each editor route also sets its own @page size. */
+/* The FA017 DATE cell packs day/month/year into a very narrow column.
+   Native number-input spin arrows and the select's dropdown arrow each eat
+   several px of that already-tight width, clipping the digits behind them.
+   Hiding them frees the full box for the digits without touching any
+   element's box size (so table grid lines/column widths stay untouched). */
+.no-spin::-webkit-inner-spin-button,
+.no-spin::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spin {
+  -moz-appearance: textfield;
+}
+
+.no-arrow {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  figure,
+  table {
+    break-inside: avoid;
+  }
+
+  *,
+  *::before,
+  *::after {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* page-shell (PageShell.tsx) has 24px padding all around on screen — the
+     gray backdrop's inset from the .paper sheet. .paper is already sized to
+     the full physical A4 page (PAPER_WIDTH_FA017/FA018), so that padding
+     was pushing it 24px past the page's true left origin, overflowing the
+     right edge by the same 24px on every print/PDF. Dropped for print;
+     .paper's own inner padding still gives the sheet its visible margin. */
+  .page-shell {
+    padding: 0 !important;
+  }
+
+  /* FA017Form/FA018Form's tail (certification text + signature grid) — each
+     page's runtime pagination (lib/pagination.ts) already fits this block
+     within its own budget, so this is a safety net against sub-pixel
+     rounding between screen px and the physical print conversion rather
+     than the normal case. If the print engine's own page break ever still
+     lands here, keep this whole block together on the next page rather
+     than letting it split mid-box. */
+  .keep-together {
+    break-inside: avoid;
+  }
+
+  /* body's own background (app/layout.tsx) is the gray #e7e5e0 backdrop
+     that sits behind the white "paper" sheet on screen — normally browsers
+     don't print element backgrounds at all, but the print-color-adjust:
+     exact rule just above forces every element's background to print
+     exactly as shown, gray backdrop included. Force it back to white here;
+     .paper's own white background (above) already handles the sheet itself. */
+  body {
+    background: #fff !important;
+  }
+}
+
+/* FA017's "DATE :" day/month/year controls (see .no-spin above) keep their
+   boxed, editable look on screen, but the real form just prints a plain
+   "d/m/y" string there — no boxes. Print-only override (screen keeps the
+   inline border/radius from the component) rather than dropping the border
+   everywhere, since it's still a live control while editing on screen. */
+@media print {
+  .date-field {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    appearance: none;
+    -webkit-appearance: none;
+  }
 }

@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Single shared row: default profile values used to prefill new bills.
+// There is no login in this app, so this is one org-wide default, not
+// per-person data. Records snapshot the employee fields at save time
+// (see ExpenseRecord) so editing this later never rewrites history.
+model EmployeeProfile {
+  id         String   @id @default(cuid())
+  name       String   @default("")
+  position   String   @default("")
+  department String   @default("")
+  office     String   @default("")
+  employeeNo String   @default("")
+  updatedAt  DateTime @updatedAt
+}
+
+// Multiple named "reuse" entries, distinct from EmployeeProfile's single
+// org-wide default above — this is for the common case of several different
+// people sharing this same (login-less) app: each can save their own
+// details once under their name via "บันทึกไว้ใช้ซ้ำ" (EntryEmployeeFields),
+// then pick themselves back out of the saved-name list next time instead of
+// retyping or overwriting the one shared default. `name` is the lookup
+// key — saving again under the same name updates that entry in place
+// rather than creating a duplicate.
+model SavedEmployee {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  position   String   @default("")
+  department String   @default("")
+  office     String   @default("")
+  employeeNo String   @default("")
+  updatedAt  DateTime @updatedAt
+}
+
+// Reusable expense-item-row templates — same "save under a key, pick it back
+// out next time" idea as SavedEmployee above, but for a single row of an
+// expense claim (e.g. a recurring "ค่าน้ำมันประจำเดือน" line) instead of
+// employee info. `desc` (the รายการ / Description of Expenses text) is the
+// lookup key, exactly like SavedEmployee.name — saving again under the same
+// desc updates that entry in place. `type` scopes entries to FA017 or
+// FA018, since the two forms' item shapes differ (see lib/types.ts's
+// FA017Item/FA018Item). `data` holds every other field except `date` (a
+// saved row is a reusable template, not tied to a specific transaction
+// date) and `desc` itself (already its own column).
+model SavedItem {
+  id        String   @id @default(cuid())
+  type      String // "FA017" | "FA018"
+  desc      String
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, desc])
+  @@index([type])
+}
+
+model ExpenseRecord {
+  id                 String   @id @default(cuid())
+  type               String // "FA017" | "FA018"
+  day                Int      @default(1) // day-of-month for the F-FA-017 "DATE :" field (unused by FA018)
+  monthName          String
+  monthYear          Int
+  employeeName       String   @default("")
+  employeePosition   String   @default("")
+  employeeDepartment String   @default("")
+  employeeOffice     String   @default("")
+  employeeNo         String   @default("")
+  remark             String   @default("")
+  items              Json // line items; shape differs by type (see lib/types.ts)
+  total              Decimal  @db.Decimal(12, 2)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([updatedAt])
+}
