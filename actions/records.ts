@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { fa017Totals, fa018Total } from "@/lib/totals";
+import { getCurrentUser } from "@/lib/session";
 import type {
   Draft,
   DraftItem,
@@ -27,12 +28,23 @@ function serialize(row: PrismaExpenseRecord): ExpenseRecordData {
     employeeDepartment: row.employeeDepartment,
     employeeOffice: row.employeeOffice,
     employeeNo: row.employeeNo,
+    employeeProjectCC: row.employeeProjectCC,
     remark: row.remark,
     items: row.items as unknown as DraftItem[],
     total: row.total.toString(),
+    createdByName: row.createdByName,
+    updatedByName: row.updatedByName,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
+}
+
+// "" if nobody's logged in — shouldn't happen in production (proxy.ts
+// gates every route behind a session first) but dev skips auth entirely
+// (see proxy.ts), so these actions still need to work with no session.
+async function currentActorName(): Promise<string> {
+  const user = await getCurrentUser();
+  return user?.displayName ?? "";
 }
 
 function computeTotal(draft: Draft): number {
@@ -56,9 +68,24 @@ export async function getRecord(
 }
 
 // Mirrors Component.saveDraft: creates a new record, or updates in place
-// when the draft carries an existing id.
-export async function saveRecord(draft: Draft): Promise<ExpenseRecordData> {
+// when the draft carries an existing id — but unlike the original design
+// (a single-user localStorage app with nothing to race against), this app
+// can have several people editing the same saved record at once (no
+// login, shared office access — see proxy.ts). A plain `update` would let
+// whoever saves second silently wipe out whoever saved first's changes.
+// Guard against that with optimistic locking: draft.updatedAt is whatever
+// this draft was loaded with, and the update only applies if the row's
+// updatedAt still matches — i.e. nobody else saved it in between. Returns
+// a discriminated result rather than throwing on conflict, since this is
+// an expected, common condition to report to the user, not an exceptional
+// one to blow up the request over.
+export async function saveRecord(
+  draft: Draft
+): Promise<
+  { ok: true; record: ExpenseRecordData } | { ok: false; reason: "conflict" }
+> {
   const total = computeTotal(draft);
+  const actorName = await currentActorName();
   const data = {
     type: draft.type,
     day: draft.day,
@@ -69,17 +96,42 @@ export async function saveRecord(draft: Draft): Promise<ExpenseRecordData> {
     employeeDepartment: draft.employee.department,
     employeeOffice: draft.employee.office,
     employeeNo: draft.employee.employeeNo,
+    employeeProjectCC: draft.employee.projectCC,
     remark: draft.remark,
     items: draft.items as object[],
     total,
+    updatedByName: actorName,
   };
 
-  const row = draft.id
-    ? await prisma.expenseRecord.update({ where: { id: draft.id }, data })
-    : await prisma.expenseRecord.create({ data });
+  if (!draft.id) {
+    const row = await prisma.expenseRecord.create({
+      data: { ...data, createdByName: actorName },
+    });
+    revalidatePath("/");
+    return { ok: true, record: serialize(row) };
+  }
 
+  // updateMany (not update) because Prisma's `update` only accepts unique
+  // fields in `where`, and updatedAt isn't one — updateMany accepts
+  // arbitrary filters and reports how many rows it touched, which is the
+  // compare-and-swap signal needed here. count === 0 covers both "someone
+  // else already saved a change" and "someone deleted it" — both are
+  // reported as the same conflict, since either way this draft's base
+  // state is stale and the right next step for the user is the same
+  // (reload before editing further).
+  const result = await prisma.expenseRecord.updateMany({
+    where: { id: draft.id, updatedAt: new Date(draft.updatedAt!) },
+    data,
+  });
+  if (result.count === 0) {
+    return { ok: false, reason: "conflict" };
+  }
+
+  const row = await prisma.expenseRecord.findUniqueOrThrow({
+    where: { id: draft.id },
+  });
   revalidatePath("/");
-  return serialize(row);
+  return { ok: true, record: serialize(row) };
 }
 
 export async function deleteRecord(id: string): Promise<void> {
@@ -93,6 +145,9 @@ export async function duplicateRecord(id: string): Promise<ExpenseRecordData> {
   const source = await prisma.expenseRecord.findUniqueOrThrow({
     where: { id },
   });
+  // The duplicate is a new record authored by whoever clicked "ทำซ้ำ" now,
+  // not a copy of the source's original createdByName/updatedByName.
+  const actorName = await currentActorName();
   const row = await prisma.expenseRecord.create({
     data: {
       type: source.type,
@@ -104,9 +159,12 @@ export async function duplicateRecord(id: string): Promise<ExpenseRecordData> {
       employeeDepartment: source.employeeDepartment,
       employeeOffice: source.employeeOffice,
       employeeNo: source.employeeNo,
+      employeeProjectCC: source.employeeProjectCC,
       remark: source.remark,
       items: source.items as object[],
       total: source.total,
+      createdByName: actorName,
+      updatedByName: actorName,
     },
   });
   revalidatePath("/");

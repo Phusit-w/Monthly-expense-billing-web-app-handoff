@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 // Small collapsed-by-default "manage saved entries" panel — a delete
 // affordance for whichever list is passed in (saved expense-item rows via
@@ -25,13 +26,14 @@ export default function SavedListManager({
 }) {
   const [open, setOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<{ id: string; text: string } | null>(null);
 
   if (items.length === 0) return null;
 
-  async function handleDelete(id: string, text: string) {
-    if (typeof window !== "undefined" && !window.confirm(`ลบ "${text}" ที่บันทึกไว้ใช่หรือไม่?`)) {
-      return;
-    }
+  async function confirmDelete() {
+    if (!confirming) return;
+    const { id } = confirming;
+    setConfirming(null);
     setDeletingId(id);
     await onDelete(id);
     setDeletingId(null);
@@ -86,7 +88,7 @@ export default function SavedListManager({
               <button
                 type="button"
                 className="btn-danger"
-                onClick={() => handleDelete(it.id, it.text)}
+                onClick={() => setConfirming({ id: it.id, text: it.text })}
                 disabled={deletingId === it.id}
                 style={{
                   flexShrink: 0,
@@ -107,6 +109,16 @@ export default function SavedListManager({
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={confirming !== null}
+        title={`ลบ${label}`}
+        message={confirming ? `ลบ "${confirming.text}" ที่บันทึกไว้ใช่หรือไม่?` : ""}
+        confirmLabel="ลบ"
+        danger
+        busy={deletingId !== null}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirming(null)}
+      />
     </div>
   );
 }

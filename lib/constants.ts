@@ -35,18 +35,31 @@ export const TABLE_FONT_SIZE = 11;
 export const PAPER_WIDTH_FA018 = "794px";
 export const PAPER_WIDTH_FA017 = "1123px";
 
+// The roomy entry forms (EntryFormFA017.tsx/EntryFormFA018.tsx) start a
+// fresh draft with this many blank rows on screen — kept short since
+// on-screen data entry just needs enough room to start typing, not a full
+// page. Not tied to FA017Form/FA018Form's print pagination (lib/pagination.ts)
+// — that packs as many rows as physically fit per printed page (see
+// PAGE_HEIGHT_BUDGET_FA017/018 below). When the entry form hands its Draft
+// off to BillEditor (handleCreate in both EntryForm components), items are
+// padded back up to DEFAULT_ROWS_FA017/018 via padItems() so the printed
+// form still starts with a full page's worth of blank lines, matching the
+// real F-FA-017/018 PDF forms, no matter how few rows PAGE_ROWS gave the
+// entry screen.
+export const PAGE_ROWS = 5;
+
 // "+ เพิ่มแถว" has no row-count cap — FA017Form/FA018Form's runtime
 // pagination (lib/pagination.ts) instead measures each page's actual
 // rendered height against these budgets (@page margin is 0 — see
 // BillEditor.tsx — so the full page height is available: 210mm for FA017's
 // landscape orientation, 297mm for FA018's portrait one) and automatically
-// continues onto additional A4 sheets once a page overflows, rather than
-// blocking further rows at a fixed count. Historical measurement that
-// originally calibrated a (since-removed) row cap, kept as a reference
-// point for these budgets: in Chrome, adding empty rows one at a time and
-// reading .paper's rendered height (1mm = 96/25.4px) — FA017's .paper hit
-// 790.09px at 12 rows / 814.09px at 13, FA018's hit 1109.78px at 30 rows /
-// 1132.78px at 31.
+// continues onto additional A4 sheets once a page overflows, packing as
+// many rows as actually fit per page rather than a fixed count. Historical
+// measurement that originally calibrated a (since-removed) row cap, kept
+// as a reference point for these budgets: in Chrome, adding empty rows one
+// at a time and reading .paper's rendered height (1mm = 96/25.4px) —
+// FA017's .paper hit 790.09px at 12 rows / 814.09px at 13, FA018's hit
+// 1109.78px at 30 rows / 1132.78px at 31.
 export const PAGE_HEIGHT_BUDGET_FA017 = 793.7; // 210mm landscape
 export const PAGE_HEIGHT_BUDGET_FA018 = 1122.52; // 297mm portrait
 

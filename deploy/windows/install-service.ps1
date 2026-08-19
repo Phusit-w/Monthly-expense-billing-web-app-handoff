@@ -13,18 +13,17 @@
   Full Postgres connection string for the production database, e.g.
   postgresql://expense_billing:REAL_PASSWORD@localhost:5432/expense_billing
 
-.PARAMETER AuthUsername
-  Shared HTTP Basic Auth username (proxy.ts) — this app has no per-user
-  login, so one username/password pair gates the whole site. Put a reverse
-  proxy with HTTPS in front of this service too (e.g. IIS with a
-  certificate) — Basic Auth is unencrypted on its own.
-
-.PARAMETER AuthPassword
-  Shared HTTP Basic Auth password (proxy.ts).
+.PARAMETER SessionSecret
+  Signs per-user login session cookies (proxy.ts, lib/auth.ts) — every
+  person gets their own username/password account instead of one shared
+  pair (see docs/DEPLOY-WINDOWS.md's "การเพิ่มผู้ใช้" section for how to
+  create accounts). Just needs to be a long random value unique to this
+  deployment; changing it logs everyone out. Put a reverse proxy with HTTPS
+  in front of this service too (e.g. IIS with a certificate).
 
 .EXAMPLE
   # Run from the project root:
-  .\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "a-real-password"
+  .\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -SessionSecret "a-long-random-value"
 #>
 
 param(
@@ -32,10 +31,7 @@ param(
     [string]$DatabaseUrl,
 
     [Parameter(Mandatory = $true)]
-    [string]$AuthUsername,
-
-    [Parameter(Mandatory = $true)]
-    [string]$AuthPassword,
+    [string]$SessionSecret,
 
     [string]$ServiceName = "ExpenseBillingApp",
     [int]$Port = 3000,
@@ -79,7 +75,7 @@ Write-Host "Installing service '$ServiceName'..."
 & $NssmPath set $ServiceName AppRotateFiles 1
 & $NssmPath set $ServiceName AppRotateBytes 10485760
 
-$envBlock = "PORT=$Port`nHOSTNAME=0.0.0.0`nNODE_ENV=production`nDATABASE_URL=$DatabaseUrl`nAUTH_USERNAME=$AuthUsername`nAUTH_PASSWORD=$AuthPassword"
+$envBlock = "PORT=$Port`nHOSTNAME=0.0.0.0`nNODE_ENV=production`nDATABASE_URL=$DatabaseUrl`nSESSION_SECRET=$SessionSecret"
 & $NssmPath set $ServiceName AppEnvironmentExtra $envBlock
 
 Write-Host "Starting service..."

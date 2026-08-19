@@ -24,8 +24,13 @@
 
 ### สิ่งที่ต้องมีบนเซิร์ฟเวอร์
 
-- [Node.js LTS](https://nodejs.org/) (เวอร์ชันเดียวกับที่ใช้ dev หรือใหม่กว่า)
-- [PostgreSQL for Windows](https://www.postgresql.org/download/windows/) — ตัวติดตั้งของ EDB จะลงเป็น Windows Service ให้อัตโนมัติ (ขั้นตอนนี้ต้อง admin เสมอไม่ว่าจะเลือกวิธี A หรือ B ในการรันตัวแอปเอง — ปกติ IT เป็นคนติดตั้ง PostgreSQL ให้ครั้งเดียว)
+**สเปกเครื่อง (ขอจาก IT):** CPU 8 core / RAM 16 GB / Storage 1 TB — เกินความต้องการจริงของแอปนี้มาก (ขั้นต่ำจริงๆ ประมาณ 2-4 core / 8GB / 40-50GB ก็พอ) แต่ขอเผื่อไว้เพราะเป็น Fixed partition ขอเพิ่มทีหลังยาก
+
+**Service ที่ต้องติดตั้ง (2 ตัว — ไม่มีอย่างอื่นแล้ว):**
+- [Node.js **24.x (LTS)**](https://nodejs.org/) — เวอร์ชันอื่นอาจใช้ไม่ได้: Next.js 16 ต้องการ >= 20.9.0, Prisma 7 ต้องการเฉพาะช่วง 20.19+/22.12+/24.0+ เท่านั้น (21.x, 23.x ใช้ไม่ได้)
+- [PostgreSQL **16.x** for Windows](https://www.postgresql.org/download/windows/) — ตัวติดตั้งของ EDB จะลงเป็น Windows Service ให้อัตโนมัติ (ขั้นตอนนี้ต้อง admin เสมอไม่ว่าจะเลือกวิธี A หรือ B ในการรันตัวแอปเอง — ปกติ IT เป็นคนติดตั้ง PostgreSQL ให้ครั้งเดียว)
+
+Prisma/Next.js/ไลบรารีอื่นๆ ของแอป **ไม่ต้องติดตั้งแยก** — มากับไฟล์ที่ build เสร็จแล้วในตัวแอปเองทั้งหมด (ดู `FAQ.md`)
 
 ### 1. เตรียมฐานข้อมูล
 
@@ -51,10 +56,10 @@ npm ci
 
 ```powershell
 Copy-Item .env.production.example .env
-notepad .env   # แก้ DATABASE_URL ให้เป็นรหัสผ่านจริงจากขั้นตอนที่ 1, และตั้ง AUTH_USERNAME/AUTH_PASSWORD (รหัสเดียวใช้ร่วมกันทั้งออฟฟิศ, HTTP Basic Auth — ดูคอมเมนต์ใน proxy.ts)
+notepad .env   # แก้ DATABASE_URL ให้เป็นรหัสผ่านจริงจากขั้นตอนที่ 1, และตั้ง SESSION_SECRET (คีย์เซ็น session cookie ของระบบ login รายคน — ดูคอมเมนต์ใน proxy.ts/lib/auth.ts, สร้างค่าด้วย: node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
 ```
 
-`deploy\windows\run-loop.ps1` อ่าน `AUTH_USERNAME`/`AUTH_PASSWORD` จากไฟล์นี้ให้อัตโนมัติถ้าไม่ได้ใส่ `-AuthUsername`/`-AuthPassword` ตอนรัน — แต่ไม่ตั้งไว้เลยสักทาง แอปจะปฏิเสธทุก request ตอนรันจริง (fail closed ไม่ใช่เปิดให้เข้าได้ฟรีๆ)
+`deploy\windows\run-loop.ps1` อ่าน `SESSION_SECRET` จากไฟล์นี้ให้อัตโนมัติถ้าไม่ได้ใส่ `-SessionSecret` ตอนรัน — แต่ไม่ตั้งไว้เลย แอปจะปฏิเสธทุก request ตอนรันจริง (fail closed ไม่ใช่เปิดให้เข้าได้ฟรีๆ) บัญชีผู้ใช้แต่ละคนตั้งแยกต่างหาก (ดูหัวข้อ "การเพิ่มผู้ใช้" ท้ายเอกสารนี้)
 
 ### 5. รัน migration
 
@@ -89,17 +94,17 @@ npm run build
 รันแบบ foreground ก่อนเพื่อทดสอบ (Ctrl+C เพื่อหยุด):
 
 ```powershell
-.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
-หรือถ้าตั้ง `DATABASE_URL`/`AUTH_USERNAME`/`AUTH_PASSWORD` ไว้ใน `.env` แล้ว (ขั้นตอนที่ 4) ไม่ต้องใส่พารามิเตอร์พวกนี้ก็ได้ สคริปต์จะอ่านจากไฟล์นั้นให้เอง
+หรือถ้าตั้ง `DATABASE_URL`/`SESSION_SECRET` ไว้ใน `.env` แล้ว (ขั้นตอนที่ 4) ไม่ต้องใส่พารามิเตอร์พวกนี้ก็ได้ สคริปต์จะอ่านจากไฟล์นั้นให้เอง
 
 ตรวจว่าเปิดได้จริงที่ `http://localhost:3000` แล้วค่อยกด Ctrl+C ปิด
 
 ### 9A. ตั้งให้ auto-start ตอน login
 
 ```powershell
-.\deploy\windows\install-startup-shortcut.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\install-startup-shortcut.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
 สร้าง shortcut ในโฟลเดอร์ Startup ของ user ปัจจุบัน (`shell:startup`) ที่จะรัน `run-loop.ps1` แบบซ่อนหน้าต่างทุกครั้งที่ user นี้ login
@@ -109,7 +114,7 @@ npm run build
 ### 10A. เริ่มทำงานทันทีโดยไม่ต้อง login ใหม่
 
 ```powershell
-.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
 รันค้างไว้ใน background (เช่นเปิด PowerShell window แยกทิ้งไว้ หรือใช้ `Start-Process powershell -ArgumentList ...` เพื่อไม่ให้ค้าง terminal ปัจจุบัน)
@@ -131,7 +136,7 @@ npm ci
 npx prisma migrate deploy
 npm run build
 .\deploy\windows\stage-standalone.ps1
-.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
 ---
@@ -145,7 +150,7 @@ npm run build
 ### 8B. ติดตั้งเป็น Windows Service
 
 ```powershell
-.\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
 สคริปต์จะ:
@@ -169,7 +174,7 @@ npm ci
 npx prisma migrate deploy
 npm run build
 .\deploy\windows\stage-standalone.ps1
-.\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "รหัสผ่านจริง"
+.\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
 ```
 
 `install-service.ps1` รันซ้ำได้อย่างปลอดภัย — จะ stop/remove service เดิมแล้วติดตั้งใหม่ทับให้เอง
@@ -193,11 +198,29 @@ New-NetFirewallRule -DisplayName "Expense Billing App" -Direction Inbound -Proto
 
 เปิด `http://<ip-เครื่องนี้>:3000` จากเครื่องอื่นในวง intranet
 
-## การยืนยันตัวตน (Basic Auth)
+## การยืนยันตัวตน (login รายคน)
 
-ระบบนี้ไม่มีระบบ login รายบุคคล ใช้รหัสผ่านเดียวร่วมกันทั้งออฟฟิศแทน (HTTP Basic Auth, ทำงานใน `proxy.ts`) เบราว์เซอร์จะเด้งกล่องใส่ username/password ก่อนเข้าเว็บได้ — ตั้งค่าที่ `AUTH_USERNAME`/`AUTH_PASSWORD` ในไฟล์ `.env` (ขั้นตอนที่ 4) หรือใส่ผ่าน `-AuthUsername`/`-AuthPassword` ตอนรันสคริปต์ก็ได้ ไม่ตั้งไว้เลยสักทาง แอปจะปฏิเสธทุก request (fail closed)
+ทุกคนมีบัญชีของตัวเอง (username/password แยกคน) — ยังไม่มีระดับสิทธิ์ต่างกัน แต่ระบบบันทึกไว้ว่าบิลแต่ละใบสร้าง/แก้ไขล่าสุดโดยใคร เข้าเว็บครั้งแรกจะเด้งไปหน้า `/login` — ตั้งค่าคีย์เซ็น session cookie ที่ `SESSION_SECRET` ในไฟล์ `.env` (ขั้นตอนที่ 4) หรือใส่ผ่าน `-SessionSecret` ตอนรันสคริปต์ก็ได้ ไม่ตั้งไว้เลยสักทาง แอปจะปฏิเสธทุก request (fail closed)
 
 `proxy.ts` ยังจำกัดจำนวน request ต่อ IP ด้วย (กัน brute-force รหัสผ่าน/สคริปต์ยิงรัวๆ) เกินแล้วตอบ `429` ชั่วคราว
+
+## การเพิ่มผู้ใช้
+
+ไม่มีหน้าสมัครสมาชิกเอง — เพิ่ม/แก้/ลบบัญชีผ่าน Prisma Studio โดยตรง (รันจากเซิร์ฟเวอร์ หรือเครื่องไหนก็ได้ที่ตั้ง `DATABASE_URL` ชี้มาที่ฐานข้อมูล production นี้ได้):
+
+```powershell
+# 1. สร้างค่า passwordHash จากรหัสผ่านที่ต้องการ
+node -e "const c=require('crypto');const s=c.randomBytes(16);const h=c.pbkdf2Sync(process.argv[1],s,100000,32,'sha256');console.log('100000$'+s.toString('base64')+'$'+h.toString('base64'))" "รหัสผ่านที่ต้องการ"
+
+# 2. เปิด Prisma Studio
+npx prisma studio
+```
+
+เปิดตาราง `User` → เพิ่มแถวใหม่ → กรอก `username`, `displayName` (ชื่อที่จะโชว์เป็น "สร้างโดย/แก้ไขล่าสุดโดย"), วางค่า `passwordHash` จากขั้นตอนที่ 1 → บันทึก แล้วบอก username + รหัสผ่าน (ไม่ใช่ hash) ให้เจ้าของบัญชีไปกรอกที่หน้า `/login`
+
+**ห้ามแตะช่อง `id`** ปล่อยว่างไว้ให้ Prisma Studio สร้างให้อัตโนมัติ — ถ้าเผลอลบ/เคลียร์จน `id` กลายเป็นค่าว่าง บัญชีนั้นจะ login ได้ปกติ (ไม่ error) แต่ระบบจะปฏิเสธ session เงียบๆ ทุกครั้ง ทำให้ "สร้างโดย/แก้ไขล่าสุดโดย" ไม่ขึ้นชื่อสักที ทั้งที่ login สำเร็จ
+
+ลืมรหัสผ่าน/ต้องการปิดสิทธิ์ใครคนหนึ่ง → ทำซ้ำขั้นตอนที่ 1 แล้วแก้ `passwordHash` ของแถวนั้น หรือลบแถวทิ้งเลย ไม่กระทบบัญชีคนอื่น
 
 ## สำรองข้อมูล (backup)
 
@@ -227,7 +250,7 @@ psql -U expense_billing -h localhost expense_billing -f backup-YYYYMMDD.sql
 
 ## หมายเหตุ
 
-- ไม่มีระบบ login แยกรายบุคคล ใช้รหัสผ่านเดียวร่วมกันทั้งออฟฟิศแทน (ดูหัวข้อ "การยืนยันตัวตน" ด้านบน) — ใครก็ตามที่รู้รหัสผ่านนี้และเข้าถึงเครือข่ายได้จะกรอก/แก้ไข/ลบข้อมูลได้ทั้งหมดเหมือนกันหมด ไม่มีการแยกสิทธิ์/audit log ควรจำกัดการเข้าถึงระดับเครือข่ายเพิ่มด้วย (intranet only, firewall) เป็นชั้นป้องกันที่สอง
+- มี login รายคนแล้ว (ดูหัวข้อ "การยืนยันตัวตน"/"การเพิ่มผู้ใช้" ด้านบน) แต่ยังไม่มีระดับสิทธิ์ต่างกัน — บัญชีไหนที่ล็อกอินได้ก็กรอก/แก้ไข/ลบข้อมูลได้ทั้งหมดเหมือนกันหมด (แยกได้แค่ "ใครทำ" ผ่าน `createdByName`/`updatedByName` ไม่ใช่ "ใครทำอะไรได้บ้าง") ควรจำกัดการเข้าถึงระดับเครือข่ายเพิ่มด้วย (intranet only, firewall) เป็นชั้นป้องกันที่สอง
 - การเซ็นอนุมัติยังคงเป็นการเซ็นบนกระดาษหลังพิมพ์ออกมา
-- **ยังไม่มี HTTPS ให้อัตโนมัติในวิธี native นี้** (ต่างจาก `DEPLOY.md`/Docker ที่มี Caddy ทำให้) — Basic Auth ที่เพิ่งตั้งไว้ส่งรหัสผ่านแบบไม่เข้ารหัส (base64) ถ้าไม่มี HTTPS คั่นกลาง ใครดักแพ็กเก็ตในเครือข่ายได้ก็เห็นรหัสผ่านตรงๆ — ต้องตั้ง reverse proxy เอง (IIS + URL Rewrite/ARR + certificate, หรือ nginx for Windows) ชี้มาที่พอร์ต 3000 — ไม่รวมอยู่ในสคริปต์นี้เพราะแล้วแต่ setup ขององค์กร
+- **ยังไม่มี HTTPS ให้อัตโนมัติในวิธี native นี้** (ต่างจาก `DEPLOY.md`/Docker ที่มี Caddy ทำให้) — session cookie ที่เพิ่งตั้งไว้ส่งผ่านเครือข่ายแบบไม่เข้ารหัสถ้าไม่มี HTTPS คั่นกลาง ใครดักแพ็กเก็ตในเครือข่ายได้ก็เห็น cookie แล้วสวมสิทธิ์ล็อกอินแทนได้ — ต้องตั้ง reverse proxy เอง (IIS + URL Rewrite/ARR + certificate, หรือ nginx for Windows) ชี้มาที่พอร์ต 3000 — ไม่รวมอยู่ในสคริปต์นี้เพราะแล้วแต่ setup ขององค์กร
 - ทั้งวิธี A และ B ทดสอบแล้วจริงว่า build → stage → รันเซิร์ฟเวอร์ → auto-restart เมื่อ process ถูกฆ่า ทำงานถูกต้อง รวมถึงการย้ายสคริปต์ทั้งหมดเข้า `deploy\windows\` ก็ทดสอบ path resolution จริงแล้ว (`stage-standalone.ps1`, `install-service.ps1` ผ่านจนถึงจุดที่ควรจะผ่าน — ล้มเหลวที่ nssm.exe หายไปตามที่คาดไว้, `stop-run-loop.ps1` เจอ/ลบ pid file ที่ตำแหน่งถูกต้อง) ส่วนการติดตั้ง shortcut ใน Startup folder จริง (วิธี A ขั้นตอน 9A) และการสร้าง Windows Service จริงผ่าน NSSM (วิธี B) ยังไม่ได้ทดสอบบนเครื่อง/เซิร์ฟเวอร์เป้าหมายจริง เพราะสภาพแวดล้อมที่พัฒนาไม่มีสิทธิ์ admin และไม่ควรทิ้ง auto-start ถาวรไว้บนเครื่อง dev

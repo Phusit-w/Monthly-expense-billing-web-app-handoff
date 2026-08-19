@@ -1,24 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
 
-// This app has no per-user login by design (see actions/profile.ts's
-// comment: it's a single shared intranet tool, not a multi-user system) —
-// instead, one shared username/password pair (AUTH_USERNAME / AUTH_PASSWORD,
-// set in .env) gates every route via plain HTTP Basic Auth. This is meant
-// to run behind HTTPS (see docker-compose.yml's caddy service): Basic Auth
-// sends credentials as unencrypted base64, so without TLS in front of this,
-// the password is exposed to anyone who can see the network traffic.
+// Per-user login (see actions/auth.ts, lib/auth.ts, lib/session.ts,
+// app/login/page.tsx): every request needs a valid signed session cookie or
+// it's redirected to /login. Replaces the single shared HTTP Basic Auth
+// pair (AUTH_USERNAME/AUTH_PASSWORD) this app used to gate every route
+// with — see docs/PROJECT-OVERVIEW.md for why that changed. There are still
+// no permission levels: any logged-in account can do everything, exactly
+// like the old shared password could; this only makes it possible to tell
+// who did what (ExpenseRecord.createdByName/updatedByName) and to revoke
+// one person's access without changing everyone else's.
 //
 // Named/filed as `proxy.ts` (not `middleware.ts`) — this Next.js version
 // (16) renamed the convention; see node_modules/next/dist/docs/01-app/
 // 03-api-reference/03-file-conventions/proxy.md. The exported function
-// must be named `proxy`, not `middleware`.
-const REALM = "expense-billing-app";
+// must be named `proxy`, not `middleware`. Also as of v16, Proxy defaults
+// to the Node.js runtime (not Edge) — see that same doc's "Runtime"
+// section — which is why lib/auth.ts can use node:crypto directly.
+const LOGIN_PATH = "/login";
 
 // Per-IP rate limit — a plain sliding-ish window counter kept in memory.
-// Checked BEFORE the auth check below so it also throttles someone
-// script-guessing the shared Basic Auth password, not just authenticated
-// abuse. In-memory state is fine for this app's deployment shape (exactly
+// Checked BEFORE the session check below so it also throttles someone
+// script-guessing a password against /login, not just authenticated abuse.
+// In-memory state is fine for this app's deployment shape (exactly
 // one `app` replica — see docker-compose.yml, there's no load balancer
 // splitting traffic across multiple instances to keep this in sync with);
 // it would need moving to something shared (e.g. Redis) if that ever
@@ -65,41 +70,49 @@ export function proxy(request: NextRequest) {
     });
   }
 
-  const username = process.env.AUTH_USERNAME;
-  const password = process.env.AUTH_PASSWORD;
-
-  if (!username || !password) {
+  if (!process.env.SESSION_SECRET) {
     // Misconfigured production deploy — fail loud and closed (refuse every
     // request with a clear message) rather than silently letting the app
-    // run wide open because someone forgot to set these two variables.
+    // run wide open because someone forgot to set this.
     return new NextResponse(
-      "Server misconfigured: AUTH_USERNAME / AUTH_PASSWORD are not set. Refusing all requests until they are configured — see DEPLOY.md.",
+      "Server misconfigured: SESSION_SECRET is not set. Refusing all requests until it is configured — see DEPLOY.md.",
       { status: 500 }
     );
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.startsWith("Basic ")) {
-    const decoded = atob(authHeader.slice("Basic ".length));
-    const sep = decoded.indexOf(":");
-    const user = sep === -1 ? decoded : decoded.slice(0, sep);
-    const pass = sep === -1 ? "" : decoded.slice(sep + 1);
-    if (user === username && pass === password) {
-      return NextResponse.next();
-    }
+  // Always reachable without a session — otherwise nobody could ever log
+  // in (redirecting here would just redirect right back).
+  if (request.nextUrl.pathname === LOGIN_PATH) {
+    return NextResponse.next();
   }
 
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": `Basic realm="${REALM}", charset="UTF-8"` },
-  });
+  const session = verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
+  if (session) {
+    return NextResponse.next();
+  }
+
+  const loginUrl = new URL(LOGIN_PATH, request.url);
+  loginUrl.searchParams.set("next", request.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
   matcher: [
     // Everything except Next's own static-asset routes — those carry no
-    // real data, and skipping them avoids an extra 401 round-trip per
-    // JS/CSS chunk before the browser's cached credential kicks in.
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // real data, and skipping them avoids an extra redirect round-trip per
+    // JS/CSS chunk before the session cookie kicks in.
+    // icn-logo.png (public/) is excluded for a different reason: next/image
+    // (Header.tsx, FA017Form.tsx, FA018Form.tsx) optimizes it via an
+    // internal server-to-server fetch back to this same app — that fetch
+    // carries no session cookie, so in production it was hitting this
+    // middleware, getting redirected instead of image bytes, and every
+    // logo on the site silently failed to render ("The requested resource
+    // isn't a valid image"). Only a problem in production — dev skips
+    // auth entirely, which is why this wasn't caught until real auth was
+    // turned on. If more files are ever added to public/, add them here
+    // too rather than widening this to a whole extension pattern —
+    // public/ is meant for genuinely public assets, so naming them
+    // explicitly keeps that assumption visible rather than silent.
+    "/((?!_next/static|_next/image|favicon.ico|icn-logo\\.png).*)",
   ],
 };

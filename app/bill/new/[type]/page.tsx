@@ -30,6 +30,7 @@ export default async function NewBillPage({
 
   const draft: Draft = {
     id: null,
+    updatedAt: null,
     type: recordType,
     day: now.getDate(),
     monthName: String(now.getMonth() + 1),

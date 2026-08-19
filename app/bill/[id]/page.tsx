@@ -19,6 +19,7 @@ export default async function EditBillPage({
 
   const draft: Draft = {
     id: record.id,
+    updatedAt: record.updatedAt,
     type: record.type,
     day: record.day,
     monthName: record.monthName,
@@ -29,10 +30,18 @@ export default async function EditBillPage({
       department: record.employeeDepartment,
       office: record.employeeOffice,
       employeeNo: record.employeeNo,
+      projectCC: record.employeeProjectCC,
     },
     remark: record.remark,
     items: record.items,
   };
 
-  return <BillEditor initialDraft={draft} savedItems={savedItems} />;
+  return (
+    <BillEditor
+      initialDraft={draft}
+      savedItems={savedItems}
+      createdByName={record.createdByName}
+      updatedByName={record.updatedByName}
+    />
+  );
 }

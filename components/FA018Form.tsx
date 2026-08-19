@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 import { PAGE_HEIGHT_BUDGET_FA018, PAPER_PADDING_FA018, PAPER_WIDTH_FA018 } from "@/lib/constants";
 import { fmt, joinDMY, splitDMY } from "@/lib/format";
-import { computePageBreaks, pageBreaksEqual } from "@/lib/pagination";
+import { computeFillerCounts, computePageBreaks, ensureLastPageHasContent, fillerCountsEqual, pageBreaksEqual } from "@/lib/pagination";
 import { fa018Total } from "@/lib/totals";
+import { isFA018ItemEmpty } from "@/lib/types";
 import type { Draft, EmployeeSnapshot, FA018Item, ItemField, SavedItemEntry } from "@/lib/types";
 import { useSavedItems } from "@/lib/useSavedItems";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import SavedListManager from "@/components/SavedListManager";
 
 const cellInput: React.CSSProperties = {
@@ -33,6 +35,11 @@ interface FA018FormProps {
   setEmpField: (field: keyof EmployeeSnapshot, value: string) => void;
   updateItem: (i: number, field: ItemField, value: string) => void;
   savedItems: SavedItemEntry[];
+  // Appends a real blank item to draft.items — same action as
+  // EditorToolbar's "+ เพิ่มแถว" button, reused here so focusing a blank
+  // filler row (see the filler-row block in renderPage below) promotes it
+  // into a real, editable row instead of leaving the click dead.
+  addRow: () => void;
 }
 
 // Screen-only "save this row" icon — see the desc <td>'s comment below for
@@ -77,20 +84,24 @@ const pickerSelect: React.CSSProperties = {
 //
 // Pagination: no cap on how many rows "+ เพิ่มแถว" can add — every render
 // checks the actual rendered page height against PAGE_HEIGHT_BUDGET_FA018
-// (lib/constants.ts) and, when it's over, falls back to splitting rows
-// across multiple ".paper" sheets (see lib/pagination.ts). รายการ is a
-// plain <input> (no wrap/grow, unlike FA017's Description textarea), so a
-// row's height is fixed — content wrapping isn't what triggers a split
-// here, adding enough rows is. Every sheet — not just the last — repeats
-// the full header AND the full tail (รวม row + certification/signature):
-// each physical page is meant to stand on its own as a complete,
-// independently signable copy of the form, so a page's "รวม" reflects only
-// that page's own rows, not the grand total across every page.
+// and, when it's over, falls back to splitting rows across multiple
+// ".paper" sheets, packing as many as actually fit per page (see
+// lib/pagination.ts) — not a fixed count. รายการ is a plain <input> (no
+// wrap/grow, unlike FA017's Description textarea), so a row's height is
+// fixed — content wrapping isn't what triggers a split here, adding enough
+// rows is. Every page repeats the full header, but only the LAST page
+// carries the รวม row: earlier pages end right after their own rows, and
+// the last page's รวม is the grand total across every page, not just its
+// own — which also means a non-last page can fit slightly more rows than
+// the last one, since it doesn't need to leave room for that block.
+// Certification/signature stays on every page unchanged (see the
+// "keep-together" block below).
 export default function FA018Form({
   draft,
   setEmpField,
   updateItem,
   savedItems,
+  addRow,
 }: FA018FormProps) {
   const items = draft.items as FA018Item[];
   const colTemplate = COL_PCT.map((p) => `${p}%`).join(" ");
@@ -106,12 +117,45 @@ export default function FA018Form({
     remove: removeSavedItem,
   } = useSavedItems("FA018", savedItems);
   const [justSavedRow, setJustSavedRow] = useState<number | null>(null);
+  // Row awaiting "ยืนยันการบันทึก" confirmation before the 💾 icon button
+  // actually calls saveItemRow — see EntryFormFA017.tsx's identical field
+  // for why (saveItemForReuse upserts keyed by รายการ text, so re-saving an
+  // existing one silently overwrites it).
+  const [pendingSaveRow, setPendingSaveRow] = useState<number | null>(null);
+
+  async function confirmSaveRow() {
+    const i = pendingSaveRow;
+    if (i === null) return;
+    setPendingSaveRow(null);
+    await saveItemRow(items[i]);
+    setJustSavedRow(i);
+    setTimeout(() => setJustSavedRow((r) => (r === i ? null : r)), 2000);
+  }
 
   const firstPageRef = useRef<HTMLDivElement>(null);
   const theadRef = useRef<HTMLTableSectionElement>(null);
+  // Only mounted on whichever page is currently last (the รวม row now only
+  // renders there — see renderPage below), unlike theadRef which is pinned
+  // to page 0 since that content is identical on every page.
   const totalsTbodyRef = useRef<HTMLTableSectionElement>(null);
   const rowRefs = useRef<Map<number, HTMLTableRowElement>>(new Map());
+  // Measures one blank filler row's real rendered height — see FA017Form's
+  // identical ref for the full rationale (single measurement covers every
+  // page, since every filler row renders identically).
+  const probeFillerRowRef = useRef<HTMLTableRowElement | null>(null);
+  // Set by a filler row's onFocus (below) to the index the newly-appended
+  // real item will land at — see FA017Form's identical ref for the full
+  // rationale (addRow() replaces the filler <tr> with a real one at a new
+  // DOM node, which otherwise silently drops focus).
+  const pendingFocusIndexRef = useRef<number | null>(null);
   const [pages, setPages] = useState<number[][] | null>(null);
+  // Blank rows appended to each page's own tbody past its real rows — see
+  // FA017Form's identical state for the full rationale (lib/pagination.ts's
+  // top comment has the design reasoning). Only populated in multi-page
+  // mode; the common single-page case stays exactly as it already was.
+  const [fillerCounts, setFillerCounts] = useState<number[] | null>(null);
+  // Also measured, not hardcoded — see probeFillerRowRef above.
+  const [fillerRowHeight, setFillerRowHeight] = useState<number | null>(null);
 
   // pages is only reconciled by the remeasure() effect below, which runs
   // AFTER render — see FA017Form's identical guard for why a stale pages
@@ -120,6 +164,12 @@ export default function FA018Form({
   // fa018Total downstream on an out-of-range absolute index.
   const pagesRowCount = pages?.reduce((sum, page) => sum + page.length, 0) ?? -1;
   const effectivePages = pages !== null && pagesRowCount === items.length ? pages : [items.map((_, i) => i)];
+  // Same staleness guard as effectivePages above, applied to fillerCounts.
+  const effectiveFillerCounts =
+    fillerCounts !== null && fillerCounts.length === effectivePages.length
+      ? fillerCounts
+      : effectivePages.map(() => 0);
+  const probeFillerPageIndex = effectiveFillerCounts.findIndex((c) => c > 0);
 
   // รายการ's font-swap re-measure — identical rationale to FA017Form's copy
   // of this same effect (see there for the full explanation): the desc
@@ -149,45 +199,105 @@ export default function FA018Form({
   }, []);
 
   function remeasure() {
+    // See pendingFocusIndexRef's declaration above and FA017Form's identical
+    // block for the full rationale — in short: the promoted row can remount
+    // twice (once for the stale-pages fallback's transitional "mega page",
+    // once when the real split settles), each time dropping focus to
+    // <body>, so this keeps reclaiming it only while focus is actually
+    // sitting on <body> (never stealing it from something the user
+    // legitimately focused since) until the render is the settled one.
+    if (pendingFocusIndexRef.current !== null) {
+      const settled = pages === null || pagesRowCount === items.length;
+      if (document.activeElement === document.body) {
+        const tr = rowRefs.current.get(pendingFocusIndexRef.current);
+        const ta = tr?.querySelector<HTMLTextAreaElement>("textarea.desc-textarea");
+        ta?.focus();
+      }
+      if (settled) {
+        pendingFocusIndexRef.current = null;
+      }
+    }
     if (effectivePages.length === 1 && firstPageRef.current) {
       const h = firstPageRef.current.getBoundingClientRect().height;
       if (h <= PAGE_HEIGHT_BUDGET_FA018) {
         if (pages !== null) setPages(null);
+        if (fillerCounts !== null) setFillerCounts(null);
         return;
       }
     }
     // Measured as deltas between real rendered edges rather than summing
     // each piece's own height — see FA017Form's identical remeasure() for
-    // why (in short: summing drops .paper's own padding and any collapsed
-    // child margins, which a delta against the owning .paper's real
-    // top/bottom edge accounts for automatically). theadRef/totalsTbodyRef
-    // always live on page 0 (every page repeats the same header and tail
-    // content), so both deltas are read against firstPageRef.
+    // why (in short: summing drops .paper's own padding, which a delta
+    // against the owning .paper's real top/bottom edge accounts for
+    // automatically). theadRef always lives on page 0 (every page repeats
+    // the same header), so its delta is read against firstPageRef.
     const headerHeight = theadRef.current
       ? theadRef.current.getBoundingClientRect().bottom - (firstPageRef.current?.getBoundingClientRect().top ?? 0)
       : 0;
     // Content only (excludes .paper's own bottom padding, already baked
-    // into the paper.bottom - totalsTbody.top delta) — that reserve is
-    // folded into budgetPx below instead, applied once per page uniformly,
-    // and must not be counted twice here.
-    const tailHeight = totalsTbodyRef.current
-      ? (firstPageRef.current?.getBoundingClientRect().bottom ?? 0) - totalsTbodyRef.current.getBoundingClientRect().top - PAPER_PADDING_FA018
+    // into the paper.bottom - itemsTable.bottom delta below) — that reserve
+    // is folded into budgetPx instead, applied once per page uniformly, and
+    // must not be counted twice here. This is the part every page pays
+    // regardless of last/non-last — the รวม row (measured separately below)
+    // is extra, paid only by whichever page is last.
+    //
+    // Measured from the item <table>'s own bottom edge (found via theadRef's
+    // ancestor) rather than from the certification/signature block's wrapper
+    // div — see FA017Form's identical fix for the full rationale: that
+    // wrapper has no border/padding of its own, so its inner content's
+    // marginTop collapses straight through it, silently dropping that margin
+    // from every quantity remeasure() sums and letting one row too many get
+    // packed onto a page before it visibly overflows past A4.
+    const itemsTable = theadRef.current?.closest("table") ?? null;
+    const recurringTailHeight = itemsTable
+      ? (firstPageRef.current?.getBoundingClientRect().bottom ?? 0) - itemsTable.getBoundingClientRect().bottom - PAPER_PADDING_FA018
       : 0;
+    // The รวม row's own height alone (not a delta) — only the last page
+    // pays this, reserved separately per page in computePageBreaks below.
+    const lastPageExtraHeight = totalsTbodyRef.current?.getBoundingClientRect().height ?? 0;
     const rowHeights = items.map((_, i) => rowRefs.current.get(i)?.getBoundingClientRect().height ?? 0);
-    const next = computePageBreaks({
-      headerHeight,
-      tailHeight,
-      rowHeights,
-      // PAPER_PADDING_FA018 reserves every page's own bottom padding (see
-      // tailHeight's comment above); the extra 2px is a small safety
-      // margin for sub-pixel rounding.
-      budgetPx: PAGE_HEIGHT_BUDGET_FA018 - PAPER_PADDING_FA018 - 2,
-    });
-    const isTrivial = next.length === 1 && next[0].length === items.length;
+    // PAPER_PADDING_FA018 reserves every page's own bottom padding (see
+    // recurringTailHeight's comment above); the extra 2px is a small safety
+    // margin for sub-pixel rounding. Shared with computeFillerCounts below
+    // so blank rows are padded against the exact same per-page budget real
+    // rows were packed against.
+    const budgetPx = PAGE_HEIGHT_BUDGET_FA018 - PAPER_PADDING_FA018 - 2;
+    const rawNext = computePageBreaks({ headerHeight, recurringTailHeight, lastPageExtraHeight, rowHeights, budgetPx });
+    const isTrivial = rawNext.length === 1 && rawNext[0].length === items.length;
     if (isTrivial) {
       if (pages !== null) setPages(null);
-    } else if (pages === null || !pageBreaksEqual(pages, next)) {
+      if (fillerCounts !== null) setFillerCounts(null);
+      return;
+    }
+    // A spillover page holding only blank/padding rows reads as an empty
+    // extra sheet with nothing but รวม on it — pull the previous page's
+    // last row over too so it shows real content instead (see this
+    // function's own doc comment in lib/pagination.ts).
+    const next = ensureLastPageHasContent(rawNext, (i) => isFA018ItemEmpty(items[i]));
+    if (pages === null || !pageBreaksEqual(pages, next)) {
       setPages(next);
+    }
+
+    // Multi-page only — see FA017Form's identical block for the full
+    // rationale (in short: pad each page's leftover space with blank
+    // filler rows instead of the old row-rebalancing approach).
+    const nextFillerCounts = computeFillerCounts({
+      pages: next,
+      rowHeights,
+      headerHeight,
+      recurringTailHeight,
+      lastPageExtraHeight,
+      budgetPx,
+      fillerRowHeight,
+    });
+    if (fillerCounts === null || !fillerCountsEqual(fillerCounts, nextFillerCounts)) {
+      setFillerCounts(nextFillerCounts);
+    }
+    if (probeFillerRowRef.current) {
+      const measured = probeFillerRowRef.current.getBoundingClientRect().height;
+      if (measured > 0 && (fillerRowHeight === null || Math.abs(fillerRowHeight - measured) > 0.5)) {
+        setFillerRowHeight(measured);
+      }
     }
   }
 
@@ -196,10 +306,12 @@ export default function FA018Form({
   }); // no dependency array — idempotent, see FA017Form's identical effect for rationale
 
   function renderPage(pageIndices: number[], pageIndex: number) {
-    // Per-page subtotal — every page carries its own รวม row +
-    // certification/signature block (see this component's doc comment), so
-    // each one totals only the rows actually printed on it.
-    const pageTotal = fmt(fa018Total(pageIndices.map((i) => items[i])));
+    // Only the last page carries the รวม row (see this component's doc
+    // comment) — and when it does, it's the grand total across every
+    // page's rows (fa018Total accepts any array, so the full items array
+    // works as-is), not just this page's own slice.
+    const isLastPage = pageIndex === effectivePages.length - 1;
+    const grandTotal = fmt(fa018Total(items));
     return (
       <div
         key={pageIndex}
@@ -208,6 +320,14 @@ export default function FA018Form({
         style={{ width: PAPER_WIDTH_FA018, padding: `${PAPER_PADDING_FA018}px 40px` }}
       >
         <div>
+          {/* "F-FA-018" moved to its own line above the logo/title row (per
+              request) rather than sharing it as a third grid column. The
+              grid below keeps that same third (90px) column, now empty, so
+              its width still balances the 90px logo column and the title
+              stays centered exactly as before. */}
+          <div style={{ textAlign: "right", fontSize: 12, color: "#555" }}>
+            F-FA-018
+          </div>
           <div
             style={{
               display: "grid",
@@ -238,9 +358,7 @@ export default function FA018Form({
                 รายงานค่าใช้จ่ายไม่มีบิล (ใบรับรองแทนใบเสร็จรับเงิน)
               </div>
             </div>
-            <div style={{ textAlign: "right", fontSize: 12, color: "#555", justifySelf: "end" }}>
-              F-FA-018
-            </div>
+            <div />
           </div>
 
           <div style={{ display: "flex", gap: 20, marginTop: 18, fontSize: 13 }}>
@@ -437,11 +555,7 @@ export default function FA018Form({
                   <button
                     type="button"
                     className="no-print"
-                    onClick={async () => {
-                      await saveItemRow(items[i]);
-                      setJustSavedRow(i);
-                      setTimeout(() => setJustSavedRow((r) => (r === i ? null : r)), 2000);
-                    }}
+                    onClick={() => setPendingSaveRow(i)}
                     disabled={!it.desc.trim()}
                     title="บันทึกรายการนี้ไว้ใช้ซ้ำ"
                     style={{ ...saveIconBtn, opacity: it.desc.trim() ? 0.4 : 0.15 }}
@@ -461,21 +575,68 @@ export default function FA018Form({
                     type="number"
                     value={it.amount}
                     onChange={(e) => updateItem(i, "amount", e.target.value)}
+                    className="no-spin"
                     style={{ ...cellInput, textAlign: "right" }}
                   />
                 </td>
               </tr>
               );
             })}
+            {/* Blank filler rows (see effectiveFillerCounts above) — same
+                column count/border/width as a real row (one <td> per
+                colgroup column, td's border+padding), and the รายการ cell
+                reuses the exact same auto-growing textarea markup as a
+                real row so its height matches a real blank row exactly.
+                Not part of draft.items, but not a dead end either —
+                focusing it promotes it into a real row, same as
+                FA017Form's identical filler row; see its comment for the
+                full rationale. */}
+            {Array.from({ length: effectiveFillerCounts[pageIndex] ?? 0 }, (_, fillerIdx) => (
+              <tr
+                key={`filler-${fillerIdx}`}
+                ref={pageIndex === probeFillerPageIndex && fillerIdx === 0 ? probeFillerRowRef : undefined}
+              >
+                {COL_PCT.map((_, colIdx) =>
+                  colIdx === 1 ? (
+                    <td key={colIdx} style={td}>
+                      <textarea
+                        ref={(el) => {
+                          if (el) {
+                            el.style.height = "auto";
+                            el.style.height = `${el.scrollHeight}px`;
+                          }
+                        }}
+                        className="desc-textarea"
+                        value=""
+                        readOnly
+                        onFocus={() => {
+                          pendingFocusIndexRef.current = items.length;
+                          addRow();
+                        }}
+                        rows={1}
+                        style={{ ...cellInput, resize: "none", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.3 }}
+                      />
+                    </td>
+                  ) : (
+                    <td key={colIdx} style={td} />
+                  )
+                )}
+              </tr>
+            ))}
           </tbody>
-          <tbody ref={pageIndex === 0 ? totalsTbodyRef : undefined}>
-            <tr>
-              <td colSpan={3} style={{ ...th, textAlign: "center", fontWeight: 700 }}>
-                รวม
-              </td>
-              <td style={{ ...th, textAlign: "right", fontWeight: 700 }}>{pageTotal}</td>
-            </tr>
-          </tbody>
+          {/* Only the last page — see this component's doc comment and
+              renderPage's isLastPage. totalsTbodyRef attaches here (not
+              page 0) since this is the only page it ever mounts on. */}
+          {isLastPage && (
+            <tbody ref={totalsTbodyRef}>
+              <tr>
+                <td colSpan={3} style={{ ...th, textAlign: "center", fontWeight: 700 }}>
+                  รวม
+                </td>
+                <td style={{ ...th, textAlign: "right", fontWeight: 700 }}>{grandTotal}</td>
+              </tr>
+            </tbody>
+          )}
         </table>
 
         <div>
@@ -537,6 +698,18 @@ export default function FA018Form({
         />
       </div>
       {effectivePages.map((idxs, pageIndex) => renderPage(idxs, pageIndex))}
+      <ConfirmDialog
+        open={pendingSaveRow !== null}
+        title="ยืนยันการบันทึกไว้ใช้ซ้ำ"
+        message={
+          pendingSaveRow !== null && findSavedItem(items[pendingSaveRow].desc)
+            ? "มีรายการที่บันทึกไว้แล้วชื่อนี้อยู่ — บันทึกซ้ำจะเขียนทับข้อมูลเดิม ต้องการดำเนินการต่อหรือไม่?"
+            : "บันทึกรายการนี้ไว้ใช้ซ้ำในครั้งหน้าหรือไม่?"
+        }
+        confirmLabel="บันทึก"
+        onConfirm={confirmSaveRow}
+        onCancel={() => setPendingSaveRow(null)}
+      />
     </>
   );
 }

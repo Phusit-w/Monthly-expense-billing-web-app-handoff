@@ -14,13 +14,16 @@ export const RATES_EFFECTIVE_DATE = "14 กันยายน 2565";
 // to just pass this through as state. One shared key-builder + payload type
 // so neither side can drift from the other's key format/shape.
 //
-// Only the calculated amount crosses over — no description text. The
-// travel-calculator's own auto-built label ("ค่าเดินทาง: ต้นทาง →
-// ปลายทาง"/"...Taxi Meter...") was deliberately dropped from the handoff:
-// the destination/description on the actual claim is left for the user to
-// type themselves on the form side.
+// `desc` only comes along when the amount was looked up from
+// FIXED_DESTINATIONS (the "เลือกจากปลายทางตามประกาศบริษัท" tab) — it's the
+// literal "เดินทางไป <short name>" text, built once on the calculator side so
+// both entry forms don't have to duplicate that string. The taxi-meter tab
+// has no single named destination to build a label from, so it still hands
+// off amount only and the form-side description is left for the user to
+// type, same as before.
 export interface PendingTravelEntry {
   amount: number;
+  desc?: string;
 }
 
 export function pendingTravelEntryKey(type: "FA017" | "FA018"): string {
@@ -36,29 +39,35 @@ export interface FixedDestination {
 // Pre-priced destinations (ตารางปลายทางที่กำหนดราคาไว้แล้ว), data as of
 // RATES_EFFECTIVE_DATE above. Selecting one of these is a flat lookup — no
 // taxi-meter calculation involved.
+//
+// `name` uses the short names (ชื่อย่อแนะนำ) from the company's destination-
+// naming announcement, since this list is a search/select UI (see
+// TravelCalculator.tsx) and the short form reads faster there. The full
+// legal/address name from that same announcement is kept in the trailing
+// comment on each line for reference.
 export const FIXED_DESTINATIONS: FixedDestination[] = [
-  { name: "บมจ. โทรคมนาคมแห่งชาติ สำนักงานใหญ่ (TOT)", distanceKm: 11, price: 95 },
-  { name: "ชุมสายโทรศัพท์กรุงเกษม", distanceKm: 22, price: 190 },
-  { name: "ชุมสายโทรศัพท์พระโขนง", distanceKm: 25, price: 215 },
-  { name: "บมจ. โทรคมนาคมแห่งชาติ สำนักงานใหญ่ (CAT)", distanceKm: 13, price: 115 },
-  { name: "ศูนย์โทรคมนาคม บางรัก", distanceKm: 25, price: 215 },
-  { name: "ศูนย์โทรคมนาคม นนทบุรี", distanceKm: 14, price: 120 },
-  { name: "การไฟฟ้าส่วนภูมิภาค สำนักงานใหญ่ ถนนงามวงศ์วาน", distanceKm: 12, price: 105 },
-  { name: "การไฟฟ้านครหลวง สำนักงานใหญ่ คลองเตย", distanceKm: 23, price: 200 },
-  { name: "การไฟฟ้านครหลวง สำนักงานเพลินจิต", distanceKm: 26, price: 225 },
-  { name: "การไฟฟ้านครหลวง เขตวัดเลียบ", distanceKm: 25, price: 215 },
-  { name: "การไฟฟ้านครหลวง เขตราษฎร์บูรณะ", distanceKm: 32, price: 275 },
-  { name: "การไฟฟ้าฝ่ายผลิตแห่งประเทศไทย สำนักงานใหญ่ บางกรวย", distanceKm: 18, price: 155 },
-  { name: "บมจ. เอสวีโอเอ สำนักงานใหญ่ ถนนพระราม 3", distanceKm: 27, price: 230 },
-  { name: "บมจ. แอ็ดวานซ์อินฟอร์เมชั่นเทคโนโลยี สำนักงานใหญ่ ถนนสุทธิสารวินิจฉัย", distanceKm: 12, price: 105 },
-  { name: "บมจ. ฟอร์ท คอร์ปอเรชั่น สำนักงานใหญ่ พญาไท", distanceKm: 16, price: 140 },
-  { name: "บจก. ไวร์เออ แอนด์ ไวร์เลส ห้วยขวาง", distanceKm: 12, price: 105 },
-  { name: "คลังสินค้า บจก. โนเกีย (ประเทศไทย) ถนนบางนา-ตราด", distanceKm: 16, price: 140 },
-  { name: "กรมพัฒนาธุรกิจการค้า กระทรวงพาณิชย์ (สนามบินน้ำ)", distanceKm: 20, price: 170 },
-  { name: "สำนักงานพัฒนาฝีมือแรงงานกรุงเทพมหานคร พื้นที่ 2 (ไอทีสแควร์)", distanceKm: 16, price: 140 },
-  { name: "สำนักงานสรรพากรพื้นที่กรุงเทพมหานคร 8 (ลาดปลาเค้า)", distanceKm: 6, price: 55 },
-  { name: "สำนักงานสรรพากรพื้นที่สาขาลาดพร้าว", distanceKm: 5, price: 45 },
-  { name: "สำนักงานสวัสดิการและคุ้มครองแรงงานกรุงเทพมหานคร พื้นที่ 4 (อาคารนวพาร์ค)", distanceKm: 7, price: 60 },
+  { name: "NT (TOT) สนญ.", distanceKm: 11, price: 95 }, // บมจ. โทรคมนาคมแห่งชาติ สำนักงานใหญ่ (TOT)
+  { name: "ชุมสายฯ กรุงเกษม", distanceKm: 22, price: 190 }, // ชุมสายโทรศัพท์กรุงเกษม
+  { name: "ชุมสายฯ พระโขนง", distanceKm: 25, price: 215 }, // ชุมสายโทรศัพท์พระโขนง
+  { name: "NT (CAT) สนญ.", distanceKm: 13, price: 115 }, // บมจ. โทรคมนาคมแห่งชาติ สำนักงานใหญ่ (CAT)
+  { name: "ศูนย์โทรคมฯ บางรัก", distanceKm: 25, price: 215 }, // ศูนย์โทรคมนาคม บางรัก
+  { name: "ศูนย์โทรคมฯ นนทบุรี", distanceKm: 14, price: 120 }, // ศูนย์โทรคมนาคม นนทบุรี
+  { name: "PEA สนญ.", distanceKm: 12, price: 105 }, // การไฟฟ้าส่วนภูมิภาค สำนักงานใหญ่ ถนนงามวงศ์วาน
+  { name: "MEA สนญ.", distanceKm: 23, price: 200 }, // การไฟฟ้านครหลวง สำนักงานใหญ่ คลองเตย
+  { name: "MEA เพลินจิต", distanceKm: 26, price: 225 }, // การไฟฟ้านครหลวง สำนักงานเพลินจิต
+  { name: "MEA วัดเลียบ", distanceKm: 25, price: 215 }, // การไฟฟ้านครหลวง เขตวัดเลียบ
+  { name: "MEA ราษฎร์บูรณะ", distanceKm: 32, price: 275 }, // การไฟฟ้านครหลวง เขตราษฎร์บูรณะ
+  { name: "EGAT สนญ. บางกรวย", distanceKm: 18, price: 155 }, // การไฟฟ้าฝ่ายผลิตแห่งประเทศไทย สำนักงานใหญ่ บางกรวย
+  { name: "SVOA สนญ. พระราม 3", distanceKm: 27, price: 230 }, // บมจ. เอสวีโอเอ สำนักงานใหญ่ ถนนพระราม 3
+  { name: "AIT สนญ. สุทธิสารวินิจฉัย", distanceKm: 12, price: 105 }, // บมจ. แอ็ดวานซ์อินฟอร์เมชั่นเทคโนโลยี สำนักงานใหญ่ ถนนสุทธิสารวินิจฉัย
+  { name: "FORTH สนญ. พญาไท", distanceKm: 16, price: 140 }, // บมจ. ฟอร์ท คอร์ปอเรชั่น สำนักงานใหญ่ พญาไท
+  { name: "Wire & Wireless ห้วยขวาง", distanceKm: 12, price: 105 }, // บจก. ไวร์เออ แอนด์ ไวร์เลส ห้วยขวาง
+  { name: "Nokia คลังสินค้า  บางนา-ตราด", distanceKm: 16, price: 140 }, // คลังสินค้า บจก. โนเกีย (ประเทศไทย) ถนนบางนา-ตราด
+  { name: "DBD สนามบินน้ำ", distanceKm: 20, price: 170 }, // กรมพัฒนาธุรกิจการค้า กระทรวงพาณิชย์ (สนามบินน้ำ)
+  { name: "สพร.กทม. 2", distanceKm: 16, price: 140 }, // สำนักงานพัฒนาฝีมือแรงงานกรุงเทพมหานคร พื้นที่ 2 (ไอทีสแควร์)
+  { name: "สรรพากร กทม. 8", distanceKm: 6, price: 55 }, // สำนักงานสรรพากรพื้นที่กรุงเทพมหานคร 8 (ลาดปลาเค้า)
+  { name: "สรรพากร ลาดพร้าว", distanceKm: 5, price: 45 }, // สำนักงานสรรพากรพื้นที่สาขาลาดพร้าว
+  { name: "สสค.กทม. 4", distanceKm: 7, price: 60 }, // สำนักงานสวัสดิการและคุ้มครองแรงงานกรุงเทพมหานคร พื้นที่ 4 (อาคารนวพาร์ค)
 ];
 
 export type VehicleType = "normal" | "large";

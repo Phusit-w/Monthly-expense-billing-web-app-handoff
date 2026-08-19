@@ -12,10 +12,14 @@ datasource db {
   provider = "postgresql"
 }
 
-// Single shared row: default profile values used to prefill new bills.
-// There is no login in this app, so this is one org-wide default, not
-// per-person data. Records snapshot the employee fields at save time
-// (see ExpenseRecord) so editing this later never rewrites history.
+// No longer read or written by the app (see actions/profile.ts) — the
+// single shared row here used to prefill new bills, but with no login,
+// every visitor's browser wrote to it on every field blur, so two people
+// at the office at once could silently overwrite each other's info.
+// Replaced by a per-browser cookie that points at a SavedEmployee entry
+// instead (nothing shared to collide over). Left in the schema rather than
+// migrated away, since dropping it would need a migration against
+// whatever's already live and isn't worth the risk for a now-unused table.
 model EmployeeProfile {
   id         String   @id @default(cuid())
   name       String   @default("")
@@ -23,6 +27,7 @@ model EmployeeProfile {
   department String   @default("")
   office     String   @default("")
   employeeNo String   @default("")
+  projectCC  String   @default("")
   updatedAt  DateTime @updatedAt
 }
 
@@ -41,6 +46,7 @@ model SavedEmployee {
   department String   @default("")
   office     String   @default("")
   employeeNo String   @default("")
+  projectCC  String   @default("")
   updatedAt  DateTime @updatedAt
 }
 
@@ -76,11 +82,36 @@ model ExpenseRecord {
   employeeDepartment String   @default("")
   employeeOffice     String   @default("")
   employeeNo         String   @default("")
+  employeeProjectCC  String   @default("")
   remark             String   @default("")
+  // Who was logged in (User.displayName, see below) when this record was
+  // created/last saved — a snapshot, not a foreign key, same denormalized-
+  // string approach as SavedEmployee/EmployeeProfile above, so the audit
+  // trail still reads correctly even if that User row is later renamed or
+  // deleted. "" for records saved before per-user login existed.
+  createdByName      String   @default("")
+  updatedByName      String   @default("")
   items              Json // line items; shape differs by type (see lib/types.ts)
   total              Decimal  @db.Decimal(12, 2)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   @@index([updatedAt])
+}
+
+// A per-person login account (proxy.ts + actions/auth.ts) — replaces the
+// single shared HTTP Basic Auth pair (AUTH_USERNAME/AUTH_PASSWORD) that used
+// to gate the whole site. No roles/permission levels: every account can do
+// everything, exactly like the old shared password could — this only splits
+// "who can get in" into one row per person, mainly so ExpenseRecord's
+// createdByName/updatedByName above can be trusted (an approval workflow in
+// the app itself was explicitly out of scope when this was added; approval
+// is still a paper signature after printing).
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  // PBKDF2-SHA256, see lib/auth.ts's hashPassword — never plaintext.
+  passwordHash String
+  displayName  String
+  createdAt    DateTime @default(now())
 }

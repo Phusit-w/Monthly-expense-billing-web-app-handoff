@@ -20,6 +20,16 @@ import type { Draft, EmployeeSnapshot, RecordType, SavedEmployeeEntry, SavedItem
 // review/print/save rather than switching to /bill/new/[type] — acceptable
 // here since a refresh mid-entry on /bill/new/[type] already loses an
 // unsaved draft too (it just rebuilds empty), so this isn't a regression.
+//
+// The entry form itself is always mounted, never conditionally rendered —
+// only hidden (display: none) once handoffDraft is set, with BillEditor
+// rendered alongside it rather than replacing it. Originally this used an
+// early `if (handoffDraft) return <BillEditor .../>`, which unmounted the
+// entry form and threw away everything typed into it; "ย้อนกลับ" flipping
+// handoffDraft back to null then remounted it empty. Keeping it mounted
+// (just hidden) means its own state (EntryFormFA017/018's employee/items/
+// etc.) survives the round trip untouched — "ย้อนกลับ" reveals it exactly
+// as it was left, no serialization of that state needed.
 export default function EntryFlow({
   type,
   profile,
@@ -31,30 +41,49 @@ export default function EntryFlow({
   savedEmployees: SavedEmployeeEntry[];
   savedItems: SavedItemEntry[];
 }) {
+  // handoffDraft's type doesn't have to match this EntryFlow's own `type`:
+  // EntryFormFA017's "สร้างฟอร์ม FA018 →" button (its own onCreate prop,
+  // wired the same as its regular "สร้างฟอร์ม" button) hands this a
+  // FA018-typed Draft from *within* a type: "FA017" EntryFlow. BillEditor
+  // picks FA017Form vs FA018Form from the draft's own .type, not from this
+  // component's `type` prop, so that just works — and "ย้อนกลับ" un-hiding
+  // *this* EntryFlow's entry form (always EntryFormFA017 here) is exactly
+  // "go back to the FA017 page", for free.
   const [handoffDraft, setHandoffDraft] = useState<Draft | null>(null);
 
-  if (handoffDraft) {
-    return <BillEditor initialDraft={handoffDraft} savedItems={savedItems} />;
-  }
-
   return (
-    <PageShell>
-      <Header />
-      {type === "FA018" ? (
-        <EntryFormFA018
-          profile={profile}
-          savedEmployees={savedEmployees}
+    <>
+      <div style={{ display: handoffDraft ? "none" : undefined }}>
+        <PageShell>
+          <Header />
+          {type === "FA018" ? (
+            <EntryFormFA018
+              profile={profile}
+              savedEmployees={savedEmployees}
+              savedItems={savedItems}
+              onCreate={setHandoffDraft}
+            />
+          ) : (
+            <EntryFormFA017
+              profile={profile}
+              savedEmployees={savedEmployees}
+              savedItems={savedItems}
+              onCreate={setHandoffDraft}
+            />
+          )}
+        </PageShell>
+      </div>
+      {handoffDraft && (
+        // onBack: BillEditor's default "ย้อนกลับ" (router.push to this same
+        // /bill/entry/[type] URL) would be a no-op here since the URL never
+        // actually changed when this swap happened — flip handoffDraft back
+        // to null instead, which just un-hides the entry form above again.
+        <BillEditor
+          initialDraft={handoffDraft}
           savedItems={savedItems}
-          onCreate={setHandoffDraft}
-        />
-      ) : (
-        <EntryFormFA017
-          profile={profile}
-          savedEmployees={savedEmployees}
-          savedItems={savedItems}
-          onCreate={setHandoffDraft}
+          onBack={() => setHandoffDraft(null)}
         />
       )}
-    </PageShell>
+    </>
   );
 }

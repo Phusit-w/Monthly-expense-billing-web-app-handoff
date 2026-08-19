@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import SavedEmployeePicker from "@/components/SavedEmployeePicker";
 import SavedListManager from "@/components/SavedListManager";
 import type { EmployeeSnapshot, SavedEmployeeEntry } from "@/lib/types";
 
@@ -52,31 +54,27 @@ export default function EntryEmployeeFields({
   onSelectSaved,
   onSave,
   onDeleteSaved,
-  projectCC,
-  onProjectCCChange,
 }: {
   employee: Pick<EmployeeSnapshot, EditableField>;
   onChange: (field: EditableField, value: string) => void;
   // Several different people share this login-less app — savedEmployees is
   // the list anyone has previously saved under their own name via "บันทึกไว้
   // ใช้ซ้ำ" below, distinct from the one org-wide default (ProfileCard on the
-  // history page). Wired to the ชื่อ-นามสกุล field as a native <datalist> so
-  // typing/picking a saved name searches and reuses it immediately.
+  // history page). Picked via SavedEmployeePicker next to that button, which
+  // reuses the rest of that person's saved details immediately.
   savedEmployees: SavedEmployeeEntry[];
   onSelectSaved: (saved: SavedEmployeeEntry) => void;
   onSave: () => Promise<void>;
   onDeleteSaved: (id: string) => Promise<void>;
-  // FA017-only: a claim-level "Project / CC" shortcut. Only EntryFormFA017
-  // passes these — FA017Item is the only item shape with a projectCC field
-  // at all (FA018Item has no equivalent), so EntryFormFA018 simply never
-  // passes them and this field doesn't render there.
-  projectCC?: string;
-  onProjectCCChange?: (value: string) => void;
 }) {
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  // onSave (saveEmployeeForReuse, actions/profile.ts) upserts keyed by name,
+  // so re-saving an existing one silently overwrites it — confirm first.
+  const [confirmingSave, setConfirmingSave] = useState(false);
 
   async function handleSave() {
+    setConfirmingSave(false);
     setSaving(true);
     setJustSaved(false);
     await onSave();
@@ -101,52 +99,45 @@ export default function EntryEmployeeFields({
             <label style={labelStyle}>{f.label}</label>
             <input
               value={employee[f.key]}
-              onChange={(e) => {
-                const value = e.target.value;
-                onChange(f.key, value);
-                // A saved name was typed or picked from the datalist below —
-                // fill in the rest of that person's saved details too, not
-                // just this one field.
-                if (f.key === "name") {
-                  const saved = savedEmployees.find((s) => s.name === value);
-                  if (saved) onSelectSaved(saved);
-                }
-              }}
+              onChange={(e) => onChange(f.key, e.target.value)}
               placeholder={f.key === "name" ? "ชื่อ-นามสกุล" : undefined}
-              list={f.key === "name" ? "saved-employee-names" : undefined}
               style={inputStyle}
             />
             {f.key === "name" && (
               <>
-                <datalist id="saved-employee-names">
-                  {savedEmployees.map((s) => (
-                    <option key={s.name} value={s.name} />
-                  ))}
-                </datalist>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  disabled={saving || !employee.name.trim()}
-                  title={
-                    employee.name.trim()
-                      ? "บันทึกข้อมูลพนักงานชุดนี้ไว้ใช้ซ้ำ ค้นหาด้วยชื่อได้ในครั้งหน้า"
-                      : "กรอกชื่อ-นามสกุลก่อนจึงจะบันทึกได้"
-                  }
-                  style={{
-                    marginTop: 6,
-                    padding: "5px 10px",
-                    border: "1px dashed #1c1c1c",
-                    borderRadius: 4,
-                    background: "#fff",
-                    font: "inherit",
-                    fontSize: 11,
-                    color: "#1c1c1c",
-                    cursor: saving || !employee.name.trim() ? "not-allowed" : "pointer",
-                    opacity: saving || !employee.name.trim() ? 0.5 : 1,
-                  }}
-                >
-                  {saving ? "กำลังบันทึก…" : justSaved ? "บันทึกแล้ว ✓" : "บันทึกไว้ใช้ซ้ำ"}
-                </button>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingSave(true)}
+                    disabled={saving || !employee.name.trim()}
+                    title={
+                      employee.name.trim()
+                        ? "บันทึกข้อมูลพนักงานชุดนี้ไว้ใช้ซ้ำ ค้นหาด้วยชื่อได้ในครั้งหน้า"
+                        : "กรอกชื่อ-นามสกุลก่อนจึงจะบันทึกได้"
+                    }
+                    style={{
+                      marginTop: 6,
+                      padding: "5px 10px",
+                      border: "1px dashed #1c1c1c",
+                      borderRadius: 4,
+                      background: "#fff",
+                      font: "inherit",
+                      fontSize: 11,
+                      color: "#1c1c1c",
+                      cursor: saving || !employee.name.trim() ? "not-allowed" : "pointer",
+                      opacity: saving || !employee.name.trim() ? 0.5 : 1,
+                    }}
+                  >
+                    {saving ? "กำลังบันทึก…" : justSaved ? "บันทึกแล้ว ✓" : "บันทึกไว้ใช้ซ้ำ"}
+                  </button>
+                  <SavedEmployeePicker
+                    savedEmployees={savedEmployees}
+                    onSelect={(saved) => {
+                      onChange("name", saved.name);
+                      onSelectSaved(saved);
+                    }}
+                  />
+                </div>
                 <div style={{ marginTop: 6 }}>
                   <SavedListManager
                     label="ชื่อที่บันทึกไว้"
@@ -158,18 +149,20 @@ export default function EntryEmployeeFields({
             )}
           </div>
         ))}
-        {onProjectCCChange && (
-          <div style={fieldWrap(140)}>
-            <label style={labelStyle}>Project / CC</label>
-            <input
-              value={projectCC ?? ""}
-              onChange={(e) => onProjectCCChange(e.target.value)}
-              title="กรอกแล้วจะใส่ให้ทุกแถวในช่อง Project / CC ของรายการค่าใช้จ่ายด้านล่างให้อัตโนมัติ"
-              style={inputStyle}
-            />
-          </div>
-        )}
       </div>
+      <ConfirmDialog
+        open={confirmingSave}
+        title="ยืนยันการบันทึกไว้ใช้ซ้ำ"
+        message={
+          savedEmployees.some((e) => e.name === employee.name.trim())
+            ? "มีข้อมูลพนักงานชื่อนี้บันทึกไว้แล้ว — บันทึกซ้ำจะเขียนทับข้อมูลเดิม ต้องการดำเนินการต่อหรือไม่?"
+            : "บันทึกข้อมูลพนักงานชุดนี้ไว้ใช้ซ้ำหรือไม่?"
+        }
+        confirmLabel="บันทึก"
+        busy={saving}
+        onConfirm={handleSave}
+        onCancel={() => setConfirmingSave(false)}
+      />
     </div>
   );
 }

@@ -10,5 +10,13 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"],
+    // `prisma migrate dev` needs a scratch database to diff against. The
+    // local `prisma dev` Postgres server doesn't support plain `CREATE
+    // DATABASE` for Migrate's default shadow-db approach, so this points at
+    // the second connection string `prisma dev` prints on startup
+    // (SHADOW_DATABASE_URL) instead. Only used by `migrate dev` locally —
+    // `migrate deploy` (docker-entrypoint.sh, DEPLOY-WINDOWS.md) doesn't
+    // need a shadow database at all.
+    shadowDatabaseUrl: process.env["SHADOW_DATABASE_URL"],
   },
 });

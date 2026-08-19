@@ -1,20 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import PageShell from "@/components/PageShell";
 import { fmt } from "@/lib/format";
-import {
-  FIXED_DESTINATIONS,
-  RATES_EFFECTIVE_DATE,
-  TRAVEL_ORIGIN,
-  calcTaxiMeter,
-  pendingTravelEntryKey,
-} from "@/lib/travelRates";
-import type { FixedDestination, PendingTravelEntry, VehicleType } from "@/lib/travelRates";
-
-type Mode = "fixed" | "meter";
+import { RATES_EFFECTIVE_DATE, TRAVEL_ORIGIN, pendingTravelEntryKey } from "@/lib/travelRates";
+import type { PendingTravelEntry } from "@/lib/travelRates";
+import { useTravelCostCalculator } from "@/lib/useTravelCostCalculator";
 
 const cardStyle: React.CSSProperties = {
   background: "#fff",
@@ -72,71 +64,47 @@ const primaryBtnStyle: React.CSSProperties = {
 
 export default function TravelCalculator() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("fixed");
-
-  // Mode 1: pre-priced destination lookup (searchable combobox — no extra
-  // library, just a filtered list under a text input).
-  const [query, setQuery] = useState("");
-  const [showList, setShowList] = useState(false);
-  const [selected, setSelected] = useState<FixedDestination | null>(null);
-
-  const filtered =
-    query.trim() === ""
-      ? FIXED_DESTINATIONS
-      : FIXED_DESTINATIONS.filter((d) => d.name.includes(query.trim()));
-
-  function selectDestination(d: FixedDestination) {
-    setSelected(d);
-    setQuery(d.name);
-    setShowList(false);
-  }
-
-  // Mode 2: taxi-meter estimate for anything not in the fixed list.
-  const [distanceKm, setDistanceKm] = useState("");
-  const [trafficMinutes, setTrafficMinutes] = useState("");
-  const [vehicleType, setVehicleType] = useState<VehicleType>("normal");
-  const [viaApp, setViaApp] = useState(false);
-  const [airportPickup, setAirportPickup] = useState(false);
-
-  const meterResult = calcTaxiMeter({
-    distanceKm: Number(distanceKm) || 0,
-    trafficMinutes: Number(trafficMinutes) || 0,
+  // State + calculation logic lives in useTravelCostCalculator (shared with
+  // TravelRowCalculatorPanel's compact per-row version on the entry forms)
+  // — this component only owns page-level concerns (routing the result to
+  // a specific entry-form type via sessionStorage).
+  const {
+    mode,
+    setMode,
+    query,
+    setQuery,
+    showList,
+    setShowList,
+    selected,
+    setSelected,
+    filtered,
+    selectDestination,
+    distanceKm,
+    setDistanceKm,
+    trafficMinutes,
+    setTrafficMinutes,
     vehicleType,
+    setVehicleType,
     viaApp,
+    setViaApp,
     airportPickup,
-  });
+    setAirportPickup,
+    meterResult,
+    handleClear,
+    hasResult,
+    resultAmount,
+    resultDesc,
+  } = useTravelCostCalculator();
 
-  function handleClear() {
-    if (mode === "fixed") {
-      setQuery("");
-      setSelected(null);
-      setShowList(false);
-    } else {
-      setDistanceKm("");
-      setTrafficMinutes("");
-      setVehicleType("normal");
-      setViaApp(false);
-      setAirportPickup(false);
-    }
-  }
-
-  // Whichever mode is active, this is the single result "ส่งไปฟอร์ม" acts
-  // on. Only the number crosses over — no auto-built description text (see
-  // PendingTravelEntry's comment in lib/travelRates.ts): the destination
-  // isn't necessarily what the user wants written on the claim, so
-  // Description of Expenses/รายการ is left for them to type on the form.
-  // Rounded UP to a whole number (Math.ceil, not nearest) per request — the
-  // headline amount doesn't show decimals either way (see fmt(resultAmount,
-  // 0) below), and rounding resultAmount itself rather than just its
-  // display keeps what's shown here identical to what actually lands in the
-  // form after "ส่งไปฟอร์ม" (still stored/printed as e.g. "150.00" there,
-  // same 2-decimal convention as every other amount field on the claim).
-  const hasResult = mode === "fixed" ? selected !== null : meterResult.total > 0;
-  const resultAmount = Math.ceil(mode === "fixed" ? (selected?.price ?? 0) : meterResult.total);
-
+  // "ส่งไปฟอร์ม": hands the current result off to a full entry-form page via
+  // sessionStorage — see PendingTravelEntry's comment in lib/travelRates.ts
+  // for why resultDesc only comes along in "fixed" mode.
   function sendToForm(type: "FA018" | "FA017") {
     if (!hasResult) return;
-    const payload: PendingTravelEntry = { amount: resultAmount };
+    const payload: PendingTravelEntry = {
+      amount: resultAmount,
+      ...(resultDesc ? { desc: resultDesc } : {}),
+    };
     sessionStorage.setItem(pendingTravelEntryKey(type), JSON.stringify(payload));
     router.push(`/bill/entry/${type.toLowerCase()}`);
   }
@@ -159,10 +127,10 @@ export default function TravelCalculator() {
 
         <div style={{ display: "flex", gap: 8 }}>
           <button style={tabButtonStyle(mode === "fixed")} onClick={() => setMode("fixed")}>
-            เลือกจากรายการปลายทาง
+            เลือกจากปลายทางตามประกาศบริษัท
           </button>
           <button style={tabButtonStyle(mode === "meter")} onClick={() => setMode("meter")}>
-            กรอกระยะทางเอง
+            เลือกระยะทางจากปลายทางอื่นๆ
           </button>
         </div>
 
@@ -200,7 +168,7 @@ export default function TravelCalculator() {
                 >
                   {filtered.length === 0 ? (
                     <div style={{ padding: "10px 12px", color: "#999", fontSize: 13 }}>
-                      ไม่พบปลายทางในรายการ — ลองใช้แท็บ &quot;กรอกระยะทางเอง&quot; แทน
+                      ไม่พบปลายทางในรายการ — ลองใช้แท็บ &quot;เลือกระยะทางจากปลายทางอื่นๆ&quot; แทน
                     </div>
                   ) : (
                     filtered.map((d) => (
@@ -350,11 +318,11 @@ export default function TravelCalculator() {
               จะไปเติมที่แถวว่างแรกของตารางรายการ (หรือเพิ่มแถวใหม่ถ้าไม่มีแถวว่างเหลือ) — แก้ไขต่อได้ตามปกติ
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button onClick={() => sendToForm("FA018")} style={primaryBtnStyle}>
-                ส่งไปฟอร์ม FA018 →
-              </button>
               <button onClick={() => sendToForm("FA017")} style={primaryBtnStyle}>
-                ส่งไปฟอร์ม FA017 →
+                ส่งไปฟอร์ม Expense Claim →
+              </button>
+              <button onClick={() => sendToForm("FA018")} style={primaryBtnStyle}>
+                ส่งไปฟอร์ม ใบรับรองแทนใบเสร็จ →
               </button>
             </div>
           </div>

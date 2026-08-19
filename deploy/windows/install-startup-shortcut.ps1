@@ -15,13 +15,12 @@
 
 .EXAMPLE
   # Run from the project root:
-  .\deploy\windows\install-startup-shortcut.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "a-real-password"
+  .\deploy\windows\install-startup-shortcut.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -SessionSecret "a-long-random-value"
 #>
 
 param(
     [string]$DatabaseUrl,
-    [string]$AuthUsername,
-    [string]$AuthPassword,
+    [string]$SessionSecret,
     [int]$Port = 3000
 )
 
@@ -48,11 +47,8 @@ $argList = "-NoLogo -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File
 if ($DatabaseUrl) {
     $argList += " -DatabaseUrl `"$DatabaseUrl`""
 }
-if ($AuthUsername) {
-    $argList += " -AuthUsername `"$AuthUsername`""
-}
-if ($AuthPassword) {
-    $argList += " -AuthPassword `"$AuthPassword`""
+if ($SessionSecret) {
+    $argList += " -SessionSecret `"$SessionSecret`""
 }
 
 $wsh = New-Object -ComObject WScript.Shell
@@ -71,11 +67,8 @@ $exampleArgs = "-Port $Port"
 if ($DatabaseUrl) {
     $exampleArgs += " -DatabaseUrl `"$DatabaseUrl`""
 }
-if ($AuthUsername) {
-    $exampleArgs += " -AuthUsername `"$AuthUsername`""
-}
-if ($AuthPassword) {
-    $exampleArgs += " -AuthPassword `"$AuthPassword`""
+if ($SessionSecret) {
+    $exampleArgs += " -SessionSecret `"$SessionSecret`""
 }
 Write-Host "To start it right now without logging out/in, run:"
 Write-Host "  .\deploy\windows\run-loop.ps1 $exampleArgs"

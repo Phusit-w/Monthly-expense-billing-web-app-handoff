@@ -6,6 +6,7 @@ import { deleteRecord, duplicateRecord } from "@/actions/records";
 import { fmt } from "@/lib/format";
 import { THAI_MONTHS } from "@/lib/constants";
 import type { ExpenseRecordData } from "@/lib/types";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 type SortKey = "type" | "month" | "employee" | "total";
 type SortDir = "asc" | "desc";
@@ -62,6 +63,7 @@ export default function RecordsTable({
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
   function toggleSort(key: SortKey) {
     if (sortKey !== key) {
@@ -138,10 +140,10 @@ export default function RecordsTable({
     });
   }
 
-  function onDelete(id: string) {
-    if (typeof window !== "undefined" && !window.confirm("ลบรายการนี้ใช่หรือไม่?")) {
-      return;
-    }
+  function confirmDelete() {
+    const id = confirmingDeleteId;
+    if (!id) return;
+    setConfirmingDeleteId(null);
     setPendingId(id);
     startTransition(async () => {
       await deleteRecord(id);
@@ -149,6 +151,8 @@ export default function RecordsTable({
       router.refresh();
     });
   }
+
+  const recordPendingDelete = records.find((r) => r.id === confirmingDeleteId) ?? null;
 
   return (
     <div style={{ maxWidth: 1160, margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -187,6 +191,7 @@ export default function RecordsTable({
               <th style={{ ...sortableTh, textAlign: "right" }} onClick={() => toggleSort("total")}>
                 ยอดรวม{sortArrow("total")}
               </th>
+              <th style={th}>แก้ไขล่าสุดโดย</th>
               <th style={{ ...th, textAlign: "center", width: 220 }}>จัดการ</th>
             </tr>
           </thead>
@@ -207,6 +212,9 @@ export default function RecordsTable({
                 >
                   {fmt(rec.total)}
                 </td>
+                <td style={{ ...td, color: rec.updatedByName ? undefined : "#aaa" }}>
+                  {rec.updatedByName || "-"}
+                </td>
                 <td style={{ padding: "8px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
                   <button
                     onClick={() => onEdit(rec.id)}
@@ -223,7 +231,7 @@ export default function RecordsTable({
                     ทำซ้ำ
                   </button>
                   <button
-                    onClick={() => onDelete(rec.id)}
+                    onClick={() => setConfirmingDeleteId(rec.id)}
                     disabled={pendingId === rec.id}
                     className="btn-danger"
                     style={deleteBtn}
@@ -246,6 +254,20 @@ export default function RecordsTable({
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmingDeleteId !== null}
+        title="ลบรายการ"
+        message={
+          recordPendingDelete
+            ? `ลบรายการ "${typeLabel(recordPendingDelete.type)} — ${recordPendingDelete.employeeName || "-"} (${recordPendingDelete.monthName} ${recordPendingDelete.monthYear})" ใช่หรือไม่? การลบนี้ย้อนกลับไม่ได้`
+            : ""
+        }
+        confirmLabel="ลบ"
+        danger
+        busy={pendingId !== null}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmingDeleteId(null)}
+      />
     </div>
   );
 }

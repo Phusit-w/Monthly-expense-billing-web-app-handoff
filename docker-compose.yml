@@ -29,13 +29,13 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://expense_billing:${POSTGRES_PASSWORD}@db:5432/expense_billing
-      AUTH_USERNAME: ${AUTH_USERNAME:?set AUTH_USERNAME in a .env file next to docker-compose.yml}
-      AUTH_PASSWORD: ${AUTH_PASSWORD:?set AUTH_PASSWORD in a .env file next to docker-compose.yml}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in a .env file next to docker-compose.yml}
     # Not published to the host directly — only the caddy service below is,
-    # reaching this one over the compose network by service name. Basic
-    # Auth (proxy.ts) sends credentials as unencrypted base64, so exposing
-    # this port straight to the host/network would let anyone bypass
-    # caddy's HTTPS and leak the password in plain HTTP.
+    # reaching this one over the compose network by service name. The
+    # session cookie (proxy.ts) isn't marked Secure unless NODE_ENV is
+    # production reaching the browser over HTTPS, so exposing this port
+    # straight to the host/network would let anyone bypass caddy's HTTPS
+    # and see it in plain HTTP.
     expose:
       - "3000"
 

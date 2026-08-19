@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow the current ngrok development URL to load Next.js dev assets and
+  // endpoints. Keep this scoped to the assigned hostname rather than all
+  // ngrok domains.
+  allowedDevOrigins: ["jokingly-gills-antler.ngrok-free.dev"],
+
   // Produces a self-contained `.next/standalone` build (minimal node_modules
   // traced in) so the Docker image doesn't need to `npm install` at runtime.
   output: "standalone",

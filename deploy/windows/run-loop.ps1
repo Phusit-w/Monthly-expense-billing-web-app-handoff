@@ -8,27 +8,23 @@
   Postgres connection string. If omitted, read from DATABASE_URL in a
   `.env` file at the project root.
 
-.PARAMETER AuthUsername
-  Shared HTTP Basic Auth username (proxy.ts) — this app has no per-user
-  login, so one username/password pair gates the whole site. If omitted,
-  read from AUTH_USERNAME in the same `.env` file as DatabaseUrl. Required
+.PARAMETER SessionSecret
+  Signs per-user login session cookies (proxy.ts, lib/auth.ts) — every
+  person gets their own username/password account instead of one shared
+  pair (see docs/DEPLOY-WINDOWS.md's "การเพิ่มผู้ใช้" section). If omitted,
+  read from SESSION_SECRET in the same `.env` file as DatabaseUrl. Required
   one way or the other: proxy.ts refuses every request in production
-  (NODE_ENV=production, which this script always sets) if these aren't
-  set, rather than silently running without auth.
-
-.PARAMETER AuthPassword
-  Shared HTTP Basic Auth password (proxy.ts). Same fallback as
-  AuthUsername — read from AUTH_PASSWORD in `.env` if omitted.
+  (NODE_ENV=production, which this script always sets) if it isn't set,
+  rather than silently running without auth.
 
 .EXAMPLE
   # Run from the project root:
-  .\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -AuthUsername "office" -AuthPassword "a-real-password"
+  .\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:secret@localhost:5432/expense_billing" -SessionSecret "a-long-random-value"
 #>
 
 param(
     [string]$DatabaseUrl,
-    [string]$AuthUsername,
-    [string]$AuthPassword,
+    [string]$SessionSecret,
     [int]$Port = 3000,
     [int]$RestartDelaySeconds = 5
 )
@@ -63,10 +59,9 @@ if (-not $DatabaseUrl) {
     throw "DATABASE_URL not provided and not found in .env. Pass -DatabaseUrl explicitly."
 }
 
-if (-not $AuthUsername) { $AuthUsername = Read-EnvValue "AUTH_USERNAME" }
-if (-not $AuthPassword) { $AuthPassword = Read-EnvValue "AUTH_PASSWORD" }
-if (-not $AuthUsername -or -not $AuthPassword) {
-    throw "AUTH_USERNAME / AUTH_PASSWORD not provided and not found in .env. Pass -AuthUsername/-AuthPassword explicitly, or the app will refuse every request once running (see proxy.ts)."
+if (-not $SessionSecret) { $SessionSecret = Read-EnvValue "SESSION_SECRET" }
+if (-not $SessionSecret) {
+    throw "SESSION_SECRET not provided and not found in .env. Pass -SessionSecret explicitly, or the app will refuse every request once running (see proxy.ts)."
 }
 
 function Log($msg) {
@@ -86,8 +81,7 @@ while ($true) {
     $env:HOSTNAME = "0.0.0.0"
     $env:NODE_ENV = "production"
     $env:DATABASE_URL = $DatabaseUrl
-    $env:AUTH_USERNAME = $AuthUsername
-    $env:AUTH_PASSWORD = $AuthPassword
+    $env:SESSION_SECRET = $SessionSecret
 
     $proc = Start-Process -FilePath "node" -ArgumentList "server.js" -WorkingDirectory $standalone `
         -RedirectStandardOutput (Join-Path $logDir "server-out.log") `

@@ -9,6 +9,7 @@ export interface EmployeeSnapshot {
   department: string;
   office: string;
   employeeNo: string;
+  projectCC: string;
 }
 
 // A saved-for-reuse employee entry as it comes back from the database (see
@@ -52,6 +53,11 @@ export type ItemField = keyof FA018Item | keyof FA017Item;
 // The in-progress form being edited on the client, before it's saved.
 export interface Draft {
   id: string | null;
+  // The updatedAt this draft was loaded with (null for a brand-new,
+  // unsaved draft) — saveRecord (actions/records.ts) uses it as an
+  // optimistic-locking token so that two people editing the same saved
+  // record at once can't silently overwrite each other's changes.
+  updatedAt: string | null;
   type: RecordType;
   day: number; // day-of-month for FA017's "DATE :" field; unused by FA018
   monthName: string;
@@ -73,9 +79,16 @@ export interface ExpenseRecordData {
   employeeDepartment: string;
   employeeOffice: string;
   employeeNo: string;
+  employeeProjectCC: string;
   remark: string;
   items: DraftItem[];
   total: string; // Decimal serialized as string across the server/client boundary
+  // Who was logged in (see lib/auth.ts's SessionPayload.displayName) when
+  // this record was created/last saved — "" for records saved before
+  // per-user login existed. Not part of Draft: the client never sets these
+  // directly, actions/records.ts stamps them from the current session.
+  createdByName: string;
+  updatedByName: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -111,6 +124,16 @@ export function emptyItemFA017(): FA017Item {
     other: "",
     localAmt: "",
   };
+}
+
+// Pads `items` with empty rows up to `minCount`, never truncates. Used when
+// EntryFormFA017/018 hand a Draft off to BillEditor (see their handleCreate)
+// so the printed form still shows a full page's worth of blank lines
+// (DEFAULT_ROWS_FA017/018 in lib/constants.ts) regardless of how few rows
+// the roomy on-screen entry form itself started with (PAGE_ROWS).
+export function padItems<T>(items: T[], minCount: number, makeEmpty: () => T): T[] {
+  if (items.length >= minCount) return items;
+  return [...items, ...Array.from({ length: minCount - items.length }, makeEmpty)];
 }
 
 // Shared by FA017Form.tsx (blank-row display) and the entry-form components

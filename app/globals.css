@@ -126,6 +126,17 @@ button.btn-danger:not(:disabled):active {
     break-inside: avoid;
   }
 
+  /* Belt-and-suspenders alongside table's own break-inside:avoid above:
+     FA017Form/FA018Form's own runtime pagination (lib/pagination.ts) never
+     splits a row across two .paper pages — every row (real or a blank
+     filler one) is placed on exactly one page — so this should never
+     actually trigger, but guards against the print engine ever breaking
+     mid-row on some sub-pixel edge case instead of respecting the table
+     break above. */
+  tr {
+    break-inside: avoid;
+  }
+
   *,
   *::before,
   *::after {
@@ -138,9 +149,18 @@ button.btn-danger:not(:disabled):active {
      the full physical A4 page (PAPER_WIDTH_FA017/FA018), so that padding
      was pushing it 24px past the page's true left origin, overflowing the
      right edge by the same 24px on every print/PDF. Dropped for print;
-     .paper's own inner padding still gives the sheet its visible margin. */
+     .paper's own inner padding still gives the sheet its visible margin.
+
+     Its background (#e7e5e0, set inline in PageShell.tsx — the same gray
+     backdrop) is reset here too: that inline style sits on a min-height:100vh
+     div layered *above* body, so forcing body's own background to white
+     (below) isn't enough on its own — page-shell's inline background is what
+     print-color-adjust: exact was actually making visible behind/around
+     .paper. !important is required to beat the inline style (inline normally
+     wins over a stylesheet rule, but not over one marked !important). */
   .page-shell {
     padding: 0 !important;
+    background: #fff !important;
   }
 
   /* FA017Form/FA018Form's tail (certification text + signature grid) — each

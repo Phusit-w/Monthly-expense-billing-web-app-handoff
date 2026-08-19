@@ -5,7 +5,7 @@
 - **F-FA-018** — รายงานค่าใช้จ่ายไม่มีบิล (ใบรับรองแทนใบเสร็จรับเงิน)
 - **F-FA-017** — Employee Expense Claim
 
-พอร์ตมาจาก design prototype ใน `../monthly-expense-billing-web-app/project/ระบบบิลค่าใช้จ่ายรายเดือน.dc.html` ให้เป็นแอปจริง: Next.js (App Router) + PostgreSQL ผ่าน Prisma แทน `localStorage` เดิม ยังไม่มีระบบ login (ตามที่ตกลงกันไว้) และการอนุมัติยังคงเป็นการเซ็นชื่อบนกระดาษหลังพิมพ์ ไม่มี digital approval workflow
+พอร์ตมาจาก design prototype ใน `../monthly-expense-billing-web-app/project/ระบบบิลค่าใช้จ่ายรายเดือน.dc.html` ให้เป็นแอปจริง: Next.js (App Router) + PostgreSQL ผ่าน Prisma แทน `localStorage` เดิม ทุกคนมีบัญชี login ของตัวเอง (ไม่มีระดับสิทธิ์ต่างกัน) และการอนุมัติยังคงเป็นการเซ็นชื่อบนกระดาษหลังพิมพ์ ไม่มี digital approval workflow
 
 ## Stack
 
@@ -36,7 +36,7 @@ npm run dev
 - **เครื่องที่รองรับ virtualization**: ดู [`docs/DEPLOY.md`](./docs/DEPLOY.md) — รันผ่าน `docker compose up -d --build` (app + postgres + Caddy สำหรับ HTTPS + backup อัตโนมัติ ในตัว)
 - **เครื่องที่ virtualization ปิดอยู่ (BIOS)** เช่นกรณี Docker Desktop ขึ้น "Virtualization support not detected": ดู [`docs/DEPLOY-WINDOWS.md`](./docs/DEPLOY-WINDOWS.md) — ติดตั้งแบบ native (PostgreSQL ตรงบน Windows + รันแอปด้วย Node.js ผ่านสคริปต์ใน `deploy/windows/`)
 
-ทั้งสองแบบใช้ HTTP Basic Auth ร่วมกัน (`proxy.ts`, รหัสเดียวใช้ร่วมกันทั้งออฟฟิศ — ไม่มีระบบ login รายบุคคล) ตั้งค่าที่ `AUTH_USERNAME`/`AUTH_PASSWORD`
+ทั้งสองแบบใช้ระบบ login รายคนร่วมกัน (`proxy.ts`, ไม่มีระดับสิทธิ์ต่างกัน) ตั้งค่าคีย์เซ็น session cookie ที่ `SESSION_SECRET`, เพิ่มบัญชีผู้ใช้ผ่าน Prisma Studio (ดูหัวข้อ "การเพิ่มผู้ใช้" ใน `docs/DEPLOY.md`/`docs/DEPLOY-WINDOWS.md`)
 
 ## โครงสร้างโปรเจกต์
 
@@ -44,9 +44,10 @@ npm run dev
 app/                    routes (History, สร้างบิลใหม่, แก้ไขบิล)
 components/              UI components (forms, header, ตาราง, toolbar)
 lib/                     constants, format, totals (คำนวณยอดรวม), types, prisma client
-actions/                 Server Actions (profile.ts, records.ts, savedItems.ts)
+actions/                 Server Actions (auth.ts, profile.ts, records.ts, savedItems.ts)
+lib/auth.ts, lib/session.ts   password hashing + session cookie สำหรับ login รายคน
 prisma/                  schema + migrations
-proxy.ts                 HTTP Basic Auth + rate limiting (ทุก route)
+proxy.ts                 login รายคน + rate limiting (ทุก route)
 docs/                    DEPLOY.md (Docker) / DEPLOY-WINDOWS.md (native Windows)
 deploy/windows/          สคริปต์ deploy แบบ native Windows (ไม่ใช้ Docker)
 Dockerfile, docker-compose.yml, Caddyfile, backup.sh   deploy ผ่าน Docker บนเซิร์ฟเวอร์ภายในองค์กร

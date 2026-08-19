@@ -15,10 +15,11 @@
 
    ```bash
    cp .env.example .env
-   # แก้ POSTGRES_PASSWORD, AUTH_USERNAME, AUTH_PASSWORD ในไฟล์ .env ให้เป็นค่าจริงที่ปลอดภัย
+   # แก้ POSTGRES_PASSWORD, SESSION_SECRET ในไฟล์ .env ให้เป็นค่าจริงที่ปลอดภัย
+   # (สร้าง SESSION_SECRET ด้วย: node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
    ```
 
-   ไฟล์ `.env` นี้ใช้โดย `docker compose` เท่านั้น (เพื่อกำหนด `POSTGRES_PASSWORD`/`AUTH_USERNAME`/`AUTH_PASSWORD`) — คนละไฟล์กับ `.env` ที่เคยใช้ตอน dev ในเครื่อง ไม่ต้องคัดลอกอันเก่ามาด้วย `AUTH_USERNAME`/`AUTH_PASSWORD` คือรหัสเดียวที่ทุกคนในออฟฟิศใช้ร่วมกัน (HTTP Basic Auth, ดูคอมเมนต์ใน `proxy.ts`) — ไม่ตั้งไว้ ระบบจะปฏิเสธทุก request ตอน production (fail closed) ไม่ใช่เปิดให้เข้าได้ฟรีๆ
+   ไฟล์ `.env` นี้ใช้โดย `docker compose` เท่านั้น (เพื่อกำหนด `POSTGRES_PASSWORD`/`SESSION_SECRET`) — คนละไฟล์กับ `.env` ที่เคยใช้ตอน dev ในเครื่อง ไม่ต้องคัดลอกอันเก่ามาด้วย `SESSION_SECRET` เป็นค่าที่ใช้เซ็น session cookie ของระบบ login รายคน (ดูคอมเมนต์ใน `proxy.ts`/`lib/auth.ts`) — ไม่ตั้งไว้ ระบบจะปฏิเสธทุก request ตอน production (fail closed) ไม่ใช่เปิดให้เข้าได้ฟรีๆ บัญชีผู้ใช้แต่ละคนตั้งแยกต่างหาก (ดูหัวข้อ "การเพิ่มผู้ใช้" ด้านล่าง)
 
 3. สั่งสร้างและรัน:
 
@@ -32,17 +33,41 @@
 
 5. เข้าใช้งานผ่าน `https://<server-ip>` (พอร์ต 443 ผ่าน `caddy`, ไม่ใช่ 3000 ตรงๆ อีกต่อไป — ดูหัวข้อ HTTPS ด้านล่าง) เบราว์เซอร์จะเตือน "ไม่ปลอดภัย/not trusted" ในครั้งแรกเพราะใช้ certificate ที่ Caddy สร้างเอง (self-signed) ถือเป็นเรื่องปกติสำหรับแอปภายในองค์กรที่ไม่มีโดเมนสาธารณะ — กด "ดำเนินการต่อ"/Advanced → Proceed ได้ หรือจะติดตั้ง Caddy's local root CA บนเครื่องพนักงานเพื่อไม่ให้ขึ้นเตือนอีกก็ได้ (ดูหัวข้อ HTTPS)
 
-## การยืนยันตัวตน (Basic Auth)
+## การยืนยันตัวตน (login รายคน)
 
-ระบบนี้ไม่มีระบบ login รายบุคคล ใช้รหัสผ่านเดียวร่วมกันทั้งออฟฟิศแทน (HTTP Basic Auth, ทำงานใน `proxy.ts`) — เบราว์เซอร์จะเด้งกล่องใส่ username/password ให้ก่อนเข้าเว็บได้ทุกครั้ง (จำได้จนกว่าจะปิดเบราว์เซอร์/ล้าง cache) ตั้งค่าได้ที่ `AUTH_USERNAME`/`AUTH_PASSWORD` ในไฟล์ `.env`
+ทุกคนมีบัญชีของตัวเอง (username/password แยกคน, ดูหัวข้อ "การเพิ่มผู้ใช้" ถัดไป) — ยังไม่มีระดับสิทธิ์ต่างกัน (role) บัญชีไหนก็ทำได้ทุกอย่างเหมือนกันหมด แต่ระบบจะบันทึกไว้ว่าบิลแต่ละใบสร้าง/แก้ไขล่าสุดโดยใคร (`ExpenseRecord.createdByName`/`updatedByName`) เข้าเว็บครั้งแรกจะเด้งไปหน้า `/login` ให้กรอก username/password (จำได้ ~30 วันผ่าน session cookie จนกว่าจะกด "ออกจากระบบ") ตั้งค่าคีย์เซ็น cookie ได้ที่ `SESSION_SECRET` ในไฟล์ `.env`
 
 `proxy.ts` ไฟล์เดียวกันนี้ยังจำกัดจำนวน request ต่อ IP ด้วย (rate limiting) — ถ้า IP ไหนยิง request รัวเกินไปในช่วงเวลาสั้นๆ (ป้องกันการเดารหัสผ่านแบบ brute-force หรือสคริปต์ยิงลบ/บันทึกรัวๆ) จะได้ error 429 กลับไปชั่วคราว
 
-ถ้าไม่ตั้งสองตัวแปรนี้ตอน production ระบบจะตอบ error 500 ปฏิเสธทุก request แทนที่จะเปิดให้เข้าได้แบบไม่มีรหัสผ่านเงียบๆ
+ถ้าไม่ตั้ง `SESSION_SECRET` ตอน production ระบบจะตอบ error 500 ปฏิเสธทุก request แทนที่จะเปิดให้เข้าได้แบบไม่มีรหัสผ่านเงียบๆ
+
+## การเพิ่มผู้ใช้
+
+ไม่มีหน้าสมัครสมาชิกเอง (ทีมเล็ก ไม่คุ้มทำ) — เพิ่ม/แก้/ลบบัญชีผ่าน Prisma Studio โดยตรง:
+
+1. สร้างค่า `passwordHash` จากรหัสผ่านที่ต้องการ (รันบนเครื่องไหนก็ได้ที่มี Node.js — ไม่ต้องเชื่อมฐานข้อมูล):
+
+   ```bash
+   node -e "const c=require('crypto');const s=c.randomBytes(16);const h=c.pbkdf2Sync(process.argv[1],s,100000,32,'sha256');console.log('100000$'+s.toString('base64')+'$'+h.toString('base64'))" "รหัสผ่านที่ต้องการ"
+   ```
+
+2. เปิด Prisma Studio ชี้ไปที่ฐานข้อมูล production (ต้องมี `DATABASE_URL` จริงใน `.env` ที่เครื่องที่รันคำสั่งนี้):
+
+   ```bash
+   npx prisma studio
+   ```
+
+3. เปิดตาราง `User` → เพิ่มแถวใหม่ → กรอก `username`, `displayName` (ชื่อที่จะโชว์เป็น "สร้างโดย/แก้ไขล่าสุดโดย"), และวางค่า `passwordHash` จากขั้นตอนที่ 1 → บันทึก
+
+   **ห้ามแตะช่อง `id`** ปล่อยว่างไว้ให้ Prisma Studio สร้างให้อัตโนมัติ (ปุ่ม/ตัวเลือก "Generate" หรือค่า default) — ถ้าเผลอลบ/เคลียร์จน `id` กลายเป็นค่าว่าง บัญชีนั้นจะ login ได้ปกติ (ไม่ error) แต่ระบบจะปฏิเสธ session เงียบๆ ทุกครั้ง ทำให้ "สร้างโดย/แก้ไขล่าสุดโดย" ไม่ขึ้นชื่อสักที ทั้งที่ login สำเร็จ — ถ้าเจอแบบนี้ให้กลับมาเช็คว่า `id` ของบัญชีนั้นว่างอยู่หรือเปล่า
+
+4. บอก username + รหัสผ่าน (ไม่ใช่ hash) ให้เจ้าของบัญชีไปกรอกที่หน้า `/login`
+
+ลืมรหัสผ่าน/ต้องการเปลี่ยน → ทำซ้ำขั้นตอนที่ 1 ด้วยรหัสใหม่ แล้วแก้ `passwordHash` ของแถวนั้นใน Prisma Studio (ไม่มี flow ลืมรหัสผ่านผ่านอีเมล เพราะไม่มี email infra) ต้องการปิดสิทธิ์เข้าใช้ของใครคนหนึ่ง → ลบแถวของคนนั้นทิ้งได้เลย ไม่กระทบบัญชีคนอื่น
 
 ## HTTPS
 
-`docker-compose.yml` มี service `caddy` ทำหน้าที่ทำ HTTPS ให้อัตโนมัติด้วย certificate ที่ Caddy สร้างเอง (self-signed, ผ่าน `tls internal` ใน `Caddyfile`) เหมาะกับการใช้งานแบบ intranet/VPN ภายในที่ไม่มีโดเมนสาธารณะ — จำเป็นเพราะ Basic Auth ส่ง password แบบไม่เข้ารหัส (base64) ถ้าไม่มี HTTPS คั่นกลาง ใครดักแพ็กเก็ตในเครือข่ายได้ก็เห็นรหัสผ่านตรงๆ
+`docker-compose.yml` มี service `caddy` ทำหน้าที่ทำ HTTPS ให้อัตโนมัติด้วย certificate ที่ Caddy สร้างเอง (self-signed, ผ่าน `tls internal` ใน `Caddyfile`) เหมาะกับการใช้งานแบบ intranet/VPN ภายในที่ไม่มีโดเมนสาธารณะ — จำเป็นเพราะไม่มี HTTPS คั่นกลาง ใครดักแพ็กเก็ตในเครือข่ายได้ก็เห็น session cookie ตรงๆ แล้วสวมสิทธิ์ล็อกอินแทนได้
 
 ถ้าองค์กรมี internal CA หรือ certificate จริงอยู่แล้ว แก้ `Caddyfile` เปลี่ยนบรรทัด `tls internal` เป็น `tls /path/to/cert.pem /path/to/key.pem` (mount ไฟล์ cert เข้า container เพิ่ม) — ไม่ต้องแก้อย่างอื่นเลย
 
@@ -99,8 +124,8 @@ docker compose down -v    # หยุดและลบ volume — ข้อม�
 
 ## หมายเหตุ
 
-- ระบบนี้ไม่มีระบบ login แยกรายบุคคล ใช้รหัสผ่านเดียวร่วมกันทั้งออฟฟิศแทน (ดูหัวข้อ "การยืนยันตัวตน" ด้านบน) — ใครก็ตามที่รู้รหัสผ่านนี้และเข้าถึงเครือข่ายได้จะกรอก/แก้ไข/ลบข้อมูลได้ทั้งหมดเหมือนกันหมด ไม่มีการแยกสิทธิ์/บันทึกว่าใครทำอะไร (ไม่มี audit log) — ควรจำกัดการเข้าถึงระดับเครือข่ายเพิ่มด้วย (VPN/intranet only, firewall) เป็นชั้นป้องกันที่สอง ไม่ใช่พึ่งรหัสผ่านอย่างเดียว
+- ระบบนี้มี login รายคนแล้ว (ดูหัวข้อ "การยืนยันตัวตน"/"การเพิ่มผู้ใช้" ด้านบน) แต่ยังไม่มีระดับสิทธิ์ต่างกัน — บัญชีไหนที่ล็อกอินได้ก็กรอก/แก้ไข/ลบข้อมูลได้ทั้งหมดเหมือนกันหมด (แยกได้แค่ "ใครทำ" ผ่าน `createdByName`/`updatedByName` ไม่ใช่ "ใครทำอะไรได้บ้าง") ควรจำกัดการเข้าถึงระดับเครือข่ายเพิ่มด้วย (VPN/intranet only, firewall) เป็นชั้นป้องกันที่สอง ไม่ใช่พึ่งบัญชี login อย่างเดียว
 - การเซ็นอนุมัติยังคงเป็นการเซ็นบนกระดาษหลังพิมพ์ออกมา (ไม่มี digital approval workflow ในระบบ)
 - ถ้าองค์กรมี reverse proxy/HTTPS ของตัวเองอยู่แล้ว (เช่น nginx ที่หน้า data center) จะ proxy ตรงไปที่พอร์ต 443 ของ container `caddy` หรือจะถอด `caddy` service ออกแล้ว proxy ตรงไปที่ `app:3000` (ปรับกลับมา publish พอร์ต) แทนก็ได้ แล้วแต่ setup
-- การ deploy แบบ native Windows (ดู [`DEPLOY-WINDOWS.md`](./DEPLOY-WINDOWS.md), สคริปต์อยู่ใน `deploy/windows/`) **ไม่มี HTTPS ให้อัตโนมัติเหมือน docker-compose** — ต้องตั้ง reverse proxy (เช่น IIS + certificate) หน้า `deploy\windows\install-service.ps1` เองแยกต่างหาก มิฉะนั้น Basic Auth จะส่งรหัสผ่านแบบไม่เข้ารหัสผ่านเครือข่าย
+- การ deploy แบบ native Windows (ดู [`DEPLOY-WINDOWS.md`](./DEPLOY-WINDOWS.md), สคริปต์อยู่ใน `deploy/windows/`) **ไม่มี HTTPS ให้อัตโนมัติเหมือน docker-compose** — ต้องตั้ง reverse proxy (เช่น IIS + certificate) หน้า `deploy\windows\install-service.ps1` เองแยกต่างหาก มิฉะนั้น session cookie จะส่งผ่านเครือข่ายแบบไม่เข้ารหัส
 - การ deploy แบบเดียวกันนี้ก็ไม่มี backup อัตโนมัติแบบ docker-compose (service `backup`) ให้เหมือนกัน — ใช้ `deploy\windows\backup-postgres.ps1` แทน (ต้องมี `pg_dump.exe` บนเครื่อง มากับตัวติดตั้ง PostgreSQL) แล้วตั้งให้รันเป็นประจำผ่าน Windows Task Scheduler เอง — ดูตัวอย่างคำสั่งลงทะเบียนใน comment ของไฟล์นั้น
