@@ -1,9 +1,12 @@
 "use client";
 
-// Ported from the editor's top bar in the design source (ยกเลิก / พิมพ์ / PDF / บันทึก).
-// "ย้อนกลับ" (onBack) and "ดาวน์โหลด PDF" (onDownloadPdf) are later
-// additions on top of that original set — see BillEditor.tsx's handleBack/
-// handleDownloadPdf for what each actually does.
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+
+// The editor's top bar (Claude Design "Turn 4a" — a white rounded card
+// above the untouched black-and-white A4 paper). "ย้อนกลับ" (onBack) and
+// "ดาวน์โหลด PDF" (onDownloadPdf) are later additions to the original
+// ยกเลิก / พิมพ์ / บันทึก set — see BillEditor.tsx for what each does.
 export default function EditorToolbar({
   paperWidth,
   heading,
@@ -21,140 +24,105 @@ export default function EditorToolbar({
 }: {
   paperWidth: string;
   heading: string;
-  // Audit trail line ("สร้างโดย ... · แก้ไขล่าสุดโดย ..."), see
-  // BillEditor.tsx — undefined for a not-yet-saved draft.
   auditLine?: string;
   onBack: () => void;
   onCancel: () => void;
   onPrint: () => void;
   onDownloadPdf: () => void;
   downloadingPdf: boolean;
-  // Only passed for an FA017 draft (see BillEditor.tsx) — undefined hides
-  // the button entirely rather than disabling it, since "create an FA018
-  // from this" has no meaning once you're already looking at one.
+  // Only passed for an FA017 draft — undefined hides the button entirely.
   onCreateFA018?: () => void;
   onSave: () => void;
   saving: boolean;
   addRow: () => void;
   removeLastRow: () => void;
 }) {
-  // whiteSpace: nowrap on every button below is deliberate: FA018's
-  // paperWidth (794px) is too narrow to fit all 7 buttons on one line at
-  // their natural size, so without this each button's own *label* would
-  // wrap mid-word ("ย้อน"/"กลับ" on separate lines) once it got squeezed —
-  // technically fits, but reads as broken. flexWrap on both groups below
-  // means the fallback for "doesn't fit" is whole buttons dropping to a
-  // second row instead, which still looks like a normal toolbar.
-  const btn: React.CSSProperties = {
-    padding: "9px 16px",
-    borderRadius: 6,
-    font: "inherit",
-    fontWeight: 600,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  };
-
   return (
-    <div
-      className="no-print"
-      style={{
-        maxWidth: paperWidth,
-        margin: "0 auto 12px",
-        display: "flex",
-        flexWrap: "wrap",
-        rowGap: 8,
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
+    <Card
+      className="no-print mx-auto mb-3 flex flex-wrap items-center gap-3 p-4"
+      style={{ maxWidth: paperWidth }}
     >
-      <div style={{ display: "flex", flexWrap: "wrap", rowGap: 8, alignItems: "center", gap: 12 }}>
-        <div style={{ fontSize: 13, color: "#555", whiteSpace: "nowrap" }}>{heading}</div>
+      <div className="flex flex-col">
+        <span className="text-sm font-medium">{heading}</span>
         {auditLine && (
-          <div style={{ fontSize: 12, color: "#888", whiteSpace: "nowrap" }}>{auditLine}</div>
+          <span className="text-xs text-muted">{auditLine}</span>
         )}
-        {/* No row cap — FA017Form/FA018Form paginate onto additional A4
-            pages automatically once content overflows one (see
-            components/BillEditor.tsx's addRow and lib/pagination.ts), so
-            there's no "table full" state to disable this for anymore. */}
+      </div>
+
+      <div className="flex gap-2">
+        {/* No row cap — FA017Form/FA018Form paginate onto more A4 pages
+            automatically once content overflows one. */}
         <button
           onClick={addRow}
-          style={{
-            padding: "6px 14px",
-            border: "1px dashed #1c1c1c",
-            borderRadius: 4,
-            background: "#fff",
-            font: "inherit",
-            fontSize: 12,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
+          className="ui-btn whitespace-nowrap rounded-chip border border-dashed border-ink px-3.5 py-2 text-xs font-medium text-ink transition-colors hover:bg-hover"
         >
           + เพิ่มแถว
         </button>
-        <button
+        <Button
+          variant="danger"
+          size="sm"
+          className="whitespace-nowrap"
           onClick={removeLastRow}
-          className="btn-danger"
-          style={{ padding: "6px 14px", border: "1px solid #b3261e", color: "#b3261e", borderRadius: 4, background: "#fff", font: "inherit", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}
         >
           − ลบแถว
-        </button>
+        </Button>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", rowGap: 8, gap: 8 }}>
-        <button
+
+      <div className="ml-auto flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="whitespace-nowrap"
           onClick={onBack}
           title="กลับไปหน้ากรอกข้อมูล"
-          style={{ ...btn, border: "1px solid #999", background: "#fff" }}
         >
           ← ย้อนกลับ
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="whitespace-nowrap"
           onClick={onCancel}
-          style={{ ...btn, border: "1px solid #999", background: "#fff" }}
         >
           ยกเลิก
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="whitespace-nowrap border-ink text-ink"
           onClick={onPrint}
-          style={{ ...btn, border: "1px solid #1c1c1c", background: "#fff" }}
         >
           พิมพ์ / PDF
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="whitespace-nowrap border-ink text-ink"
           onClick={onDownloadPdf}
           disabled={downloadingPdf}
           title="ดาวน์โหลดเป็นไฟล์ PDF โดยตรง (ไม่ต้องผ่านหน้าต่างพิมพ์)"
-          style={{
-            ...btn,
-            border: "1px solid #1c1c1c",
-            background: "#fff",
-            opacity: downloadingPdf ? 0.6 : 1,
-          }}
         >
           {downloadingPdf ? "กำลังสร้าง PDF…" : "ดาวน์โหลด PDF"}
-        </button>
+        </Button>
         {onCreateFA018 && (
           <button
             onClick={onCreateFA018}
             title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
-            style={{ ...btn, border: "1px solid #1c1c1c", background: "#fff" }}
+            className="ui-btn whitespace-nowrap rounded-input bg-lavender px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:brightness-95"
           >
             สร้างฟอร์มใบรับรองแทนใบเสร็จ →
           </button>
         )}
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          className="whitespace-nowrap"
           onClick={onSave}
           disabled={saving}
-          style={{
-            ...btn,
-            border: "1px solid #1c1c1c",
-            background: "#1c1c1c",
-            color: "#fff",
-            opacity: saving ? 0.6 : 1,
-          }}
         >
           บันทึก
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }

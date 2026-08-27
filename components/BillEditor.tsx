@@ -300,21 +300,14 @@ export default function BillEditor({
           edits the same two fields as part of its d/m/y control. */}
       {draft.type === "FA018" && (
         <div
-          className="no-print"
-          style={{
-            maxWidth: paperWidth,
-            margin: "0 auto 12px",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 13,
-          }}
+          className="no-print mx-auto mb-3 flex items-center gap-2 text-[13px]"
+          style={{ maxWidth: paperWidth }}
         >
           <span>ประจำเดือน :</span>
           <select
             value={draft.monthName}
             onChange={(e) => setMonthName(e.target.value)}
-            style={{ font: "inherit", padding: "4px 6px" }}
+            className="rounded-input border border-line bg-surface px-2.5 py-1.5 text-sm"
           >
             {THAI_MONTHS.map((label, i) => (
               <option key={label} value={String(i + 1)}>
@@ -326,7 +319,7 @@ export default function BillEditor({
             type="number"
             value={draft.monthYear}
             onChange={(e) => setMonthYear(Number(e.target.value))}
-            style={{ font: "inherit", padding: "4px 6px", width: 80 }}
+            className="w-20 rounded-input border border-line bg-surface px-2.5 py-1.5 text-sm"
           />
         </div>
       )}
