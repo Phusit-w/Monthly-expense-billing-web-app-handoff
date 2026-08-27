@@ -127,8 +127,9 @@ export default function BillEditor({
 
   // "สร้างฟอร์มใบรับรองแทนใบเสร็จ" — same handoff EntryFormFA017.tsx's
   // identical button does (see its handleCreateFA018 doc comment for the
-  // field-mapping rationale: date/desc carry over, Receipt/Project-CC drop,
-  // remark resets), just triggered from an already-created FA017 bill
+  // field-mapping rationale: date/desc/Project-CC carry over — Project/CC
+  // lands in FA018's "เลขที่โครงการ" column — Receipt drops, remark resets),
+  // just triggered from an already-created FA017 bill
   // instead of the entry form. Swaps this same editor over to a fresh
   // FA018 draft in place (BillEditor already picks FA017Form vs FA018Form
   // from draft.type, so nothing else needs to change) — always starts with
@@ -158,7 +159,7 @@ export default function BillEditor({
           return {
             date: it.date,
             desc: it.desc,
-            projectNo: "",
+            projectNo: it.projectCC,
             amount: total ? total.toFixed(2) : "",
           };
         }),

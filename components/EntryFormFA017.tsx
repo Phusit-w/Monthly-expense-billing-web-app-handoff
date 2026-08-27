@@ -400,10 +400,9 @@ export default function EntryFormFA017({
   }
 
   // "สร้างฟอร์มใบรับรองแทนใบเสร็จ →" — hands the same rows off to an FA018 draft instead,
-  // carrying over วันที่ → วันที่, Description of Expenses → รายการ, and a
-  // row's amount → จำนวนเงิน. Everything FA018 has no equivalent for
-  // (Receipt, Project/CC) is dropped; เลขที่โครงการ is left blank same as a
-  // fresh FA018 row. DATE: does carry over even though FA018Form has no
+  // carrying over วันที่ → วันที่, Description of Expenses → รายการ,
+  // Project/CC → เลขที่โครงการ, and a row's amount → จำนวนเงิน. Receipt
+  // (which FA018 has no equivalent for) is dropped. DATE: does carry over even though FA018Form has no
   // visible field for it (see this file's "DATE :" state comment) — the
   // Draft still stores monthName/monthYear, which RecordsTable's history
   // view groups by, so the date the user actually picked here should win
@@ -445,7 +444,7 @@ export default function EntryFormFA017({
           return {
             date: it.date,
             desc: it.desc,
-            projectNo: "",
+            projectNo: it.projectCC,
             amount: total ? total.toFixed(2) : "",
           };
         }),
@@ -774,7 +773,7 @@ export default function EntryFormFA017({
       <div style={{ display: "flex", gap: 10, alignSelf: "flex-end" }}>
         <button
           onClick={handleCreateFA018}
-          title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Local Currency Amount)"
+          title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
           style={{
             padding: "12px 28px",
             border: "1px solid #1c1c1c",

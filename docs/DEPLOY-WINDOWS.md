@@ -75,6 +75,8 @@ npm run build
 
 (สคริปต์ `build` ตั้ง `--webpack` ไว้แล้วเป็นค่าเริ่มต้น เผื่อเครื่องนี้ก็ติด Application Control policy บล็อก native binary ของ SWC เหมือนเครื่อง dev)
 
+Prisma Client (`lib/generated/prisma/`) ถูก `.gitignore` ตัดออก (regeneratable) — ต้อง `npx prisma generate` ให้เกิดโฟลเดอร์นี้ก่อน build ไม่งั้น build พังทันทีด้วย `Module not found: Can't resolve '@/lib/generated/prisma/client'` ตอนนี้ `package.json` มี `postinstall: prisma generate` แล้ว `npm ci` ในขั้นตอนที่ 3 จะ generate ให้อัตโนมัติ — ถ้าข้ามขั้น 3 หรือ generate พลาด รันเองด้วย `npx prisma generate` ก่อน `npm run build`
+
 ### 7. ประกอบไฟล์ standalone ให้พร้อมรัน
 
 ```powershell

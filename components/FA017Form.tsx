@@ -72,6 +72,25 @@ const cellInput = (align?: "right" | "center"): React.CSSProperties => ({
   textAlign: align,
 });
 
+// Layered onto cellInput for the per-row Project/CC + amount cells, which
+// are <textarea>s (not one-line <input>s) so a value wider than the narrow
+// column wraps onto a second line and grows the row instead of the digits
+// being clipped or scrolling out of view. Same wrap/no-resize/no-scrollbar
+// treatment the Description textarea already uses.
+const cellTextareaWrap: React.CSSProperties = {
+  resize: "none",
+  overflow: "hidden",
+  whiteSpace: "normal",
+  wordBreak: "break-word",
+  lineHeight: 1.3,
+};
+
+// Total row's amount cells: same as their inline style was, plus wordBreak
+// so a grand total too wide for its column wraps rather than overflowing
+// the box (fmt()'s thousands separators are not break opportunities on
+// their own).
+const totalNumTd: React.CSSProperties = { border: "1px solid #000", padding: 5, textAlign: "right", wordBreak: "break-word" };
+
 // Column widths measured directly from the real F-FA-017 workbook (Excel
 // column-width units, converted to % of the 217.52-unit total) — replaces
 // earlier guesses made by eyeballing a compressed PDF render, which is what
@@ -348,7 +367,7 @@ export default function FA017Form({
     document.fonts.ready.then(() => {
       if (cancelled) return;
       rowRefs.current.forEach((tr) => {
-        tr.querySelectorAll<HTMLTextAreaElement>("textarea.desc-textarea").forEach((el) => {
+        tr.querySelectorAll<HTMLTextAreaElement>("textarea.desc-textarea, textarea.amount-textarea").forEach((el) => {
           el.style.height = "auto";
           el.style.height = `${el.scrollHeight}px`;
         });
@@ -514,22 +533,50 @@ export default function FA017Form({
     remeasure();
   });
 
-  // Shared behavior for the 7 per-row amount fields (Gasoline..Local
-  // Currency Amount): step="0.01" for 2-decimal increments, snap the
-  // displayed value to 2 decimals on blur (only when non-empty — an
-  // untouched cell stays blank rather than turning into "0.00"), and
-  // clear the field on focus if it's showing zero so typing a fresh
-  // number doesn't start by prefixing onto a "0".
+  // Re-measure a wrapping cell <textarea> and pin its height to the
+  // content: a value that wraps past one line grows the row to fit, a
+  // value that stops wrapping shrinks it back. Re-created every render so
+  // its ref identity changes every render, which is what makes React
+  // re-run it on mount *and* on every keystroke — same trick, and same
+  // reason, as the Description textarea's inline ref below.
+  const measureCellTextarea = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  // Shared props for the per-row Project/CC + amount cells. All are
+  // auto-growing <textarea>s (see cellTextareaWrap) so a value wider than
+  // the column wraps onto a new line instead of being clipped; Enter is
+  // swallowed so the field can never gain a literal newline of its own.
+  function wrapCellProps(i: number, field: ItemField, value: string) {
+    return {
+      ref: measureCellTextarea,
+      className: "amount-textarea",
+      rows: 1,
+      value,
+      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => updateItem(i, field, e.target.value),
+      onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter") e.preventDefault();
+      },
+    };
+  }
+
+  // wrapCellProps plus the numeric behavior of the 7 amount fields
+  // (Gasoline..Local Currency Amount): snap the value to 2 decimals on
+  // blur (only when non-empty — an untouched cell stays blank rather than
+  // turning into "0.00"), and clear the field on focus if it's showing
+  // zero so typing a fresh number doesn't start by prefixing onto a "0".
+  // inputMode keeps a numeric keypad on mobile now that there's no
+  // type="number" (a <textarea> has none); num() already does all parsing.
   function amountFieldProps(i: number, field: ItemField, value: string) {
     return {
-      type: "number" as const,
-      step: "0.01",
-      value,
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => updateItem(i, field, e.target.value),
-      onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+      ...wrapCellProps(i, field, value),
+      inputMode: "decimal" as const,
+      onFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => {
         if (e.target.value !== "" && num(e.target.value) === 0) updateItem(i, field, "");
       },
-      onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      onBlur: (e: React.FocusEvent<HTMLTextAreaElement>) => {
         if (e.target.value !== "") updateItem(i, field, num(e.target.value).toFixed(2));
       },
     };
@@ -873,31 +920,31 @@ export default function FA017Form({
                 </td>
                 {SHOW_PROJECT_FIELD && (
                   <td style={cellTd}>
-                    <input value={it.projectCC} onChange={(e) => updateItem(i, "projectCC", e.target.value)} style={cellInput("center")} />
+                    <textarea {...wrapCellProps(i, "projectCC", it.projectCC)} style={{ ...cellInput("center"), ...cellTextareaWrap }} />
                   </td>
                 )}
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "gasoline", it.gasoline)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "gasoline", it.gasoline)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "hotel", it.hotel)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "hotel", it.hotel)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "entertain", it.entertain)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "entertain", it.entertain)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "mobile", it.mobile)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "mobile", it.mobile)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "transport", it.transport)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "transport", it.transport)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "other", it.other)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "other", it.other)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
                 <td style={cellTd}>
-                  <input {...amountFieldProps(i, "localAmt", it.localAmt)} className="no-spin" style={cellInput("right")} />
+                  <textarea {...amountFieldProps(i, "localAmt", it.localAmt)} style={{ ...cellInput("right"), ...cellTextareaWrap }} />
                 </td>
-                <td style={{ ...cellTd, textAlign: "right", fontWeight: 600 }}>
+                <td style={{ ...cellTd, textAlign: "right", fontWeight: 600, wordBreak: "break-word" }}>
                   {isFA017ItemEmpty(it) ? "" : fmt(fa017RowTotal(it))}
                 </td>
               </tr>
@@ -971,14 +1018,14 @@ export default function FA017Form({
                 {Array.from({ length: totalsColspan - 1 }, (_, i) => (
                   <td key={i} style={{ border: "1px solid #000", padding: 5 }} />
                 ))}
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.gasoline)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.hotel)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.entertain)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.mobile)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.transport)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.other)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.localAmt)}</td>
-                <td style={{ border: "1px solid #000", padding: 5, textAlign: "right" }}>{fmt(grandTotals.thb)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.gasoline)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.hotel)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.entertain)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.mobile)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.transport)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.other)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.localAmt)}</td>
+                <td style={totalNumTd}>{fmt(grandTotals.thb)}</td>
               </tr>
               <SpacerRow cols={COL_PCT.length} />
               <SpacerRow cols={COL_PCT.length} />

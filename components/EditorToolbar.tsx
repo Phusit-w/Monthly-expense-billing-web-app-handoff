@@ -135,7 +135,7 @@ export default function EditorToolbar({
         {onCreateFA018 && (
           <button
             onClick={onCreateFA018}
-            title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Local Currency Amount)"
+            title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
             style={{ ...btn, border: "1px solid #1c1c1c", background: "#fff" }}
           >
             สร้างฟอร์มใบรับรองแทนใบเสร็จ →
