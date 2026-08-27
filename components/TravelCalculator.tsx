@@ -2,71 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { fmt } from "@/lib/format";
 import { RATES_EFFECTIVE_DATE, TRAVEL_ORIGIN, pendingTravelEntryKey } from "@/lib/travelRates";
 import type { PendingTravelEntry } from "@/lib/travelRates";
 import { useTravelCostCalculator } from "@/lib/useTravelCostCalculator";
 
-const cardStyle: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #d8d5cc",
-  borderRadius: 8,
-  padding: "18px 22px",
-};
+const inputClass =
+  "w-full rounded-field border border-line bg-surface px-3.5 py-2.5 text-sm text-ink outline-none " +
+  "transition-[border-color,box-shadow] duration-150 " +
+  "focus:border-[#181818] focus:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]";
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "7px 8px",
-  border: "1px solid #ccc",
-  borderRadius: 4,
-  font: "inherit",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  color: "#555",
-  marginBottom: 4,
-};
-
-// Styled after EditorToolbar's button conventions (dashed/outline for
-// secondary actions, filled black for the primary one) so this page reads
-// consistently with the rest of the app despite not being part of the
-// bill-editing flow.
-function tabButtonStyle(active: boolean): React.CSSProperties {
-  return {
-    padding: "10px 18px",
-    border: "1px solid #1c1c1c",
-    borderRadius: 6,
-    background: active ? "#1c1c1c" : "#fff",
-    color: active ? "#fff" : "#1c1c1c",
-    fontWeight: 600,
-    font: "inherit",
-    fontSize: 14,
-    cursor: "pointer",
-  };
-}
-
-// Matches EntryFormFA017/EntryFormFA018's "สร้างฟอร์ม →" primary button —
-// this is the same kind of "hand off to the form" action.
-const primaryBtnStyle: React.CSSProperties = {
-  padding: "10px 20px",
-  border: "1px solid #1c1c1c",
-  background: "#1c1c1c",
-  color: "#fff",
-  borderRadius: 6,
-  font: "inherit",
-  fontWeight: 700,
-  fontSize: 14,
-  cursor: "pointer",
-};
+const labelClass = "mb-1.5 block text-[13px] font-medium text-label";
 
 export default function TravelCalculator() {
   const router = useRouter();
   // State + calculation logic lives in useTravelCostCalculator (shared with
-  // TravelRowCalculatorPanel's compact per-row version on the entry forms)
-  // — this component only owns page-level concerns (routing the result to
-  // a specific entry-form type via sessionStorage).
+  // TravelRowCalculatorPanel's compact per-row version on the entry forms).
   const {
     mode,
     setMode,
@@ -108,34 +61,40 @@ export default function TravelCalculator() {
     router.push(`/bill/entry/${type.toLowerCase()}`);
   }
 
+  function tabClass(active: boolean) {
+    return `ui-btn rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
+      active ? "bg-ink text-white" : "text-muted hover:text-ink"
+    }`;
+  }
+
   return (
     <PageShell>
-      <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="mx-auto flex w-full max-w-[900px] flex-col gap-4">
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700 }}>
+          <h1 className="font-display text-[28px] font-bold leading-tight">
             คำนวณค่าเดินทางกรณีปฏิบัติงานภายนอกบริษัท
-          </div>
-          <div style={{ fontSize: 13, color: "#666", marginTop: 2 }}>ตามระเบียบ Cir.HR-076/2022</div>
+          </h1>
+          <p className="mt-1 text-sm text-muted">ตามระเบียบ Cir.HR-076/2022</p>
         </div>
 
-        <div style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontWeight: 700, fontSize: 13, color: "#555" }}>ต้นทาง:</span>
-          <span style={{ fontSize: 14 }}>{TRAVEL_ORIGIN}</span>
+        <div className="flex items-center gap-3 rounded-card bg-peach px-5 py-4">
+          <span className="text-[13px] font-medium text-[#7a5a2e]">ต้นทาง:</span>
+          <span className="text-sm">{TRAVEL_ORIGIN}</span>
         </div>
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button style={tabButtonStyle(mode === "fixed")} onClick={() => setMode("fixed")}>
+        <div className="flex flex-wrap gap-1.5 self-start rounded-field bg-chip p-1.5">
+          <button className={tabClass(mode === "fixed")} onClick={() => setMode("fixed")}>
             เลือกจากปลายทางตามประกาศบริษัท
           </button>
-          <button style={tabButtonStyle(mode === "meter")} onClick={() => setMode("meter")}>
+          <button className={tabClass(mode === "meter")} onClick={() => setMode("meter")}>
             เลือกระยะทางจากปลายทางอื่นๆ
           </button>
         </div>
 
         {mode === "fixed" ? (
-          <div style={cardStyle}>
-            <label style={labelStyle}>ปลายทาง (พิมพ์เพื่อค้นหา)</label>
-            <div style={{ position: "relative" }}>
+          <Card className="p-6">
+            <label className={labelClass}>ปลายทาง (พิมพ์เพื่อค้นหา)</label>
+            <div className="relative">
               <input
                 value={query}
                 onChange={(e) => {
@@ -146,26 +105,12 @@ export default function TravelCalculator() {
                 onFocus={() => setShowList(true)}
                 onBlur={() => setTimeout(() => setShowList(false), 150)}
                 placeholder="พิมพ์ชื่อปลายทาง..."
-                style={inputStyle}
+                className={inputClass}
               />
               {showList && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 4px)",
-                    left: 0,
-                    right: 0,
-                    maxHeight: 260,
-                    overflowY: "auto",
-                    background: "#fff",
-                    border: "1px solid #ccc",
-                    borderRadius: 4,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    zIndex: 10,
-                  }}
-                >
+                <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 max-h-[260px] overflow-y-auto rounded-field border border-line bg-surface shadow-dropdown">
                   {filtered.length === 0 ? (
-                    <div style={{ padding: "10px 12px", color: "#999", fontSize: 13 }}>
+                    <div className="px-3 py-2.5 text-[13px] text-muted">
                       ไม่พบปลายทางในรายการ — ลองใช้แท็บ &quot;เลือกระยะทางจากปลายทางอื่นๆ&quot; แทน
                     </div>
                   ) : (
@@ -173,16 +118,11 @@ export default function TravelCalculator() {
                       <div
                         key={d.name}
                         onClick={() => selectDestination(d)}
-                        style={{
-                          padding: "9px 12px",
-                          fontSize: 13,
-                          cursor: "pointer",
-                          borderBottom: "1px solid #f0efe9",
-                        }}
                         onMouseDown={(e) => e.preventDefault()}
+                        className="cursor-pointer border-b border-divider px-3 py-2.5 text-[13px] last:border-b-0 hover:bg-hover"
                       >
                         {d.name}
-                        <span style={{ color: "#999", marginLeft: 8 }}>
+                        <span className="ml-2 text-muted">
                           ({d.distanceKm} กม. · {fmt(d.price)} บาท)
                         </span>
                       </div>
@@ -193,28 +133,22 @@ export default function TravelCalculator() {
             </div>
 
             {selected && (
-              <div
-                style={{
-                  marginTop: 16,
-                  padding: "14px 16px",
-                  background: "#f7f6f1",
-                  border: "1px solid #e3e0d8",
-                  borderRadius: 6,
-                }}
-              >
-                <div style={{ fontSize: 13, color: "#555" }}>{selected.name}</div>
-                <div style={{ fontSize: 13, color: "#555", marginTop: 4 }}>
+              <div className="mt-4 rounded-field bg-[#f8f8f8] px-4 py-3.5">
+                <div className="text-[13px] text-label">{selected.name}</div>
+                <div className="mt-1 text-[13px] text-label">
                   ระยะทาง: {selected.distanceKm} กม.
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>{fmt(resultAmount, 0)} บาท</div>
+                <div className="mt-1.5 font-display text-[22px] font-bold">
+                  {fmt(resultAmount, 0)} บาท
+                </div>
               </div>
             )}
-          </div>
+          </Card>
         ) : (
-          <div style={cardStyle}>
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <label style={labelStyle}>
+          <Card className="p-6">
+            <div className="flex flex-wrap gap-4">
+              <div className="min-w-[200px] flex-1">
+                <label className={labelClass}>
                   ระยะทาง (กม.) —{" "}
                   <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
                     ดูระยะทางจาก Google Maps
@@ -226,26 +160,26 @@ export default function TravelCalculator() {
                   step="0.1"
                   value={distanceKm}
                   onChange={(e) => setDistanceKm(e.target.value)}
-                  style={inputStyle}
+                  className={inputClass}
                 />
               </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <label style={labelStyle}>นาทีรถติดเผื่อไว้ (ความเร็ว &lt;6 กม./ชม.)</label>
+              <div className="min-w-[200px] flex-1">
+                <label className={labelClass}>นาทีรถติดเผื่อไว้ (ความเร็ว &lt;6 กม./ชม.)</label>
                 <input
                   type="number"
                   min={0}
                   step="1"
                   value={trafficMinutes}
                   onChange={(e) => setTrafficMinutes(e.target.value)}
-                  style={inputStyle}
+                  className={inputClass}
                 />
               </div>
             </div>
 
-            <div style={{ marginTop: 16 }}>
-              <label style={labelStyle}>ประเภทรถ</label>
-              <div style={{ display: "flex", gap: 20, fontSize: 14 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+            <div className="mt-4">
+              <label className={labelClass}>ประเภทรถ</label>
+              <div className="flex gap-5 text-sm">
+                <label className="flex cursor-pointer items-center gap-1.5">
                   <input
                     type="radio"
                     name="vehicleType"
@@ -254,7 +188,7 @@ export default function TravelCalculator() {
                   />
                   รถปกติ
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+                <label className="flex cursor-pointer items-center gap-1.5">
                   <input
                     type="radio"
                     name="vehicleType"
@@ -266,12 +200,12 @@ export default function TravelCalculator() {
               </div>
             </div>
 
-            <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <div className="mt-4 flex flex-col gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2">
                 <input type="checkbox" checked={viaApp} onChange={(e) => setViaApp(e.target.checked)} />
                 เรียกผ่าน Call center/แอพ (+20 บาท)
               </label>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+              <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={airportPickup}
@@ -281,71 +215,53 @@ export default function TravelCalculator() {
               </label>
             </div>
 
-            <div
-              style={{
-                marginTop: 16,
-                padding: "14px 16px",
-                background: "#f7f6f1",
-                border: "1px solid #e3e0d8",
-                borderRadius: 6,
-              }}
-            >
-              <div style={{ fontSize: 22, fontWeight: 700 }}>{fmt(resultAmount, 0)} บาท</div>
+            <div className="mt-4 rounded-field bg-[#f8f8f8] px-4 py-3.5">
+              <div className="font-display text-[22px] font-bold">
+                {fmt(resultAmount, 0)} บาท
+              </div>
               {meterResult.breakdown.length > 0 && (
-                <div style={{ marginTop: 10, fontSize: 12, color: "#666" }}>
+                <div className="mt-2.5 text-xs text-label">
                   {meterResult.breakdown.map((b, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+                    <div key={i} className="flex justify-between py-0.5">
                       <span>{b.label}</span>
                       <span>{fmt(b.amount)}</span>
                     </div>
                   ))}
                 </div>
               )}
-              <div style={{ marginTop: 10, fontSize: 11.5, color: "#b3261e" }}>
+              <div className="mt-2.5 text-[11.5px] text-danger">
                 โปรแกรมคำนวณนี้ใช้เพื่อเป็นข้อมูลประกอบการตัดสินใจเบื้องต้นเท่านั้น
                 ไม่สามารถนำมาเป็นหลักฐานอ้างอิงได้
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {hasResult && (
-          <div style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: 10 }}>
-            <div style={{ fontWeight: 700, fontSize: 14 }}>ส่งค่านี้ไปกรอกในฟอร์ม</div>
-            <div style={{ fontSize: 12, color: "#777" }}>
+          <Card className="flex flex-col gap-2.5 p-6">
+            <div className="text-base font-medium">ส่งค่านี้ไปกรอกในฟอร์ม</div>
+            <div className="text-[13px] text-muted">
               จะไปเติมที่แถวว่างแรกของตารางรายการ (หรือเพิ่มแถวใหม่ถ้าไม่มีแถวว่างเหลือ) — แก้ไขต่อได้ตามปกติ
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button onClick={() => sendToForm("FA017")} style={primaryBtnStyle}>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="primary" size="sm" onClick={() => sendToForm("FA017")}>
                 ส่งไปฟอร์ม Expense Claim →
-              </button>
-              <button onClick={() => sendToForm("FA018")} style={primaryBtnStyle}>
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => sendToForm("FA018")}>
                 ส่งไปฟอร์ม ใบรับรองแทนใบเสร็จ →
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         )}
 
         <div>
-          <button
-            onClick={handleClear}
-            style={{
-              padding: "9px 16px",
-              border: "1px solid #999",
-              borderRadius: 6,
-              background: "#fff",
-              font: "inherit",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer",
-            }}
-          >
+          <Button variant="outline" size="sm" onClick={handleClear}>
             ล้างข้อมูล
-          </button>
+          </Button>
         </div>
 
-        <div style={{ fontSize: 11.5, lineHeight: 1.7, color: "#777", marginTop: 8 }}>
-          <div style={{ fontWeight: 700, color: "#555", marginBottom: 4 }}>หมายเหตุ</div>
+        <div className="mt-2 text-[11.5px] leading-relaxed text-muted">
+          <div className="mb-1 font-medium text-label">หมายเหตุ</div>
           <div>
             1. ค่าเดินทางปฏิบัติงานนอกบริษัท หมายถึงค่าเดินทางโดยรถยนต์ส่วนตัว/แท็กซี่มิเตอร์/แกร็บแท็กซี่
             เป็นต้น
