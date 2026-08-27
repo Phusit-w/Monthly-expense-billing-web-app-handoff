@@ -159,3 +159,38 @@ Get-Service ExpenseBillingApp     # ต้อง Running
 - โค้ดแก้เสร็จ + commit + push `backup` เรียบร้อย — **ยังไม่ได้ deploy ขึ้นเซิร์ฟเวอร์**
 - เครื่อง dev: `npm run dev` + `pilot-db` (prisma dev) รันค้างอยู่จากเซสชันนี้
 - **ทำต่อ:** ทำตามส่วนที่ 2 (deploy) — เริ่มจากข้อ 0 (backup DB) หรือจะจัดการ follow-up ข้อ 1 (BOM) / ข้อ 3 (push origin) ก่อนก็ได้
+
+---
+
+## ส่วนที่ 4 — deploy ขึ้นเซิร์ฟเวอร์แล้ว (ต่อในเซสชันเดียวกัน 2026-08-27)
+
+**deploy สำเร็จ** — FA017 wrapping + Project/CC → เลขที่โครงการ ขึ้น production `psaidemo.icn21.local` แล้ว ทดสอบผ่าน (login เดิมใช้ได้ / บิลเก่าครบ / ตัวเลขยาว wrap / ปุ่มสร้าง FA018 map Project/CC ถูก)
+
+### สิ่งที่เจอ + แก้เพิ่มระหว่าง deploy (commit + push `origin` แล้ว)
+
+| commit | เรื่อง |
+|---|---|
+| `a1d2911` | เติม UTF-8 BOM ให้ `deploy/windows/*.ps1` ทั้ง 8 ไฟล์ (follow-up §3.1 — จบแล้ว) |
+| `66127a8` | เลิก track `expense-billing-app-deploy.zip` + `.gitignore` (มันติดอยู่ใน `origin` จาก web upload รอบ 08-19) |
+| `769071f` | **fix `backup-postgres.ps1`**: `pg_dump <uri> --file <dest>` พังบน pg_dump Windows (getopt หยุด parse option หลังเจอ positional แรก) → "too many command-line arguments (first is --file)" แก้เป็น `pg_dump --file <dest> --dbname <uri>` |
+| `a88dc0f` | **เพิ่ม `deploy/windows/update.ps1`** — one-command redeploy (ดูข้างล่าง) |
+
+- `origin/main` ตอนนี้ = local (push แล้ว ครบทุก commit) — **`backup` remote ยัง diverge** (rebase ทำ hash เปลี่ยน; เนื้อหาโค้ดเหมือนกัน) force-push ถูก classifier บล็อก ยังไม่ได้ทำ ถ้าจะ sync: `git push backup main --force`
+- pilot DB บนเครื่อง dev / production DB backup: `pg_dump` production ได้ไฟล์ 12 KB (schema + 9 users + 1 บิล + 2 SavedEmployee + 1 SavedItem) — production ข้อมูลน้อยเพราะ pilot data ยังไม่ migrate (ค้างเดิม §3.4)
+
+### `update.ps1` — routine redeploy รอบต่อไปใช้ตัวนี้
+
+รอบหน้าที่แก้แค่โค้ด (ไม่มี migration):
+1. **dev:** `git commit` → `git push origin main` → `git archive --format=zip -o ..\expense-billing-app-deploy.zip HEAD`
+2. ก็อป zip ขึ้นเซิร์ฟเวอร์ → **แตกทับ** `C:\Apps\expense-billing-app-deploy` (การแตกทับนี้เอง `update.ps1` ตัวใหม่ก็มากับ zip)
+3. **server:** `.\deploy\windows\update.ps1`
+
+`update.ps1` ทำ: backup DB → `nssm stop` → `npm ci` (เฉพาะตอน `package-lock.json` เปลี่ยนจริง เทียบ hash) → `prisma migrate deploy` → `prisma generate` → `npm run build` → `stage-standalone.ps1` → `nssm start` → health check `GET /login` 200
+
+- **ไม่แตะ env ของ service** — อ่าน `DATABASE_URL` / `SESSION_SECRET` / `PORT` จาก `AppEnvironmentExtra` เดิม → ไม่ต้องพิมพ์รหัส/secret ซ้ำ (บทเรียนรอบนี้: พลาดใส่ `SESSION_SECRET` มี `<>` ครอบ ต้องรัน `install-service.ps1` ซ้ำ)
+- `install-service.ps1` เหลือไว้ใช้เฉพาะ **ติดตั้งครั้งแรก** หรือ **ต้องเปลี่ยน env var**
+
+### follow-up ใหม่จากส่วนนี้
+
+- **`icn_logo-removebg-preview.png ... received null`** สแปม `logs/service-err.log` ทุก request (`components/Header.tsx:74` ใช้ `next/image` แต่ optimizer ทำงานไม่ได้ใน standalone — น่าจะขาด `sharp`) ไฟล์มีจริงใน `public/` + ก็อปเข้า standalone แล้ว แอปไม่ crash โลโก้ขึ้นรูปแตก **แนะนำแก้:** `images: { unoptimized: true }` ใน `next.config.ts` แล้ว rebuild — one-liner แก้ทุกหน้า (รวม `/icn-logo.png` ใน FA017/FA018Form ด้วย) nssm rotate log ไว้แล้วไม่ท่วมดิสก์
+- ยังไม่ได้ทำ `git push backup main --force` (ดูข้างบน)
