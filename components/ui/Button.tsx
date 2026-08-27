@@ -5,7 +5,13 @@ import type { ButtonHTMLAttributes } from "react";
 // explicitly excludes, so each variant keeps its own hover treatment.
 // Legacy screens keep their inline-styled <button>s until they're converted.
 
-type Variant = "primary" | "dark" | "outline" | "ghost" | "danger";
+type Variant =
+  | "primary"
+  | "dark"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "dangerSolid";
 type Size = "md" | "sm";
 
 const base =
@@ -26,8 +32,11 @@ const variants: Record<Variant, string> = {
   outline:
     "border border-line bg-surface text-label hover:bg-hover hover:text-ink",
   ghost: "bg-transparent text-label hover:bg-hover hover:text-ink",
+  // Outline red — the "ลบ" / "ล้างข้อมูล" pills. Fills solid red on hover.
   danger:
     "border border-danger-border bg-surface text-danger hover:bg-danger hover:text-white",
+  // Solid red — a confirm-delete primary action.
+  dangerSolid: "bg-danger text-white hover:bg-[#8f1e17] active:bg-[#7a1a14]",
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
