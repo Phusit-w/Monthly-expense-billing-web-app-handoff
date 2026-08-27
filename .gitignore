@@ -62,3 +62,7 @@ next-env.d.ts
 # database backups (docker-compose's `backup` service / backup-postgres.ps1)
 # — real financial/employee data, never commit these
 /backups
+
+# deploy archive produced by `git archive` for server transfer — a build
+# artifact, rebuilt each deploy; never version-control it
+/expense-billing-app-deploy.zip
