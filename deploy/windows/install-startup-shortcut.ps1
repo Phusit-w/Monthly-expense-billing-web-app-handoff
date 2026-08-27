@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Registers run-loop.ps1 to launch automatically when THIS Windows account
   logs in — no Administrator rights required (unlike a real Windows Service).

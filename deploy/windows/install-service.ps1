@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Installs (or reinstalls) the app as a Windows Service using NSSM.
 

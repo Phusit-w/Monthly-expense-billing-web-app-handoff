@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Assembles a runnable copy of the Next.js standalone build.
 

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Runs the app forever, restarting it if it crashes — no admin rights or
   Windows Service required. Pair with install-startup-shortcut.ps1 so this

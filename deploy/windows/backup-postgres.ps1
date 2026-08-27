@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Dumps the production Postgres database to a timestamped .sql file and
   deletes backups older than -RetentionDays. For the native-Windows-Service

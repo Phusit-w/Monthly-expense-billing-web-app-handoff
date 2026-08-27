@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Stops a run-loop.ps1 instance started on this machine (kills both the
   loop's own PowerShell process and the current node.exe child, if any).

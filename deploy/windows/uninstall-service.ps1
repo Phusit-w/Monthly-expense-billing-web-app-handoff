@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Stops and removes the Windows Service installed by install-service.ps1.
 #>

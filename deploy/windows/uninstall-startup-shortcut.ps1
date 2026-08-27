@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Removes the auto-start shortcut created by install-startup-shortcut.ps1.
   Does not stop an already-running instance — use stop-run-loop.ps1 for that.
