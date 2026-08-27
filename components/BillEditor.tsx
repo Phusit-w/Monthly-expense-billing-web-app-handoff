@@ -169,7 +169,7 @@ export default function BillEditor({
   }
 
   function handleCancel() {
-    router.push("/");
+    router.push("/records");
   }
 
   // Default "ย้อนกลับ": navigate to the corresponding friendly entry form
@@ -255,7 +255,7 @@ export default function BillEditor({
         );
         return;
       }
-      router.push("/");
+      router.push("/records");
     });
   }
 

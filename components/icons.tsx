@@ -144,4 +144,11 @@ export const ChevronDownIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const ShieldIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3.5l7 3v5.5c0 4.5-3 7.5-7 8.5-4-1-7-4-7-8.5V6.5z" />
+    <path d="M9 12.5l2 2 4-4.5" />
+  </Icon>
+);
+
 export type { IconProps };

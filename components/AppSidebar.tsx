@@ -83,6 +83,28 @@ export default function AppSidebar() {
           {NAV_ITEMS.map((item) => {
             const active = isNavItemActive(item, pathname);
             const Icon = item.icon;
+
+            if (item.disabled) {
+              return (
+                <li key={item.label}>
+                  <div
+                    title="เร็วๆ นี้"
+                    className="flex cursor-not-allowed items-center gap-3 px-4 opacity-40"
+                  >
+                    <span className="grid size-12 shrink-0 place-items-center rounded-chip text-[#8b8b8b]">
+                      <Icon size={22} />
+                    </span>
+                    <span
+                      className="whitespace-nowrap text-sm font-medium text-[#c9c9c9]"
+                      style={labelStyle}
+                    >
+                      {item.label}
+                    </span>
+                  </div>
+                </li>
+              );
+            }
+
             return (
               <li key={item.href}>
                 <Link

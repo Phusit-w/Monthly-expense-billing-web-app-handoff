@@ -10,6 +10,8 @@ import { BellIcon, ChevronRightIcon } from "@/components/icons";
 // mockup; wire it up when a notification source exists.
 
 function crumbForPath(pathname: string): string {
+  // The launcher is "หน้าหลัก" itself — no second crumb.
+  if (pathname === "/") return "";
   const navMatch = NAV_ITEMS.find((i) => isNavItemActive(i, pathname));
   if (navMatch) return navMatch.label;
   // Routes with no sidebar entry (the pixel-perfect bill editor).

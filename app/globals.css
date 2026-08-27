@@ -62,12 +62,21 @@ body {
   padding: 0;
 }
 
-a {
-  color: #1a56db;
-}
+/* Wrapped in @layer base so Tailwind utility classes (which live in
+   @layer utilities) can override the link colour on <Link>s styled as
+   buttons/cards/nav — unlayered rules always beat layered ones regardless
+   of specificity, which is why `text-ink` on a styled <a> was losing to a
+   bare `a { color }` before. Genuine inline text links (e.g. the Google
+   Maps link on /travel) still get this blue since they set no colour of
+   their own. */
+@layer base {
+  a {
+    color: #1a56db;
+  }
 
-a:hover {
-  color: #1e429f;
+  a:hover {
+    color: #1e429f;
+  }
 }
 
 * {

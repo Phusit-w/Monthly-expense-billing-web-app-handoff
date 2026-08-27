@@ -1,143 +1,131 @@
 import Link from "next/link";
-import { getProfile, listSavedEmployees } from "@/actions/profile";
-import { listRecords } from "@/actions/records";
-import PageShell from "@/components/PageShell";
-import ProfileCard from "@/components/ProfileCard";
-import RecordsTable from "@/components/RecordsTable";
-import { fmt } from "@/lib/format";
-import { THAI_MONTHS } from "@/lib/constants";
+import {
+  ReceiptIcon,
+  FileTextIcon,
+  CarIcon,
+  ListIcon,
+  ShieldIcon,
+} from "@/components/icons";
 
-// Records change whenever anyone saves/deletes a bill, so this page must
-// never be served from a static build-time snapshot.
-export const dynamic = "force-dynamic";
+// The Applications launcher — the portal front door. Matches Claude Design
+// "Turn 6a": a card grid of every tool in the system, plus a disabled
+// "เร็วๆ นี้" slot for future subsystems. Static; no data fetch.
+export const dynamic = "force-static";
 
-function relativeDay(iso: string): string {
-  const then = new Date(iso);
-  const today = new Date();
-  const startOf = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const days = Math.round((startOf(today) - startOf(then)) / 86_400_000);
-  if (days <= 0) return "วันนี้";
-  if (days === 1) return "เมื่อวาน";
-  return then.toLocaleDateString("th-TH", {
-    day: "numeric",
-    month: "short",
-  });
-}
+type Tile = {
+  href: string;
+  title: string;
+  desc: string;
+  cta: string;
+  icon: (p: { size?: number }) => React.ReactElement;
+  tile: string;
+  soon?: boolean;
+};
 
-// The history view. Server Component: fetches profile + records straight
-// from the DB.
-export default async function HistoryPage() {
-  // Sequential, not Promise.all: verified against this project's Postgres
-  // setup that concurrent queries sharing one Prisma client can corrupt the
-  // wire protocol (mixed-up bind/prepared-statement state).
-  const profile = await getProfile();
-  const savedEmployees = await listSavedEmployees();
-  const records = await listRecords();
+const TILES: Tile[] = [
+  {
+    href: "/bill/entry/fa017",
+    title: "Employee Expense Claim",
+    desc: "F-FA-017 · เบิกค่าใช้จ่ายที่มีใบเสร็จ พร้อมคำนวณค่าเดินทางในตัว",
+    cta: "เปิดฟอร์ม →",
+    icon: ReceiptIcon,
+    tile: "bg-peach",
+  },
+  {
+    href: "/bill/entry/fa018",
+    title: "ใบรับรองแทนใบเสร็จ",
+    desc: "F-FA-018 · สำหรับค่าใช้จ่ายที่ไม่มีบิล เช่น ค่ารถ ค่าที่จอดรถ",
+    cta: "เปิดฟอร์ม →",
+    icon: FileTextIcon,
+    tile: "bg-lavender",
+  },
+  {
+    href: "/travel",
+    title: "คำนวณค่าเดินทาง",
+    desc: "คิดระยะทาง เบี้ยเลี้ยง และค่าน้ำมันตามอัตราบริษัท",
+    cta: "เปิดเครื่องมือ →",
+    icon: CarIcon,
+    tile: "bg-chip",
+  },
+  {
+    href: "/records",
+    title: "รายการทั้งหมด",
+    desc: "บิลที่บันทึกไว้ทั้งหมด ค้นหา แก้ไข ทำซ้ำ และพิมพ์",
+    cta: "เปิดรายการ →",
+    icon: ListIcon,
+    tile: "bg-chip",
+  },
+  {
+    href: "#",
+    title: "ตรวจสอบ SOC",
+    desc: "ตรวจสอบเอกสารอ้างอิงและ Statement of Compliance",
+    cta: "ยังใช้งานไม่ได้",
+    icon: ShieldIcon,
+    tile: "bg-chip",
+    soon: true,
+  },
+];
 
-  const now = new Date();
-  const monthNum = String(now.getMonth() + 1);
-  const beYear = now.getFullYear() + 543;
-  const thisMonth = records.filter(
-    (r) => r.monthName === monthNum && r.monthYear === beYear,
-  );
-  const monthTotal = thisMonth.reduce((s, r) => s + parseFloat(r.total), 0);
-  const fa018Count = records.filter((r) => r.type === "FA018").length;
-  const lastEdited = records[0]; // listRecords orders by updatedAt desc
-
-  const stats: {
-    label: string;
-    value: string;
-    tone: "plain" | "peach" | "lavender";
-  }[] = [
-    {
-      label: "ยอดรวมเดือนนี้",
-      value: monthTotal ? fmt(monthTotal) : "-",
-      tone: "plain",
-    },
-    {
-      label: `ฟอร์มเดือน${THAI_MONTHS[now.getMonth()]}`,
-      value: `${thisMonth.length} ฉบับ`,
-      tone: "peach",
-    },
-    {
-      label: "ใบรับรองแทนใบเสร็จ",
-      value: `${fa018Count} ฉบับ`,
-      tone: "lavender",
-    },
-    {
-      label: "แก้ไขล่าสุด",
-      value: lastEdited
-        ? `${relativeDay(lastEdited.updatedAt)} · ${lastEdited.updatedByName || "-"}`
-        : "—",
-      tone: "plain",
-    },
-  ];
-
-  const toneClass = {
-    plain: "bg-surface shadow-card text-ink",
-    peach: "bg-peach text-[#7a5a2e]",
-    lavender: "bg-lavender text-[#3b3f75]",
-  } as const;
-
+export default function AppsLauncherPage() {
   return (
-    <PageShell>
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-end gap-5">
-          <div className="flex flex-col gap-1.5">
-            <h1 className="font-display text-[28px] font-bold leading-tight">
-              รายการทั้งหมด
-            </h1>
-            <p className="text-sm text-muted">
-              ระบบบิลค่าใช้จ่ายรายเดือน · {records.length} รายการที่บันทึกไว้
-            </p>
-          </div>
-          <div className="ml-auto flex flex-wrap gap-2.5">
-            <Link
-              href="/travel"
-              className="rounded-field border border-line bg-surface px-5 py-3 text-[13.5px] font-medium transition-colors hover:bg-hover"
-            >
-              คำนวณค่าเดินทาง
-            </Link>
-            <Link
-              href="/bill/entry/fa018"
-              className="rounded-field border-[1.5px] border-ink px-5 py-3 text-[13.5px] font-medium transition-colors hover:bg-hover"
-            >
-              + ใบรับรองแทนใบเสร็จ
-            </Link>
-            <Link
-              href="/bill/entry/fa017"
-              className="rounded-field bg-accent px-5 py-3 font-display text-[13.5px] font-bold transition-colors hover:bg-[#f08d10]"
-            >
-              + Expense Claim
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className={`flex flex-col gap-1.5 rounded-card p-5 ${toneClass[s.tone]}`}
-            >
-              <div
-                className={`text-[13px] ${s.tone === "plain" ? "text-muted" : "opacity-80"}`}
-              >
-                {s.label}
-              </div>
-              <div className="font-display text-[26px] font-bold leading-tight">
-                {s.value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <ProfileCard
-          initialProfile={profile}
-          savedEmployees={savedEmployees}
-        />
-        <RecordsTable records={records} />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1.5">
+        <h1 className="font-display text-[28px] font-bold leading-tight">
+          แอปพลิเคชัน
+        </h1>
+        <p className="text-sm text-muted">เลือกเครื่องมือที่ต้องการใช้งาน</p>
       </div>
-    </PageShell>
+
+      <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+        {TILES.map((t) => {
+          const Icon = t.icon;
+          const body = (
+            <>
+              <div
+                className={`grid size-11 place-items-center rounded-chip ${t.tile} text-ink`}
+              >
+                <Icon size={20} />
+              </div>
+              <div className="font-display text-[15px] font-semibold">
+                {t.title}
+              </div>
+              <div className="text-[13px] leading-relaxed text-muted">
+                {t.desc}
+              </div>
+              <div
+                className={`mt-auto text-[13px] font-medium ${t.soon ? "text-muted" : "text-ink"}`}
+              >
+                {t.cta}
+              </div>
+            </>
+          );
+
+          if (t.soon) {
+            return (
+              <div
+                key={t.title}
+                title="เร็วๆ นี้"
+                className="relative flex cursor-not-allowed flex-col gap-3 rounded-card bg-surface p-[22px] opacity-45 shadow-card"
+              >
+                <span className="absolute right-4 top-4 rounded-full bg-chip px-2.5 py-1 text-[11px] font-semibold text-muted">
+                  เร็วๆ นี้
+                </span>
+                {body}
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              key={t.title}
+              href={t.href}
+              className="flex flex-col gap-3 rounded-card bg-surface p-[22px] text-ink no-underline shadow-card transition-colors hover:bg-hover"
+            >
+              {body}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
