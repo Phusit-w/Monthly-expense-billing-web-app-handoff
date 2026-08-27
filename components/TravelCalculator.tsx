@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
 import PageShell from "@/components/PageShell";
 import { fmt } from "@/lib/format";
 import { RATES_EFFECTIVE_DATE, TRAVEL_ORIGIN, pendingTravelEntryKey } from "@/lib/travelRates";
@@ -111,7 +110,6 @@ export default function TravelCalculator() {
 
   return (
     <PageShell>
-      <Header />
       <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700 }}>

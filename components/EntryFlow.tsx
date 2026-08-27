@@ -4,7 +4,6 @@ import { useState } from "react";
 import BillEditor from "@/components/BillEditor";
 import EntryFormFA017 from "@/components/EntryFormFA017";
 import EntryFormFA018 from "@/components/EntryFormFA018";
-import Header from "@/components/Header";
 import PageShell from "@/components/PageShell";
 import type { Draft, EmployeeSnapshot, RecordType, SavedEmployeeEntry, SavedItemEntry } from "@/lib/types";
 
@@ -55,7 +54,6 @@ export default function EntryFlow({
     <>
       <div style={{ display: handoffDraft ? "none" : undefined }}>
         <PageShell>
-          <Header />
           {type === "FA018" ? (
             <EntryFormFA018
               profile={profile}

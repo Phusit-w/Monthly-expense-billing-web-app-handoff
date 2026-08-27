@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
   // traced in) so the Docker image doesn't need to `npm install` at runtime.
   output: "standalone",
 
+  // Serve images as-is, no on-the-fly optimization. The standalone server
+  // has no `sharp`, so next/image's optimizer 500s on every logo request and
+  // spams service-err.log (the logo renders broken). These are two tiny
+  // static PNGs that never need resizing — unoptimized is the right call and
+  // it also means /_next/image isn't hit, so the proxy.ts matcher doesn't
+  // need to care about it. Files are requested at their public path
+  // (/icn-logo.png etc.), which proxy.ts already allow-lists.
+  images: { unoptimized: true },
+
   // Baseline security headers on every response. This app is entirely
   // first-party (no third-party scripts, fonts, or embeds anywhere), so a
   // plain same-origin CSP is enough without needing per-request nonce

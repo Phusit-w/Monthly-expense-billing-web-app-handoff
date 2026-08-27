@@ -1,6 +1,5 @@
 import { getProfile, listSavedEmployees } from "@/actions/profile";
 import { listRecords } from "@/actions/records";
-import Header from "@/components/Header";
 import PageShell from "@/components/PageShell";
 import ProfileCard from "@/components/ProfileCard";
 import RecordsTable from "@/components/RecordsTable";
@@ -22,7 +21,6 @@ export default async function HistoryPage() {
 
   return (
     <PageShell>
-      <Header />
       <ProfileCard initialProfile={profile} savedEmployees={savedEmployees} />
       <RecordsTable records={records} />
     </PageShell>

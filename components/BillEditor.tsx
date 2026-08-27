@@ -23,7 +23,6 @@ import {
   PAPER_WIDTH_FA018,
   THAI_MONTHS,
 } from "@/lib/constants";
-import Header from "@/components/Header";
 import PageShell from "@/components/PageShell";
 import EditorToolbar from "@/components/EditorToolbar";
 import FA018Form from "@/components/FA018Form";
@@ -273,7 +272,6 @@ export default function BillEditor({
           printable area *on top of* that already-full-width paper, pushing
           ~10mm off the right/bottom edge on every print/PDF. */}
       <style>{`@page { size: A4 ${draft.type === "FA018" ? "portrait" : "landscape"}; margin: 0; }`}</style>
-      <Header />
       <EditorToolbar
         paperWidth={paperWidth}
         heading={heading}

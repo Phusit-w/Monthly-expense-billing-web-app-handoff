@@ -1,5 +1,61 @@
-/* Base reset ported from the design source's <helmet> block. This app is a
-   fixed light-themed paper-forms tool (see plan) — no Tailwind, no dark mode. */
+@import "tailwindcss";
+
+/* Design tokens for the 2026 UI redesign (see docs/ux-audit/CURRENT-UI-AUDIT.md
+   and the Claude Design handoff "Web app selector UI mockups"). Values lifted
+   from the mockup artboards. Tailwind v4 generates utilities from these
+   (bg-accent, rounded-card, shadow-card, font-display, …). Legacy screens still
+   use inline style={{}} with hard-coded hex — those get converted screen by
+   screen in later passes; both approaches coexist. This app stays fixed
+   light-mode: no dark theme. */
+@theme {
+  /* Fonts — actual faces are self-hosted by next/font/google in app/layout.tsx
+     (CSP is default-src 'self', so no Google Fonts <link>). */
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-ibm-plex-thai), var(--font-poppins), ui-sans-serif,
+    system-ui, sans-serif;
+
+  /* Surfaces & ink */
+  --color-ground: #f8f8f8;
+  --color-surface: #ffffff;
+  --color-ink: #000000;
+  --color-rail: #000000;
+
+  /* Accents */
+  --color-accent: #ff9b21;
+  --color-peach: #ffe7ca;
+  --color-lavender: #b9bff8;
+
+  /* Text ramp */
+  --color-muted: #8b8b8b;
+  --color-label: #6b6b6b;
+  --color-subtle: #4a4a4a;
+
+  /* Lines & fills */
+  --color-line: #e4e4e4;
+  --color-divider: #f1f1f1;
+  --color-chip: #efefef;
+  --color-hover: #f0f0f0;
+
+  /* Danger */
+  --color-danger: #b3261e;
+  --color-danger-border: #ffd7d5;
+
+  /* Radii */
+  --radius-input: 13px;
+  --radius-field: 14px;
+  --radius-chip: 16px;
+  --radius-card: 20px;
+  --radius-shell: 24px;
+
+  /* Elevation */
+  --shadow-card: 0 6px 20px rgb(0 0 0 / 0.05);
+  --shadow-hero: 0 4px 12px rgb(0 0 0 / 0.15);
+  --shadow-rail: 0 12px 32px rgb(0 0 0 / 0.25);
+  --shadow-paper: 0 4px 24px rgb(0 0 0 / 0.15);
+  --shadow-dropdown: 0 12px 32px rgb(0 0 0 / 0.18);
+}
+
+/* Base reset ported from the design source's <helmet> block. */
 html,
 body {
   margin: 0;
@@ -32,9 +88,13 @@ a:hover {
    Next.js <Link>s styled to look like buttons (so page navigation doesn't
    trigger a full reload), not real <button> elements, so the plain `button`
    selector alone can't reach them — every other button-styled element in
-   the app is an actual <button>, already covered without needing a class. */
-button:not(:disabled):hover,
-button:not(:disabled):active,
+   the app is an actual <button>, already covered without needing a class.
+   `.ui-btn` (components/ui/Button.tsx, the redesign's shared button) is
+   excluded: those carry their own per-variant hover state and must not be
+   force-blackened here. This whole rule is scaffolding for the not-yet-
+   restyled legacy screens and gets deleted once they all move to <Button>. */
+button:not(:disabled):not(.ui-btn):hover,
+button:not(:disabled):not(.ui-btn):active,
 .nav-btn:hover,
 .nav-btn:active {
   background: #1c1c1c !important;
@@ -49,8 +109,8 @@ button:not(:disabled):active,
    `button.btn-danger` (element + class) is more specific than the plain
    `button` selector above, so this wins regardless of source order even
    though both use !important. */
-button.btn-danger:not(:disabled):hover,
-button.btn-danger:not(:disabled):active {
+button.btn-danger:not(:disabled):not(.ui-btn):hover,
+button.btn-danger:not(:disabled):not(.ui-btn):active {
   background: #b3261e !important;
   color: #fff !important;
   border-color: #b3261e !important;
@@ -160,6 +220,19 @@ button.btn-danger:not(:disabled):active {
      wins over a stylesheet rule, but not over one marked !important). */
   .page-shell {
     padding: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Same story for the 2026 app shell (app/(app)/layout.tsx): the rail and
+     top bar are .no-print, but the content column's 128px left gutter and
+     the root's --color-ground fill would otherwise shift and tint the
+     printed A4 sheet. Zero the gutter and force white so .paper prints from
+     the true page origin. */
+  .app-main {
+    padding: 0 !important;
+  }
+
+  .app-shell-root {
     background: #fff !important;
   }
 

@@ -113,6 +113,9 @@ export const config = {
     // too rather than widening this to a whole extension pattern —
     // public/ is meant for genuinely public assets, so naming them
     // explicitly keeps that assumption visible rather than silent.
-    "/((?!_next/static|_next/image|favicon.ico|icn-logo\\.png).*)",
+    // icn-logo-white.png: the transparent logo shown on the redesigned
+    // /login split-panel and the app-shell rail — /login renders it before
+    // any session exists, so it must be reachable unauthenticated too.
+    "/((?!_next/static|_next/image|favicon.ico|icn-logo\\.png|icn-logo-white\\.png).*)",
   ],
 };
