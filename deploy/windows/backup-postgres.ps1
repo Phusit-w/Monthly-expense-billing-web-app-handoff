@@ -59,10 +59,13 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $dest = Join-Path $BackupDir "backup-$timestamp.sql"
 
 Write-Host "Dumping database to $dest..."
-# pg_dump accepts a full connection URI directly as its one positional
-# argument (supported since Postgres 9.2) — no need to split DatabaseUrl
-# into separate -h/-U/-d flags.
-& pg_dump $DatabaseUrl --file $dest
+# pg_dump accepts a full connection URI via --dbname (supported since
+# Postgres 9.2) — no need to split DatabaseUrl into separate -h/-U/-d
+# flags. Pass every option BEFORE the connection string: the getopt_long
+# bundled with the Windows build stops parsing options at the first
+# non-option argument, so `pg_dump <uri> --file <dest>` makes it treat
+# --file/<dest> as stray operands ("too many command-line arguments").
+& pg_dump --file $dest --dbname $DatabaseUrl
 if ($LASTEXITCODE -ne 0) {
     Remove-Item -Path $dest -ErrorAction SilentlyContinue
     throw "pg_dump failed with exit code $LASTEXITCODE"
