@@ -6,6 +6,8 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import EntryEmployeeFields from "@/components/EntryEmployeeFields";
 import SavedListManager from "@/components/SavedListManager";
 import TravelRowCalculatorPanel from "@/components/TravelRowCalculatorPanel";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { dmyFromISODate, todayISODate } from "@/lib/draft";
 import { DEFAULT_ROWS_FA017, DEFAULT_ROWS_FA018, PAGE_ROWS, SHOW_PROJECT_FIELD } from "@/lib/constants";
 import { num } from "@/lib/format";
@@ -33,34 +35,17 @@ function freshItems(): FA017Item[] {
   return Array.from({ length: PAGE_ROWS }, emptyItemFA017);
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "7px 8px",
-  border: "1px solid #ccc",
-  borderRadius: 4,
-  font: "inherit",
-};
+const inputClass =
+  "w-full rounded-field border border-line bg-surface px-3.5 py-2.5 text-sm text-ink outline-none " +
+  "transition-[border-color,box-shadow] duration-150 " +
+  "focus:border-[#181818] focus:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]";
 
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  color: "#555",
-  marginBottom: 4,
-};
+const labelClass = "mb-1.5 block text-[13px] font-medium text-label";
 
-// AMOUNT_FIELDS' labels sit side-by-side in one flex row per item (see
-// render below), but "Transport & Express way" and "Local Currency Amount"
-// wrap onto 2 lines while the rest ("Gasoline", "Hotel", ...) fit on 1 —
-// with only labelStyle's marginBottom under each, the wrapped labels push
-// their input down further than the single-line ones, so the row of inputs
-// no longer lines up. Reserving 2 lines' worth of height up front keeps
-// every label in the row the same height regardless of wrap, so the inputs
-// stay aligned.
-const amountLabelStyle: React.CSSProperties = {
-  ...labelStyle,
-  minHeight: "2.6em",
-  lineHeight: 1.3,
-};
+// "Transport & Express way" and "Local Currency Amount" wrap onto 2 lines
+// while the rest fit on 1; reserving 2 lines' worth of height (min-h-[2.6em])
+// keeps every label in the amounts row the same height so the inputs align.
+const amountLabelClass = `${labelClass} min-h-[2.6em] leading-tight`;
 
 // Description of Expenses prints into a narrow, fixed-width table column
 // (FA017Form.tsx) — a long description wraps onto several lines there and
@@ -471,33 +456,25 @@ export default function EntryFormFA017({
       onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
         if (e.target.value !== "") updateItem(i, field, num(e.target.value).toFixed(2));
       },
-      style: inputStyle,
+      className: inputClass,
     };
   }
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-        <div style={{ fontSize: 20, fontWeight: 700 }}>กรอกข้อมูล Expense Claim</div>
+    <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <h1 className="font-display text-[28px] font-bold leading-tight">
+          กรอกข้อมูล Expense Claim
+        </h1>
         {!isFormPristine() && (
-          <button
-            type="button"
+          <Button
+            variant="danger"
+            size="sm"
             onClick={startOver}
-            className="btn-danger"
             title="ล้างข้อมูลที่กรอกไว้ทั้งหมดในฟอร์มนี้ แล้วเริ่มกรอกใหม่"
-            style={{
-              padding: "6px 14px",
-              border: "1px solid #b3261e",
-              color: "#b3261e",
-              borderRadius: 4,
-              background: "#fff",
-              font: "inherit",
-              fontSize: 12,
-              cursor: "pointer",
-            }}
           >
             เริ่มกรอกใหม่
-          </button>
+          </Button>
         )}
       </div>
 
@@ -522,44 +499,41 @@ export default function EntryFormFA017({
           with a custom widget. dmyFromISODate (lib/draft.ts) still converts
           the "yyyy-mm-dd" value's Gregorian year to Buddhist era for the
           Draft regardless of how the picker displays it. */}
-      <div style={{ background: "#fff", border: "1px solid #d8d5cc", borderRadius: 8, padding: "18px 22px", fontSize: 13 }}>
-        <div style={{ maxWidth: 200 }}>
-          <label style={labelStyle}>DATE :</label>
+      <Card className="p-6 text-[13px]">
+        <div className="max-w-[200px]">
+          <label className={labelClass}>DATE :</label>
           <input
             type="date"
             value={dateISO}
             onChange={(e) => setDateISO(e.target.value)}
-            style={inputStyle}
+            className={inputClass}
           />
         </div>
-      </div>
+      </Card>
 
-      <div style={{ background: "#fff", border: "1px solid #d8d5cc", borderRadius: 8, padding: "18px 22px" }}>
-        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>รายการค่าใช้จ่าย</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <Card className="flex flex-col gap-4 p-6">
+        <div className="text-base font-medium">รายการค่าใช้จ่าย</div>
+        <div className="flex flex-col gap-3">
           {items.map((it, i) => (
             <div
               key={i}
-              style={{
-                border: "1px solid #e3e0d8",
-                borderRadius: 6,
-                padding: "12px 14px",
-                fontSize: 13,
-              }}
+              className="rounded-field border border-line p-3.5 text-[13px]"
             >
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-                <div style={{ width: 42, fontWeight: 700, color: "#999", alignSelf: "center" }}>#{i + 1}</div>
-                <div style={{ flex: 1, minWidth: 150 }}>
-                  <label style={labelStyle}>วันที่</label>
+              <div className="mb-2.5 flex flex-wrap gap-3">
+                <div className="w-9 self-center font-bold text-muted">
+                  #{i + 1}
+                </div>
+                <div className="min-w-[150px] flex-1">
+                  <label className={labelClass}>วันที่</label>
                   <input
                     type="date"
                     value={it.date}
                     onChange={(e) => updateItem(i, "date", e.target.value)}
-                    style={inputStyle}
+                    className={inputClass}
                   />
                 </div>
-                <div style={{ flex: 3, minWidth: 220 }}>
-                  <label style={labelStyle}>Description of Expenses</label>
+                <div className="min-w-[220px] flex-[3]">
+                  <label className={labelClass}>Description of Expenses</label>
                   {/* Auto-growing textarea (not a single-line <input>) so
                       text that's too long for the box — or that the user
                       hard-wraps with Enter — grows the box downward instead
@@ -593,10 +567,10 @@ export default function EntryFormFA017({
                       }
                     }}
                     rows={1}
-                    style={{ ...inputStyle, resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.4 }}
+                    className={`${inputClass} resize-none overflow-hidden leading-relaxed whitespace-pre-wrap break-words`}
                   />
                   {isDescriptionLong(it.desc) && (
-                    <div style={{ marginTop: 4, fontSize: 11, color: "#9a6700" }}>
+                    <div className="mt-1 text-[11px] text-[#9a6700]">
                       รายละเอียดยาวมาก อาจทำให้พิมพ์ออกมาเกิน 1 หน้ากระดาษ แนะนำให้สรุปให้สั้นลง
                     </div>
                   )}
@@ -610,97 +584,69 @@ export default function EntryFormFA017({
                       this same constraint. Value always resets back to ""
                       right after a pick so this stays a reusable trigger
                       rather than displaying whatever was last chosen. */}
-                  {savedItemList.length > 0 && (
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        const desc = e.target.value;
-                        if (!desc) return;
-                        updateItem(i, "desc", desc);
-                        const saved = findSavedItem(desc);
-                        if (saved) {
-                          Object.entries(saved.data).forEach(([field, fieldValue]) =>
-                            updateItem(i, field as ItemField, fieldValue)
-                          );
-                        }
-                        e.target.value = "";
-                      }}
-                      title="เลือกรายการที่เคยบันทึกไว้"
-                      style={{
-                        marginTop: 6,
-                        padding: "4px 8px",
-                        border: "1px dashed #999",
-                        borderRadius: 4,
-                        background: "#fff",
-                        font: "inherit",
-                        fontSize: 11,
-                        color: "#555",
-                        cursor: "pointer",
-                        maxWidth: "100%",
-                      }}
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    {savedItemList.length > 0 && (
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          const desc = e.target.value;
+                          if (!desc) return;
+                          updateItem(i, "desc", desc);
+                          const saved = findSavedItem(desc);
+                          if (saved) {
+                            Object.entries(saved.data).forEach(([field, fieldValue]) =>
+                              updateItem(i, field as ItemField, fieldValue)
+                            );
+                          }
+                          e.target.value = "";
+                        }}
+                        title="เลือกรายการที่เคยบันทึกไว้"
+                        className="max-w-full rounded-chip border border-dashed border-line bg-surface px-3 py-1.5 text-[11px] text-label"
+                      >
+                        <option value="">เลือกรายการที่บันทึกไว้…</option>
+                        {savedItemList.map((entry) => (
+                          <option key={entry.desc} value={entry.desc}>
+                            {entry.desc}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setPendingSaveRow(i)}
+                      disabled={savingRow === i || !it.desc.trim()}
+                      title="บันทึกรายการนี้ไว้ใช้ซ้ำ พิมพ์/เลือก Description เดิมในแถวอื่นแล้วช่องที่เหลือจะเติมให้อัตโนมัติ"
+                      className="ui-btn rounded-chip border border-dashed border-ink px-3 py-1.5 text-[11px] font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <option value="">เลือกรายการที่บันทึกไว้…</option>
-                      {savedItemList.map((entry) => (
-                        <option key={entry.desc} value={entry.desc}>
-                          {entry.desc}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setPendingSaveRow(i)}
-                    disabled={savingRow === i || !it.desc.trim()}
-                    title="บันทึกรายการนี้ไว้ใช้ซ้ำ พิมพ์/เลือก Description เดิมในแถวอื่นแล้วช่องที่เหลือจะเติมให้อัตโนมัติ"
-                    style={{
-                      marginTop: 6,
-                      marginLeft: 6,
-                      padding: "4px 8px",
-                      border: "1px dashed #1c1c1c",
-                      borderRadius: 4,
-                      background: "#fff",
-                      font: "inherit",
-                      fontSize: 11,
-                      color: "#1c1c1c",
-                      cursor: savingRow === i || !it.desc.trim() ? "not-allowed" : "pointer",
-                      opacity: savingRow === i || !it.desc.trim() ? 0.5 : 1,
-                    }}
-                  >
-                    {savingRow === i ? "กำลังบันทึก…" : justSavedRow === i ? "บันทึกแล้ว ✓" : "บันทึกไว้ใช้ซ้ำ"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => clearRow(i)}
-                    className="btn-danger"
-                    title="ล้างข้อมูลเฉพาะแถวนี้ โดยไม่ลบรายการที่บันทึกไว้"
-                    style={{
-                      marginTop: 6,
-                      marginLeft: 6,
-                      padding: "4px 8px",
-                      border: "1px solid #b3261e",
-                      borderRadius: 4,
-                      background: "#fff",
-                      font: "inherit",
-                      fontSize: 11,
-                      color: "#b3261e",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ล้างข้อมูลแถวนี้
-                  </button>
-                  <TravelRowCalculatorPanel
-                    onApply={(amount, desc) => {
-                      updateItem(i, "transport", amount.toFixed(2));
-                      if (desc && !it.desc.trim()) updateItem(i, "desc", desc);
-                    }}
-                  />
+                      {savingRow === i
+                        ? "กำลังบันทึก…"
+                        : justSavedRow === i
+                          ? "บันทึกแล้ว ✓"
+                          : "บันทึกไว้ใช้ซ้ำ"}
+                    </button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="!h-7 !px-3 !text-[11px]"
+                      onClick={() => clearRow(i)}
+                      title="ล้างข้อมูลเฉพาะแถวนี้ โดยไม่ลบรายการที่บันทึกไว้"
+                    >
+                      ล้างข้อมูลแถวนี้
+                    </Button>
+                    <TravelRowCalculatorPanel
+                      onApply={(amount, desc) => {
+                        updateItem(i, "transport", amount.toFixed(2));
+                        if (desc && !it.desc.trim()) updateItem(i, "desc", desc);
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ flex: 1, minWidth: 110 }}>
-                  <label style={labelStyle}>Receipt</label>
+                <div className="min-w-[110px] flex-1">
+                  <label className={labelClass}>Receipt</label>
                   <select
                     value={it.receipt}
                     onChange={(e) => updateItem(i, "receipt", e.target.value)}
-                    style={inputStyle}
+                    className={inputClass}
                   >
                     <option value=""></option>
                     <option value="Y">Yes</option>
@@ -708,20 +654,20 @@ export default function EntryFormFA017({
                   </select>
                 </div>
                 {SHOW_PROJECT_FIELD && (
-                  <div style={{ flex: 1, minWidth: 110 }}>
-                    <label style={labelStyle}>Project / CC</label>
+                  <div className="min-w-[110px] flex-1">
+                    <label className={labelClass}>Project / CC</label>
                     <input
                       value={it.projectCC}
                       onChange={(e) => updateItem(i, "projectCC", e.target.value)}
-                      style={inputStyle}
+                      className={inputClass}
                     />
                   </div>
                 )}
               </div>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <div className="flex flex-wrap gap-3">
                 {AMOUNT_FIELDS.map((f) => (
-                  <div key={f.key} style={{ flex: 1, minWidth: 110 }}>
-                    <label style={amountLabelStyle}>{f.label}</label>
+                  <div key={f.key} className="min-w-[110px] flex-1">
+                    <label className={amountLabelClass}>{f.label}</label>
                     <input {...amountFieldProps(i, f.key, it[f.key])} />
                   </div>
                 ))}
@@ -729,81 +675,34 @@ export default function EntryFormFA017({
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 10 }}>
-          <SavedListManager
-            label="รายการที่บันทึกไว้"
-            items={savedItemList.map((entry) => ({ id: entry.id, text: entry.desc }))}
-            onDelete={removeSavedItem}
-          />
-        </div>
-        <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-          <button
-            onClick={addRow}
-            style={{
-              padding: "6px 14px",
-              border: "1px dashed #1c1c1c",
-              borderRadius: 4,
-              background: "#fff",
-              font: "inherit",
-              fontSize: 12,
-              cursor: "pointer",
-            }}
-          >
-            + เพิ่มรายการ
-          </button>
-          <button
-            onClick={removeLastRow}
-            className="btn-danger"
-            style={{
-              padding: "6px 14px",
-              border: "1px solid #b3261e",
-              color: "#b3261e",
-              borderRadius: 4,
-              background: "#fff",
-              font: "inherit",
-              fontSize: 12,
-              cursor: "pointer",
-            }}
-          >
-            − ลบรายการ
-          </button>
-        </div>
-      </div>
 
-      <div style={{ display: "flex", gap: 10, alignSelf: "flex-end" }}>
-        <button
+        <SavedListManager
+          label="รายการที่บันทึกไว้"
+          items={savedItemList.map((entry) => ({ id: entry.id, text: entry.desc }))}
+          onDelete={removeSavedItem}
+        />
+
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={addRow}>
+            + เพิ่มรายการ
+          </Button>
+          <Button variant="danger" size="sm" onClick={removeLastRow}>
+            − ลบรายการ
+          </Button>
+        </div>
+      </Card>
+
+      <div className="flex flex-wrap justify-end gap-2.5">
+        <Button
+          variant="outline"
           onClick={handleCreateFA018}
           title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
-          style={{
-            padding: "12px 28px",
-            border: "1px solid #1c1c1c",
-            background: "#fff",
-            color: "#1c1c1c",
-            borderRadius: 6,
-            font: "inherit",
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: "pointer",
-          }}
         >
           สร้างฟอร์มใบรับรองแทนใบเสร็จ →
-        </button>
-        <button
-          onClick={handleCreate}
-          style={{
-            padding: "12px 28px",
-            border: "1px solid #1c1c1c",
-            background: "#fff",
-            color: "#1c1c1c",
-            borderRadius: 6,
-            font: "inherit",
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: "pointer",
-          }}
-        >
+        </Button>
+        <Button variant="primary" onClick={handleCreate}>
           สร้างฟอร์ม Expense Claim →
-        </button>
+        </Button>
       </div>
       <ConfirmDialog
         open={pendingSaveRow !== null}

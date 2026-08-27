@@ -4,49 +4,28 @@ import { useState } from "react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import SavedEmployeePicker from "@/components/SavedEmployeePicker";
 import SavedListManager from "@/components/SavedListManager";
+import Card from "@/components/ui/Card";
 import type { EmployeeSnapshot, SavedEmployeeEntry } from "@/lib/types";
 
-// Styling ported from ProfileCard.tsx's plain-input pattern (as opposed to
-// FA017Form/FA018Form's dense pixel-table inputs) — this is the "roomy" look
-// the whole entry flow uses.
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "7px 8px",
-  border: "1px solid #ccc",
-  borderRadius: 4,
-  font: "inherit",
-};
-
-const fieldWrap = (minWidth: number): React.CSSProperties => ({
-  flex: 1,
-  minWidth,
-});
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  color: "#555",
-  marginBottom: 4,
-};
+const inputClass =
+  "w-full rounded-field border border-line bg-surface px-4 py-3 text-sm text-ink outline-none " +
+  "transition-[border-color,box-shadow] duration-150 " +
+  "focus:border-[#181818] focus:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]";
 
 type EditableField = "name" | "position" | "department" | "employeeNo";
 
-const FIELDS: { key: EditableField; label: string; minWidth: number }[] = [
-  { key: "name", label: "ชื่อ-นามสกุล", minWidth: 200 },
-  { key: "position", label: "ตำแหน่ง / Position", minWidth: 160 },
-  { key: "department", label: "ฝ่าย / แผนก", minWidth: 160 },
-  { key: "employeeNo", label: "Employee No", minWidth: 140 },
+const FIELDS: { key: EditableField; label: string }[] = [
+  { key: "name", label: "ชื่อ-นามสกุล" },
+  { key: "position", label: "ตำแหน่ง / Position" },
+  { key: "department", label: "ฝ่าย / แผนก" },
+  { key: "employeeNo", label: "Employee No" },
 ];
 
 // The one piece genuinely identical between EntryFormFA017 and
 // EntryFormFA018 — same 4 fields, same labels. Office is deliberately not
-// here: neither FA017Form nor FA018Form exposes an editable Office field
-// (FA017Form prints a hardcoded company name; FA018Form doesn't show it at
-// all) — but the caller must still carry `office` through unedited in the
-// full EmployeeSnapshot it hands to onCreate, since saveRecord writes
-// draft.employee.office to the DB unconditionally. Selecting a saved
-// employee (below) still updates office behind the scenes even though
-// there's no visible field for it, same as it already flows through today.
+// here (neither printed form exposes it) but the caller carries `office`
+// through unedited; selecting a saved employee still updates it behind the
+// scenes.
 export default function EntryEmployeeFields({
   employee,
   onChange,
@@ -57,11 +36,6 @@ export default function EntryEmployeeFields({
 }: {
   employee: Pick<EmployeeSnapshot, EditableField>;
   onChange: (field: EditableField, value: string) => void;
-  // Several different people share this login-less app — savedEmployees is
-  // the list anyone has previously saved under their own name via "บันทึกไว้
-  // ใช้ซ้ำ" below, distinct from the one org-wide default (ProfileCard on the
-  // history page). Picked via SavedEmployeePicker next to that button, which
-  // reuses the rest of that person's saved details immediately.
   savedEmployees: SavedEmployeeEntry[];
   onSelectSaved: (saved: SavedEmployeeEntry) => void;
   onSave: () => Promise<void>;
@@ -69,8 +43,6 @@ export default function EntryEmployeeFields({
 }) {
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
-  // onSave (saveEmployeeForReuse, actions/profile.ts) upserts keyed by name,
-  // so re-saving an existing one silently overwrites it — confirm first.
   const [confirmingSave, setConfirmingSave] = useState(false);
 
   async function handleSave() {
@@ -84,72 +56,58 @@ export default function EntryEmployeeFields({
   }
 
   return (
-    <div
-      style={{
-        background: "#fff",
-        border: "1px solid #d8d5cc",
-        borderRadius: 8,
-        padding: "18px 22px",
-      }}
-    >
-      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>ข้อมูลพนักงาน</div>
-      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13 }}>
+    <Card className="flex flex-col gap-4 p-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="text-base font-medium">ข้อมูลพนักงาน</div>
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmingSave(true)}
+            disabled={saving || !employee.name.trim()}
+            title={
+              employee.name.trim()
+                ? "บันทึกข้อมูลพนักงานชุดนี้ไว้ใช้ซ้ำ ค้นหาด้วยชื่อได้ในครั้งหน้า"
+                : "กรอกชื่อ-นามสกุลก่อนจึงจะบันทึกได้"
+            }
+            className="ui-btn rounded-chip border border-dashed border-ink px-3.5 py-2 text-xs font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {saving
+              ? "กำลังบันทึก…"
+              : justSaved
+                ? "บันทึกแล้ว ✓"
+                : "บันทึกไว้ใช้ซ้ำ"}
+          </button>
+          <SavedEmployeePicker
+            savedEmployees={savedEmployees}
+            onSelect={(saved) => {
+              onChange("name", saved.name);
+              onSelectSaved(saved);
+            }}
+          />
+          <SavedListManager
+            label="ชื่อที่บันทึกไว้"
+            items={savedEmployees.map((s) => ({ id: s.id, text: s.name }))}
+            onDelete={onDeleteSaved}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {FIELDS.map((f) => (
-          <div key={f.key} style={fieldWrap(f.minWidth)}>
-            <label style={labelStyle}>{f.label}</label>
+          <div key={f.key}>
+            <label className="mb-1.5 block text-[13px] font-medium text-label">
+              {f.label}
+            </label>
             <input
               value={employee[f.key]}
               onChange={(e) => onChange(f.key, e.target.value)}
               placeholder={f.key === "name" ? "ชื่อ-นามสกุล" : undefined}
-              style={inputStyle}
+              className={inputClass}
             />
-            {f.key === "name" && (
-              <>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmingSave(true)}
-                    disabled={saving || !employee.name.trim()}
-                    title={
-                      employee.name.trim()
-                        ? "บันทึกข้อมูลพนักงานชุดนี้ไว้ใช้ซ้ำ ค้นหาด้วยชื่อได้ในครั้งหน้า"
-                        : "กรอกชื่อ-นามสกุลก่อนจึงจะบันทึกได้"
-                    }
-                    style={{
-                      marginTop: 6,
-                      padding: "5px 10px",
-                      border: "1px dashed #1c1c1c",
-                      borderRadius: 4,
-                      background: "#fff",
-                      font: "inherit",
-                      fontSize: 11,
-                      color: "#1c1c1c",
-                      cursor: saving || !employee.name.trim() ? "not-allowed" : "pointer",
-                      opacity: saving || !employee.name.trim() ? 0.5 : 1,
-                    }}
-                  >
-                    {saving ? "กำลังบันทึก…" : justSaved ? "บันทึกแล้ว ✓" : "บันทึกไว้ใช้ซ้ำ"}
-                  </button>
-                  <SavedEmployeePicker
-                    savedEmployees={savedEmployees}
-                    onSelect={(saved) => {
-                      onChange("name", saved.name);
-                      onSelectSaved(saved);
-                    }}
-                  />
-                </div>
-                <div style={{ marginTop: 6 }}>
-                  <SavedListManager
-                    label="ชื่อที่บันทึกไว้"
-                    items={savedEmployees.map((s) => ({ id: s.id, text: s.name }))}
-                    onDelete={onDeleteSaved}
-                  />
-                </div>
-              </>
-            )}
           </div>
         ))}
       </div>
+
       <ConfirmDialog
         open={confirmingSave}
         title="ยืนยันการบันทึกไว้ใช้ซ้ำ"
@@ -163,6 +121,6 @@ export default function EntryEmployeeFields({
         onConfirm={handleSave}
         onCancel={() => setConfirmingSave(false)}
       />
-    </div>
+    </Card>
   );
 }
