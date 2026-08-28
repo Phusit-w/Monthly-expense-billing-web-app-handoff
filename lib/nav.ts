@@ -56,11 +56,10 @@ export const NAV_ITEMS: NavItem[] = [
     match: (p) => p.startsWith("/bill/entry/fa018"),
   },
   {
-    // No settings screen yet — shown for the "expandable system" shape.
-    href: "#",
+    href: "/settings",
     label: "ตั้งค่า",
     icon: SettingsIcon,
-    disabled: true,
+    match: (p) => p.startsWith("/settings"),
   },
 ];
 
