@@ -93,15 +93,14 @@ body {
    ignored. Buttons already black by default (primary actions, active
    tabs/nav) are a no-op under this rule since they already satisfy it.
    :disabled is excluded — a disabled button shouldn't look clickable.
-   .nav-btn covers Header.tsx's top-nav items specifically: those are
-   Next.js <Link>s styled to look like buttons (so page navigation doesn't
-   trigger a full reload), not real <button> elements, so the plain `button`
-   selector alone can't reach them — every other button-styled element in
-   the app is an actual <button>, already covered without needing a class.
-   `.ui-btn` (components/ui/Button.tsx, the redesign's shared button) is
-   excluded: those carry their own per-variant hover state and must not be
-   force-blackened here. This whole rule is scaffolding for the not-yet-
-   restyled legacy screens and gets deleted once they all move to <Button>. */
+   `.ui-btn` (components/ui/Button.tsx and every button in the redesigned
+   screens) is excluded: those carry their own per-variant hover state and
+   must not be force-blackened here. What's left for this rule to catch is
+   the plain <button>s inside the untouched FA017Form/FA018Form paper plus a
+   few inline-styled controls not yet on <Button>; it gets deleted once
+   those move over. .nav-btn / .btn-danger no longer match anything
+   (Header.tsx and the old confirm modals were removed) but are kept so the
+   rule still reads complete. */
 button:not(:disabled):not(.ui-btn):hover,
 button:not(:disabled):not(.ui-btn):active,
 .nav-btn:hover,

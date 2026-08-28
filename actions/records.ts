@@ -107,7 +107,9 @@ export async function saveRecord(
     const row = await prisma.expenseRecord.create({
       data: { ...data, createdByName: actorName },
     });
-    revalidatePath("/");
+    // The saved-records list lives at /records (it was "/" before the 2026
+    // redesign moved the Applications launcher there).
+    revalidatePath("/records");
     return { ok: true, record: serialize(row) };
   }
 
@@ -130,13 +132,13 @@ export async function saveRecord(
   const row = await prisma.expenseRecord.findUniqueOrThrow({
     where: { id: draft.id },
   });
-  revalidatePath("/");
+  revalidatePath("/records");
   return { ok: true, record: serialize(row) };
 }
 
 export async function deleteRecord(id: string): Promise<void> {
   await prisma.expenseRecord.delete({ where: { id } });
-  revalidatePath("/");
+  revalidatePath("/records");
 }
 
 // Mirrors Component.duplicateRecord: clone with a fresh id/timestamps,
@@ -167,6 +169,6 @@ export async function duplicateRecord(id: string): Promise<ExpenseRecordData> {
       updatedByName: actorName,
     },
   });
-  revalidatePath("/");
+  revalidatePath("/records");
   return serialize(row);
 }
