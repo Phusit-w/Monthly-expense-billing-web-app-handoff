@@ -9,8 +9,12 @@ import {
 
 // The Applications launcher — the portal front door. Matches Claude Design
 // "Turn 6a": a card grid of every tool in the system, plus a disabled
-// "เร็วๆ นี้" slot for future subsystems. Static; no data fetch.
-export const dynamic = "force-static";
+// "เร็วๆ นี้" slot for future subsystems. No data fetch of its own, but it
+// must stay dynamic like every other route in this group: the shared
+// layout (app/(app)/layout.tsx) reads the session cookie for the top-bar
+// avatar, and under force-static that cookie read returns empty, baking a
+// "?" avatar into the prerendered page for every user.
+export const dynamic = "force-dynamic";
 
 type Tile = {
   href: string;
