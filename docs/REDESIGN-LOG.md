@@ -32,7 +32,14 @@
 
 ---
 
-## สิ่งที่ทำเสร็จ — 6 commit บน `redesign/foundation`
+## สถานะ merge/deploy
+
+- **2026-08-28: merge เข้า `main` แล้ว** (fast-forward, `31f3a1a..ad60b78`) — `redesign/foundation` sync ตาม `main`
+- **ยังไม่ `git push origin main`** (`main` นำหน้า `origin/main` 9 commit) · **ยังไม่ deploy** ขึ้น `psaidemo.icn21.local`
+- ไม่มี migration — แตะแค่ frontend + `next.config.ts` + `proxy.ts` (ไม่มี `prisma/`) → DB ไม่เปลี่ยน
+- follow-up ที่ปิดไปแล้วด้วยงานนี้: standalone `next/image` โลโก้ spam `service-err.log` — round 1 ใส่ `images:{unoptimized:true}` แก้แล้ว
+
+## สิ่งที่ทำเสร็จ — 8 commit บน `main`
 
 | commit | รอบ | เนื้อหา |
 |---|---|---|
@@ -42,14 +49,18 @@
 | `dc288ea` | **3 — คำนวณค่าเดินทาง** | `TravelCalculator` (`/travel`) + `TravelRowCalculatorPanel` (เวอร์ชันย่อในฟอร์ม) — hook / fixed+meter mode / sessionStorage handoff ไม่แตะ |
 | `a7149ca` | **4 — toolbar หน้าฟอร์ม** | `EditorToolbar` → white `<Card>` เหนือกระดาษ (ปุ่มบันทึกส้ม, สร้างฟอร์มใบรับรอง lavender) · `BillEditor` ควบคุม "ประจำเดือน" FA018 · **กระดาษ A4 / `@page` / pagination / PDF export ไม่แตะ** |
 | `9a3d769` | **5+6 — Applications launcher + ย้าย History** | `app/(app)/page.tsx` = launcher (การ์ด Expense Claim / ใบรับรองแทนใบเสร็จ / คำนวณค่าเดินทาง / รายการทั้งหมด + "ตรวจสอบ SOC — เร็วๆ นี้" disabled) · History → `app/(app)/records/page.tsx` (`/records`) · `BillEditor` `router.push("/")` → `/records` (2 จุด) · `lib/nav.ts` เพิ่ม flag `disabled` ("ตั้งค่า" เป็น placeholder เทา) · `globals.css` ย้าย `a { color }` เข้า `@layer base` (ไม่งั้น `text-ink` บน `<Link>` ที่ทำเป็นปุ่ม/การ์ด แพ้ rule ที่ไม่ layered → ลิงก์เป็นสีน้ำเงิน) · เพิ่ม `ShieldIcon` |
+| `744314b` | **docs** | เพิ่มไฟล์ log นี้ |
+| `54e4b95` | **followup (รีวิวก่อน merge)** | `actions/records.ts` `revalidatePath("/")` → `"/records"` 4 จุด (create/update/delete/duplicate — round 5+6 ย้ายรายการออกจาก `/` แต่ลืม repoint; ไม่เห็นเป็นบั๊กเพราะ `/records` เป็น `force-dynamic` + `RecordsTable` `router.refresh()`) · เก็บคอมเมนต์ค้างใน `PageShell.tsx` + `globals.css` (อ้าง `Header.tsx`/`.nav-btn`/`.btn-danger` ที่ลบไปแล้ว) |
+| `ad60b78` | **fix (เจอตอนรีวิวหน้าจริง)** | หน้า launcher `/` โชว์ avatar เป็น "?" ให้ทุกคน (รวม prod) — เพราะเป็น route เดียวใน `(app)` ที่ตั้ง `dynamic = "force-static"`; layout กลางอ่าน session cookie มาโชว์ชื่อบน topbar แต่ `force-static` ทำให้ `cookies()` คืนค่าว่าง → prerender ครั้งเดียวตอน build ด้วย `displayName=null`. แก้เป็น `force-dynamic` ให้เหมือน route อื่น (launcher ไม่มีข้อมูล build-time อยู่แล้ว) |
 
-**สถานะ:** ทุกหน้าปรับเป็นสไตล์ใหม่ครบแล้ว — ที่เหลือเป็นของสร้างใหม่ล้วน (ดูหัวข้อถัดไป)
+**สถานะ:** ทุกหน้าปรับเป็นสไตล์ใหม่ครบแล้ว · merge เข้า `main` แล้ว (ดูหัวข้อ "สถานะ merge/deploy" ข้างบน) — ที่เหลือเป็นของสร้างใหม่ล้วน (ดูหัวข้อถัดไป)
 
 ### Validation (ทุก commit)
 
 - `npm run build` ผ่าน · `npm run typecheck` สะอาด
 - `npm run lint` — **13 ปัญหา** (baseline เดิม 15; 6 error เดิมทั้งหมดใน `FA017Form`/`FA018Form` `remeasure` — pre-existing; ไฟล์ใหม่ไม่เพิ่มปัญหา บังเอิญเก็บ unused-var เดิมไป 2)
-- เช็คในเบราว์เซอร์ทุกหน้า (`/`, `/records`, `/travel`, `/bill/entry/fa017`, `/bill/entry/fa018`, `/bill/new/fa018`, `/login`) — ไม่มี console error / CSP violation / hydration error
+- เช็คในเบราว์เซอร์ทุกหน้า (`/`, `/records`, `/travel`, `/bill/entry/fa017`, `/bill/entry/fa018`, `/bill/[id]` editor, `/login`) — ไม่มี console error / CSP violation / hydration error
+- warning dev-only ที่เหลือ: `Image "icn-logo.png" width/height modified` × ใน `FA017Form`/`FA018Form` (โลโก้แดงในกระดาษ A4) — pre-existing ไฟล์ไม่ได้แตะ ไม่บล็อก
 
 ---
 
@@ -63,7 +74,7 @@
   ทำเมื่อมี workflow อนุมัติในระบบจริง แล้วเพิ่ม `/dashboard` → ดันเป็น `/` (launcher ย้ายไป `/apps` หรือเป็น section ใน dashboard)
 - **mascot login แบบ animated** (`Login.dc.html`) — polish รอบเสริม; ตอนนี้เป็น split-panel เรียบ
 - เมนู "เอกสารเก่า" ใน mockup Turn 6a — ยังไม่ทำ (ความหมายไม่ชัด ไม่มีของจริงรองรับ); ใส่แค่ "ตั้งค่า" เป็น disabled placeholder
-- avatar ใน topbar โชว์ "?" ตอนไม่มี session (เฉพาะ dev — prod มี session จริงจะโชว์ initials) — ปรับเป็น fallback icon ได้ถ้าอยาก
+- avatar ใน topbar: prod มี session จริงจะโชว์ initials แล้ว (บั๊ก "?" บนหน้า `/` แก้ใน `ad60b78`) — เหลือแต่ตอน dev ที่ยังไม่ได้ login จริงจะเห็น "?" (เพราะ dev bypass auth); ปรับเป็น fallback icon ได้ถ้าอยาก
 
 ---
 
@@ -76,7 +87,7 @@ npx.cmd prisma dev start pilot-db -P 51218 --shadow-db-port 51219 -d   # ถ้�
 npm.cmd run dev
 ```
 (ดู `docs/DEV-START.md` — dev ข้าม login อัตโนมัติ)
-เช็ก branch: `git checkout redesign/foundation`
+งาน redesign หลัก merge เข้า `main` แล้ว — ทำงานบน `main` ต่อได้เลย (`redesign/foundation` = สำเนาที่ sync ไว้)
 
 **หมายเหตุ dev:** อย่า `rm -rf .next` ตอน `next dev` รันอยู่ — server จะขึ้น "(stale)" ต้อง restart;
 `npm run typecheck` แบบ standalone หลังลบ `.next` จะ error `Cannot find name 'LayoutProps'` (Next
@@ -88,15 +99,16 @@ gen types หาย) — รัน `npm run build` ก่อน 1 รอบใ�
 - ปุ่มใหม่ใช้ `<Button variant=... />` (มี class `ui-btn` ที่ globals.css ยกเว้นจาก rule hover ดำ)
 - `<Link>` ที่ทำเป็นปุ่ม/การ์ด **ต้องใส่ `text-ink no-underline`** เอง
 
-### merge + deploy (เมื่อรีวิวผ่าน)
-1. `git checkout main && git merge redesign/foundation`
-2. **ไม่มี migration** — แตะแค่ frontend + `next.config.ts` + `proxy.ts` (ไม่มี `prisma/`) → DB ไม่เปลี่ยน
-3. deploy ตาม `docs/SESSION-LOG-2026-08-27.md` ส่วนที่ 4 (`update.ps1`)
-4. **แจ้งผู้ใช้:** `/` เปลี่ยนเป็นหน้า launcher, หน้ารายการทั้งหมดย้ายไป `/records` — bookmark เดิมจะเปลี่ยน
-5. ยัง diverge: remote `backup` (`git push backup main --force` ถ้าจะ sync — ค้างจาก session ก่อน)
+### deploy (ค้างอยู่ — merge เข้า `main` แล้ว ยังไม่ push/deploy)
+1. ✅ merge เข้า `main` (`31f3a1a..ad60b78`, fast-forward)
+2. `git push origin main` (นำหน้า `origin/main` 9 commit)
+3. `git push backup main --force` — sync remote `backup` ที่ diverge ค้างจาก session ก่อน
+4. **ไม่มี migration** — แตะแค่ frontend + `next.config.ts` + `proxy.ts` (ไม่มี `prisma/`) → DB ไม่เปลี่ยน
+5. deploy ตาม `docs/SESSION-LOG-2026-08-27.md` ส่วนที่ 4: `git archive --format=zip -o ..\expense-billing-app-deploy.zip HEAD` → copy ไปเซิร์ฟเวอร์ → extract ทับ `C:\Apps\expense-billing-app-deploy` → รัน `.\deploy\windows\update.ps1`
+6. **แจ้งผู้ใช้:** `/` เปลี่ยนเป็นหน้า launcher, หน้ารายการทั้งหมดย้ายไป `/records` — bookmark เดิมจะเปลี่ยน
 
-### ไฟล์ที่แตะทั้งหมดในงานนี้ (`git diff --stat main..redesign/foundation`)
-39 ไฟล์ · +2036 / −2034 — สรุป: สร้าง `app/(app)/{layout,page,records/page}.tsx`,
+### ไฟล์ที่แตะทั้งหมดในงานนี้ (`git diff --stat 31f3a1a..ad60b78`)
+41 ไฟล์ · +2147 / −2042 — สรุป: สร้าง `app/(app)/{layout,page,records/page}.tsx`,
 `components/{AppSidebar,AppTopBar,icons}.tsx`, `components/ui/*`, `lib/nav.ts`, `public/icn-logo-white.png`;
 ลบ `components/Header.tsx`, `app/page.tsx` (ย้าย); เขียนใหม่/ปรับ component เดิมเกือบทั้งหมด +
-`app/globals.css`, `app/layout.tsx`, `next.config.ts`, `proxy.ts`
+`app/globals.css`, `app/layout.tsx`, `next.config.ts`, `proxy.ts`, `actions/records.ts`
