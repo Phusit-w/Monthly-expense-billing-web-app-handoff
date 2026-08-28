@@ -59,7 +59,7 @@
 
 - `npm run build` ผ่าน · `npm run typecheck` สะอาด
 - `npm run lint` — **13 ปัญหา** (baseline เดิม 15; 6 error เดิมทั้งหมดใน `FA017Form`/`FA018Form` `remeasure` — pre-existing; ไฟล์ใหม่ไม่เพิ่มปัญหา บังเอิญเก็บ unused-var เดิมไป 2)
-- เช็คในเบราว์เซอร์ทุกหน้า (`/`, `/records`, `/travel`, `/bill/entry/fa017`, `/bill/entry/fa018`, `/bill/[id]` editor, `/login`) — ไม่มี console error / CSP violation / hydration error
+- เช็คในเบราว์เซอร์ทุกหน้า (`/`, `/records`, `/travel`, `/bill/entry/fa017`, `/bill/entry/fa018`, `/bill/[id]` editor, `/settings`, `/login`) — ไม่มี console error / CSP violation / hydration error (รวมเช็คบน production standalone build ด้วย)
 - warning dev-only ที่เหลือ: `Image "icn-logo.png" width/height modified` × ใน `FA017Form`/`FA018Form` (โลโก้แดงในกระดาษ A4) — pre-existing ไฟล์ไม่ได้แตะ ไม่บล็อก
 
 ---
@@ -73,7 +73,9 @@
   - log การใช้แอป (สำหรับ "แอปที่ใช้ล่าสุด")
   ทำเมื่อมี workflow อนุมัติในระบบจริง แล้วเพิ่ม `/dashboard` → ดันเป็น `/` (launcher ย้ายไป `/apps` หรือเป็น section ใน dashboard)
 - **mascot login แบบ animated** (`Login.dc.html`) — polish รอบเสริม; ตอนนี้เป็น split-panel เรียบ
-- เมนู "เอกสารเก่า" ใน mockup Turn 6a — ยังไม่ทำ (ความหมายไม่ชัด ไม่มีของจริงรองรับ); ใส่แค่ "ตั้งค่า" เป็น disabled placeholder
+- **ธีม light/dark** — ยังไม่ทำ (แอปล็อก fixed-light: `@theme` มี palette แค่โหมดสว่าง, หลาย component hardcode hex, กระดาษ A4 ต้องขาวเสมอ) เป็นงาน ~1 รอบเต็ม ทำเป็นรอบแยก แล้วเพิ่มปุ่มใน `/settings`
+- เมนู "เอกสารเก่า" ใน mockup Turn 6a — ยังไม่ทำ (ความหมายไม่ชัด ไม่มีของจริงรองรับ)
+- **`/settings` v1 เสร็จแล้ว** (`fd10b88`): "ตั้งค่า" ใน sidebar ใช้งานได้จริง — v1 มีหัวข้อเดียว "ค่าเริ่มต้นผู้กรอก" (`DefaultEmployeeSetting` = ProfileCard แบบย่อ, reuse `rememberLastEmployee`) · Account section (ชื่อ+logout) กับ "จัดการข้อมูลที่บันทึกไว้" ยังไม่ใส่ (drop-in ทีหลังได้)
 - avatar ใน topbar: prod มี session จริงจะโชว์ initials แล้ว (บั๊ก "?" บนหน้า `/` แก้ใน `ad60b78`) — เหลือแต่ตอน dev ที่ยังไม่ได้ login จริงจะเห็น "?" (เพราะ dev bypass auth); ปรับเป็น fallback icon ได้ถ้าอยาก
 
 ---
