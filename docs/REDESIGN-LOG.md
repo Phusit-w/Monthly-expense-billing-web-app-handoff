@@ -34,12 +34,13 @@
 
 ## สถานะ merge/deploy
 
-- **2026-08-28: merge เข้า `main` แล้ว** (fast-forward, `31f3a1a..ad60b78`) — `redesign/foundation` sync ตาม `main`
-- **ยังไม่ `git push origin main`** (`main` นำหน้า `origin/main` 9 commit) · **ยังไม่ deploy** ขึ้น `psaidemo.icn21.local`
+- **2026-08-28: merge เข้า `main` แล้ว** (fast-forward จาก `31f3a1a`) — `redesign/foundation` sync ตาม `main` ตลอด
+- redesign หลัก + งานต่อเนื่อง **push `origin/main` แล้ว** ถึง `597d1ea` · หลังจากนั้น `/settings` (`fd10b88`) และ theme toggle (`ae8e8c2`) commit บน `main` — **ยังไม่ push, ยังไม่ deploy** ขึ้น `psaidemo.icn21.local`
 - ไม่มี migration — แตะแค่ frontend + `next.config.ts` + `proxy.ts` (ไม่มี `prisma/`) → DB ไม่เปลี่ยน
 - follow-up ที่ปิดไปแล้วด้วยงานนี้: standalone `next/image` โลโก้ spam `service-err.log` — round 1 ใส่ `images:{unoptimized:true}` แก้แล้ว
+- deploy รอบนี้จะพา 3 ของใหม่ขึ้นด้วย: `/` = launcher, รายการย้าย `/records`, มี `/settings` + ปุ่มสลับธีมสว่าง/มืด
 
-## สิ่งที่ทำเสร็จ — 8 commit บน `main`
+## สิ่งที่ทำเสร็จ — บน `main`
 
 | commit | รอบ | เนื้อหา |
 |---|---|---|
@@ -52,14 +53,18 @@
 | `744314b` | **docs** | เพิ่มไฟล์ log นี้ |
 | `54e4b95` | **followup (รีวิวก่อน merge)** | `actions/records.ts` `revalidatePath("/")` → `"/records"` 4 จุด (create/update/delete/duplicate — round 5+6 ย้ายรายการออกจาก `/` แต่ลืม repoint; ไม่เห็นเป็นบั๊กเพราะ `/records` เป็น `force-dynamic` + `RecordsTable` `router.refresh()`) · เก็บคอมเมนต์ค้างใน `PageShell.tsx` + `globals.css` (อ้าง `Header.tsx`/`.nav-btn`/`.btn-danger` ที่ลบไปแล้ว) |
 | `ad60b78` | **fix (เจอตอนรีวิวหน้าจริง)** | หน้า launcher `/` โชว์ avatar เป็น "?" ให้ทุกคน (รวม prod) — เพราะเป็น route เดียวใน `(app)` ที่ตั้ง `dynamic = "force-static"`; layout กลางอ่าน session cookie มาโชว์ชื่อบน topbar แต่ `force-static` ทำให้ `cookies()` คืนค่าว่าง → prerender ครั้งเดียวตอน build ด้วย `displayName=null`. แก้เป็น `force-dynamic` ให้เหมือน route อื่น (launcher ไม่มีข้อมูล build-time อยู่แล้ว) |
+| `597d1ea` | **push origin** | redesign + followup ขึ้น `origin/main` ถึงจุดนี้ |
+| `fd10b88` | **`/settings` v1** | "ตั้งค่า" ใน sidebar ใช้งานได้ (`lib/nav.ts` flip disabled→`/settings`) · `app/(app)/settings/page.tsx` (`force-dynamic`) · `DefaultEmployeeSetting` = ProfileCard แบบย่อ (แค่ picker + ค่าปัจจุบัน) reuse `rememberLastEmployee` · v1 มีหัวข้อเดียว "ค่าเริ่มต้นผู้กรอก" |
+| `ae8e8c2` | **theme toggle** | ปุ่มสลับสว่าง/มืดใน `AppTopBar` (`ThemeToggle` — pill เลื่อน sun/moon) · cookie `theme` อ่านใน `(app)/layout.tsx` → `data-theme` บน `.app-shell-root` (SSR = ไม่แฟลช) · dark palette = บล็อกเดียว `.app-shell-root[data-theme="dark"]` override `--color-*` ใน `globals.css` · scope แค่ shell → `/login` + กระดาษ A4 คง light เสมอ · `lib/theme.ts` ใหม่ · แก้ contrast ~10 จุด (`text-ink`→`text-black`/`text-ground` บนพื้นที่ไม่ flip, sidebar active, dark link เข้า `@layer base`, `focus:border-[#181818]`→`focus:border-ink` + token `--ring-focus`) |
 
-**สถานะ:** ทุกหน้าปรับเป็นสไตล์ใหม่ครบแล้ว · merge เข้า `main` แล้ว (ดูหัวข้อ "สถานะ merge/deploy" ข้างบน) — ที่เหลือเป็นของสร้างใหม่ล้วน (ดูหัวข้อถัดไป)
+**สถานะ:** ทุกหน้าปรับเป็นสไตล์ใหม่ครบแล้ว · merge เข้า `main` แล้ว · `/settings` + theme toggle เพิ่มหลัง merge (ดูหัวข้อ "สถานะ merge/deploy") — ที่เหลือเป็นของสร้างใหม่ล้วน (ดูหัวข้อถัดไป)
 
 ### Validation (ทุก commit)
 
 - `npm run build` ผ่าน · `npm run typecheck` สะอาด
 - `npm run lint` — **13 ปัญหา** (baseline เดิม 15; 6 error เดิมทั้งหมดใน `FA017Form`/`FA018Form` `remeasure` — pre-existing; ไฟล์ใหม่ไม่เพิ่มปัญหา บังเอิญเก็บ unused-var เดิมไป 2)
 - เช็คในเบราว์เซอร์ทุกหน้า (`/`, `/records`, `/travel`, `/bill/entry/fa017`, `/bill/entry/fa018`, `/bill/[id]` editor, `/settings`, `/login`) — ไม่มี console error / CSP violation / hydration error (รวมเช็คบน production standalone build ด้วย)
+- theme (`ae8e8c2`): เดินทุกหน้า shell + 1 modal ทั้ง light และ dark บน standalone prod build — สลับทันทีไม่ reload/แฟลช, reload แล้ว persist, `/login` คง light, กระดาษ A4 ขาวใน dark
 - warning dev-only ที่เหลือ: `Image "icn-logo.png" width/height modified` × ใน `FA017Form`/`FA018Form` (โลโก้แดงในกระดาษ A4) — pre-existing ไฟล์ไม่ได้แตะ ไม่บล็อก
 
 ---
@@ -73,7 +78,7 @@
   - log การใช้แอป (สำหรับ "แอปที่ใช้ล่าสุด")
   ทำเมื่อมี workflow อนุมัติในระบบจริง แล้วเพิ่ม `/dashboard` → ดันเป็น `/` (launcher ย้ายไป `/apps` หรือเป็น section ใน dashboard)
 - **mascot login แบบ animated** (`Login.dc.html`) — polish รอบเสริม; ตอนนี้เป็น split-panel เรียบ
-- **ธีม light/dark** — ยังไม่ทำ (แอปล็อก fixed-light: `@theme` มี palette แค่โหมดสว่าง, หลาย component hardcode hex, กระดาษ A4 ต้องขาวเสมอ) เป็นงาน ~1 รอบเต็ม ทำเป็นรอบแยก แล้วเพิ่มปุ่มใน `/settings`
+- ~~ธีม light/dark~~ **เสร็จแล้ว** (`ae8e8c2`) — ค่าเริ่มต้น light, สลับด้วยปุ่มใน topbar, ไม่มีโหมด "ตามระบบ" · dark hex ใน `globals.css` เป็น first pass ปรับได้ · จุดที่ยัง soft: `--color-accent`/`peach`/`lavender` คง light ทั้งสองธีมโดยตั้งใจ
 - เมนู "เอกสารเก่า" ใน mockup Turn 6a — ยังไม่ทำ (ความหมายไม่ชัด ไม่มีของจริงรองรับ)
 - **`/settings` v1 เสร็จแล้ว** (`fd10b88`): "ตั้งค่า" ใน sidebar ใช้งานได้จริง — v1 มีหัวข้อเดียว "ค่าเริ่มต้นผู้กรอก" (`DefaultEmployeeSetting` = ProfileCard แบบย่อ, reuse `rememberLastEmployee`) · Account section (ชื่อ+logout) กับ "จัดการข้อมูลที่บันทึกไว้" ยังไม่ใส่ (drop-in ทีหลังได้)
 - avatar ใน topbar: prod มี session จริงจะโชว์ initials แล้ว (บั๊ก "?" บนหน้า `/` แก้ใน `ad60b78`) — เหลือแต่ตอน dev ที่ยังไม่ได้ login จริงจะเห็น "?" (เพราะ dev bypass auth); ปรับเป็น fallback icon ได้ถ้าอยาก
