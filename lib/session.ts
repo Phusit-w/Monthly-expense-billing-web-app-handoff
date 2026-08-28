@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, createSessionToken, verifySessionToken } from "@/lib/auth";
 import type { SessionPayload } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 // Cookie read/write glue for Server Actions/Components (uses next/headers'
 // cookies(), only callable from that context — same constraint
@@ -25,7 +26,11 @@ export async function clearSessionCookie(): Promise<void> {
   store.delete(SESSION_COOKIE);
 }
 
-export async function getCurrentUser(): Promise<SessionPayload | null> {
+export async function getCurrentUser() {
   const store = await cookies();
-  return verifySessionToken(store.get(SESSION_COOKIE)?.value);
+  const payload = verifySessionToken(store.get(SESSION_COOKIE)?.value);
+  if (!payload) return null;
+  const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+  if (!user || !user.isActive || user.sessionVersion !== payload.sessionVersion) return null;
+  return user;
 }

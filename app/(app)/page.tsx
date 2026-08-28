@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {
-  ReceiptIcon,
-  FileTextIcon,
-  CarIcon,
+  BanknoteIcon,
+  FileCheckIcon,
+  CalculatorIcon,
   ListIcon,
-  ShieldIcon,
+  ClipboardCheckIcon,
 } from "@/components/icons";
 
 // The Applications launcher — the portal front door. Matches Claude Design
@@ -32,7 +32,7 @@ const TILES: Tile[] = [
     title: "Employee Expense Claim",
     desc: "F-FA-017 · เบิกค่าใช้จ่ายที่มีใบเสร็จ พร้อมคำนวณค่าเดินทางในตัว",
     cta: "เปิดฟอร์ม →",
-    icon: ReceiptIcon,
+    icon: BanknoteIcon,
     tile: "bg-peach text-black",
   },
   {
@@ -40,7 +40,7 @@ const TILES: Tile[] = [
     title: "ใบรับรองแทนใบเสร็จ",
     desc: "F-FA-018 · สำหรับค่าใช้จ่ายที่ไม่มีบิล เช่น ค่ารถ ค่าที่จอดรถ",
     cta: "เปิดฟอร์ม →",
-    icon: FileTextIcon,
+    icon: FileCheckIcon,
     tile: "bg-lavender text-black",
   },
   {
@@ -48,7 +48,7 @@ const TILES: Tile[] = [
     title: "คำนวณค่าเดินทาง",
     desc: "คิดระยะทาง เบี้ยเลี้ยง และค่าน้ำมันตามอัตราบริษัท",
     cta: "เปิดเครื่องมือ →",
-    icon: CarIcon,
+    icon: CalculatorIcon,
     tile: "bg-chip text-ink",
   },
   {
@@ -60,13 +60,12 @@ const TILES: Tile[] = [
     tile: "bg-chip text-ink",
   },
   {
-    href: "#",
+    href: "/soc",
     title: "ตรวจสอบ SOC",
     desc: "ตรวจสอบเอกสารอ้างอิงและ Statement of Compliance",
-    cta: "ยังใช้งานไม่ได้",
-    icon: ShieldIcon,
+    cta: "เปิดเครื่องมือ →",
+    icon: ClipboardCheckIcon,
     tile: "bg-chip text-ink",
-    soon: true,
   },
 ];
 

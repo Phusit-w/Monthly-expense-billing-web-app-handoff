@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // SOC uploads allow one 25 MB DOCX plus up to ten 25 MB PDFs. Proxy
+  // inspects the authenticated request before the route handler, so its
+  // body limit must be large enough for the same validated payload.
+  experimental: { proxyClientMaxBodySize: "300mb" },
+
+  // Optional isolated build directory for CI/verification while a staged
+  // standalone server is running and holding `.next/standalone` open.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Allow the current ngrok development URL to load Next.js dev assets and
   // endpoints. Keep this scoped to the assigned hostname rather than all
   // ngrok domains.

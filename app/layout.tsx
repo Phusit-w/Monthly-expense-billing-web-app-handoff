@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   description: "ระบบกรอกและพิมพ์แบบฟอร์มเบิกค่าใช้จ่ายรายเดือน (F-FA-017 / F-FA-018)",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="th"

@@ -15,7 +15,7 @@ import ConfirmLogoutModal from "@/components/ConfirmLogoutModal";
 // content, a dim scrim behind it) — the page shell reserves only the 80px
 // collapsed width (see app/(app)/layout.tsx's 128px = 24+80+24 gutter), so
 // expanding never reflows the page.
-export default function AppSidebar() {
+export default function AppSidebar({ role }: { role: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
@@ -80,7 +80,7 @@ export default function AppSidebar() {
         </div>
 
         <ul className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter((item) => !item.adminOnly || role === "ADMIN").map((item) => {
             const active = isNavItemActive(item, pathname);
             const Icon = item.icon;
 

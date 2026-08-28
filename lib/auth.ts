@@ -42,6 +42,7 @@ export interface SessionPayload {
   userId: string;
   username: string;
   displayName: string;
+  sessionVersion: number;
 }
 
 function sessionSecret(): string {
@@ -82,7 +83,7 @@ export function verifySessionToken(token: string | undefined | null): SessionPay
 
   try {
     const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as SessionPayload;
-    if (!payload.userId || !payload.username || !payload.displayName) return null;
+    if (!payload.userId || !payload.username || !payload.displayName || !Number.isInteger(payload.sessionVersion)) return null;
     return payload;
   } catch {
     return null;

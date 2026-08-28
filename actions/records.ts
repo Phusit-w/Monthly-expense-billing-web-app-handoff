@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { fa017Totals, fa018Total } from "@/lib/totals";
-import { getCurrentUser } from "@/lib/session";
+import { authorizeExpenseRecord, requireActor, writeAudit } from "@/lib/authorization";
 import type {
   Draft,
   DraftItem,
@@ -42,11 +42,6 @@ function serialize(row: PrismaExpenseRecord): ExpenseRecordData {
 // "" if nobody's logged in — shouldn't happen in production (proxy.ts
 // gates every route behind a session first) but dev skips auth entirely
 // (see proxy.ts), so these actions still need to work with no session.
-async function currentActorName(): Promise<string> {
-  const user = await getCurrentUser();
-  return user?.displayName ?? "";
-}
-
 function computeTotal(draft: Draft): number {
   return draft.type === "FA018"
     ? fa018Total(draft.items as FA018Item[])
@@ -54,7 +49,9 @@ function computeTotal(draft: Draft): number {
 }
 
 export async function listRecords(): Promise<ExpenseRecordData[]> {
+  const actor = await requireActor();
   const rows = await prisma.expenseRecord.findMany({
+    where: { deletedAt: null, ...(actor.role === "ADMIN" ? {} : { ownerId: actor.id }) },
     orderBy: { updatedAt: "desc" },
   });
   return rows.map(serialize);
@@ -63,8 +60,12 @@ export async function listRecords(): Promise<ExpenseRecordData[]> {
 export async function getRecord(
   id: string
 ): Promise<ExpenseRecordData | null> {
-  const row = await prisma.expenseRecord.findUnique({ where: { id } });
-  return row ? serialize(row) : null;
+  try {
+    const { record } = await authorizeExpenseRecord(id);
+    return serialize(record);
+  } catch {
+    return null;
+  }
 }
 
 // Mirrors Component.saveDraft: creates a new record, or updates in place
@@ -85,7 +86,8 @@ export async function saveRecord(
   { ok: true; record: ExpenseRecordData } | { ok: false; reason: "conflict" }
 > {
   const total = computeTotal(draft);
-  const actorName = await currentActorName();
+  const actor = await requireActor();
+  const actorName = actor.displayName;
   const data = {
     type: draft.type,
     day: draft.day,
@@ -105,8 +107,9 @@ export async function saveRecord(
 
   if (!draft.id) {
     const row = await prisma.expenseRecord.create({
-      data: { ...data, createdByName: actorName },
+      data: { ...data, ownerId: actor.id, createdByName: actorName },
     });
+    await writeAudit({ actorId: actor.id, action: "EXPENSE_CREATED", entityType: "EXPENSE", entityId: row.id, summary: `สร้างเอกสาร ${row.type}`, after: { type: row.type, total: row.total.toString() } });
     // The saved-records list lives at /records (it was "/" before the 2026
     // redesign moved the Applications launcher there).
     revalidatePath("/records");
@@ -121,8 +124,9 @@ export async function saveRecord(
   // reported as the same conflict, since either way this draft's base
   // state is stale and the right next step for the user is the same
   // (reload before editing further).
+  const { record: existing } = await authorizeExpenseRecord(draft.id);
   const result = await prisma.expenseRecord.updateMany({
-    where: { id: draft.id, updatedAt: new Date(draft.updatedAt!) },
+    where: { id: draft.id, deletedAt: null, updatedAt: new Date(draft.updatedAt!), ...(actor.role === "ADMIN" ? {} : { ownerId: actor.id }) },
     data,
   });
   if (result.count === 0) {
@@ -132,24 +136,26 @@ export async function saveRecord(
   const row = await prisma.expenseRecord.findUniqueOrThrow({
     where: { id: draft.id },
   });
+  await writeAudit({ actorId: actor.id, action: "EXPENSE_UPDATED", entityType: "EXPENSE", entityId: row.id, summary: `แก้ไขเอกสาร ${row.type}`, before: { total: existing.total.toString() }, after: { total: row.total.toString() } });
   revalidatePath("/records");
   return { ok: true, record: serialize(row) };
 }
 
 export async function deleteRecord(id: string): Promise<void> {
-  await prisma.expenseRecord.delete({ where: { id } });
+  const { actor, record } = await authorizeExpenseRecord(id);
+  const now = new Date();
+  await prisma.expenseRecord.update({ where: { id }, data: { deletedAt: now, deletedById: actor.id, purgeAfter: new Date(now.getTime() + 30 * 86400000) } });
+  await writeAudit({ actorId: actor.id, action: "EXPENSE_TRASHED", entityType: "EXPENSE", entityId: id, summary: `ย้ายเอกสาร ${record.type} ไปถังขยะ` });
   revalidatePath("/records");
 }
 
 // Mirrors Component.duplicateRecord: clone with a fresh id/timestamps,
 // prepended to the list (achieved here via a new row + updatedAt: now).
 export async function duplicateRecord(id: string): Promise<ExpenseRecordData> {
-  const source = await prisma.expenseRecord.findUniqueOrThrow({
-    where: { id },
-  });
+  const { actor, record: source } = await authorizeExpenseRecord(id);
   // The duplicate is a new record authored by whoever clicked "ทำซ้ำ" now,
   // not a copy of the source's original createdByName/updatedByName.
-  const actorName = await currentActorName();
+  const actorName = actor.displayName;
   const row = await prisma.expenseRecord.create({
     data: {
       type: source.type,
@@ -167,8 +173,10 @@ export async function duplicateRecord(id: string): Promise<ExpenseRecordData> {
       total: source.total,
       createdByName: actorName,
       updatedByName: actorName,
+      ownerId: actor.id,
     },
   });
+  await writeAudit({ actorId: actor.id, action: "EXPENSE_DUPLICATED", entityType: "EXPENSE", entityId: row.id, summary: `ทำสำเนาจาก ${id}`, metadata: { sourceId: id } });
   revalidatePath("/records");
   return serialize(row);
 }

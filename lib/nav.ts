@@ -1,10 +1,12 @@
 import {
   GridIcon,
   ListIcon,
-  CarIcon,
-  ReceiptIcon,
-  FileTextIcon,
+  CalculatorIcon,
+  BanknoteIcon,
+  FileCheckIcon,
   SettingsIcon,
+  ClipboardCheckIcon,
+  ShieldUserIcon,
   type IconProps,
 } from "@/components/icons";
 
@@ -19,6 +21,7 @@ export interface NavItem {
   // exact match on `href`.
   match?: (pathname: string) => boolean;
   disabled?: boolean;
+  adminOnly?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -38,7 +41,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/travel",
     label: "คำนวณค่าเดินทาง",
-    icon: CarIcon,
+    icon: CalculatorIcon,
     match: (p) => p.startsWith("/travel"),
   },
   {
@@ -46,14 +49,27 @@ export const NAV_ITEMS: NavItem[] = [
     // "Expense Claim" here.
     href: "/bill/entry/fa017",
     label: "Expense Claim",
-    icon: ReceiptIcon,
+    icon: BanknoteIcon,
     match: (p) => p.startsWith("/bill/entry/fa017"),
   },
   {
     href: "/bill/entry/fa018",
     label: "ใบรับรองแทนใบเสร็จ",
-    icon: FileTextIcon,
+    icon: FileCheckIcon,
     match: (p) => p.startsWith("/bill/entry/fa018"),
+  },
+  {
+    href: "/soc",
+    label: "ตรวจสอบ SOC",
+    icon: ClipboardCheckIcon,
+    match: (p) => p.startsWith("/soc"),
+  },
+  {
+    href: "/admin",
+    label: "Admin Center",
+    icon: ShieldUserIcon,
+    match: (p) => p.startsWith("/admin"),
+    adminOnly: true,
   },
   {
     href: "/settings",

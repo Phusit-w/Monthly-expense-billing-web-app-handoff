@@ -34,7 +34,7 @@ export default function LoginForm({ next }: { next: string }) {
         setError(result.error);
         return;
       }
-      router.push(next);
+      router.push(result.mustChangePassword ? "/change-password" : next);
       router.refresh();
     });
   }
@@ -43,7 +43,7 @@ export default function LoginForm({ next }: { next: string }) {
     <div className="flex min-h-screen items-center justify-center bg-[#e8e8e8] p-6 font-sans">
       <div className="flex w-full max-w-[1500px] overflow-hidden rounded-shell md:min-h-[680px]">
         {/* Left: ICN brand panel — hidden on narrow screens */}
-        <div className="hidden w-[42%] shrink-0 flex-col justify-between rounded-shell bg-[#050505] p-11 text-white md:flex">
+        <div className="hidden w-[42%] shrink-0 flex-col justify-center gap-5 rounded-shell bg-[#050505] p-11 text-white md:flex">
           <div className="flex items-center gap-3">
             <Image
               src="/icn-logo-white.png"
@@ -54,14 +54,8 @@ export default function LoginForm({ next }: { next: string }) {
               className="h-12 w-12 object-contain"
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <div className="font-display text-4xl font-bold leading-tight">
-              ICN Apps
-            </div>
-            <div className="text-lg text-white/70">ศูนย์รวมระบบงานภายใน</div>
-          </div>
-          <div className="text-[13px] text-white/40">
-            ระบบบิลค่าใช้จ่ายรายเดือน · F-FA-017 / F-FA-018
+          <div className="font-display text-4xl font-bold leading-tight">
+            ICN Apps
           </div>
         </div>
 
@@ -114,7 +108,7 @@ export default function LoginForm({ next }: { next: string }) {
                     type="button"
                     aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                     onClick={() => setShowPassword((v) => !v)}
-                    className="ui-btn flex items-center p-1 text-muted"
+                    className="ui-btn flex items-center p-1 text-muted transition-colors hover:text-ink"
                   >
                     {showPassword ? (
                       <EyeOffIcon size={18} />

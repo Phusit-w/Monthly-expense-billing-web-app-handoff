@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/session";
 import { parseTheme, THEME_COOKIE } from "@/lib/theme";
 import AppSidebar from "@/components/AppSidebar";
 import AppTopBar from "@/components/AppTopBar";
+import { redirect } from "next/navigation";
 
 // Shared shell for every signed-in screen (2026 redesign). `/login` is
 // deliberately outside this route group so it renders bare. A future
@@ -19,6 +20,8 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  if (user.mustChangePassword) redirect("/change-password");
   // Light/dark for the shell (see lib/theme.ts). Emitting data-theme in the
   // SSR'd HTML is what keeps the first paint flash-free — no inline script.
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
@@ -29,7 +32,7 @@ export default async function AppLayout({
       data-theme={theme}
       style={{ colorScheme: theme }}
     >
-      <AppSidebar />
+      <AppSidebar role={user.role} />
       {/* pl-32 = 128px = 24 (rail inset) + 80 (collapsed rail) + 24 (gap).
           The rail expands over this padding, never widening it. */}
       <div className="app-main flex min-h-screen flex-col gap-6 py-7 pl-32 pr-8 pb-10">

@@ -30,6 +30,9 @@ services:
     environment:
       DATABASE_URL: postgresql://expense_billing:${POSTGRES_PASSWORD}@db:5432/expense_billing
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in a .env file next to docker-compose.yml}
+      SOC_STORAGE_ROOT: /data/soc
+    volumes:
+      - soc_data:/data/soc
     # Not published to the host directly — only the caddy service below is,
     # reaching this one over the compose network by service name. The
     # session cookie (proxy.ts) isn't marked Secure unless NODE_ENV is
@@ -38,6 +41,23 @@ services:
     # and see it in plain HTTP.
     expose:
       - "3000"
+
+  soc-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql://expense_billing:${POSTGRES_PASSWORD}@db:5432/expense_billing
+      SOC_STORAGE_ROOT: /data/soc
+      SOC_AI_PROVIDER: ${SOC_AI_PROVIDER:-disabled}
+    volumes:
+      - soc_data:/data/soc
 
   # Terminates HTTPS in front of `app` using a self-signed certificate from
   # Caddy's own local CA (`tls internal` in Caddyfile) — appropriate for an
@@ -79,3 +99,4 @@ services:
 volumes:
   db_data:
   caddy_data:
+  soc_data:
