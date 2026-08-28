@@ -35,11 +35,12 @@ const variants: Record<Variant, string> = {
   // both themes without another inversion step.
   dark: "bg-ink text-ground hover:opacity-90 active:opacity-80",
   outline:
-    "border border-line bg-surface text-label hover:bg-hover hover:text-ink",
-  ghost: "bg-transparent text-label hover:bg-hover hover:text-ink",
-  // Outline red — the "ลบ" / "ล้างข้อมูล" pills. Fills solid red on hover.
+    "border border-line bg-surface text-label hover:bg-hover hover:text-ink active:bg-line",
+  ghost: "bg-transparent text-label hover:bg-hover hover:text-ink active:bg-line",
+  // Outline red — the "ลบ" / "ล้างข้อมูล" pills. Fills solid red on hover,
+  // one shade darker while held (matches dangerSolid's active).
   danger:
-    "border border-danger-border bg-surface text-danger hover:bg-danger hover:text-white",
+    "border border-danger-border bg-surface text-danger hover:bg-danger hover:text-white active:bg-[#8f1e17] active:text-white",
   // Solid red — a confirm-delete primary action.
   dangerSolid: "bg-danger text-white hover:bg-[#8f1e17] active:bg-[#7a1a14]",
 };

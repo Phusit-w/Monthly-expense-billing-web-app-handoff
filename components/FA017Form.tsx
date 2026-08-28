@@ -203,7 +203,6 @@ const saveIconBtn: React.CSSProperties = {
   lineHeight: "14px",
   fontSize: 9,
   border: "none",
-  background: "transparent",
   cursor: "pointer",
 };
 
@@ -891,7 +890,7 @@ export default function FA017Form({
                       saveIconBtn's comment above. */}
                   <button
                     type="button"
-                    className="no-print"
+                    className="no-print ui-btn rounded-[3px] bg-transparent transition-colors hover:bg-black/5"
                     onClick={() => setPendingSaveRow(i)}
                     disabled={!it.desc.trim()}
                     title="บันทึกรายการนี้ไว้ใช้ซ้ำ"

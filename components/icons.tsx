@@ -60,8 +60,26 @@ export const FileTextIcon = (p: IconProps) => (
 
 export const ReceiptIcon = (p: IconProps) => (
   <Icon {...p}>
-    <path d="M6.5 3.5h11a1.5 1.5 0 0 1 1.5 1.5v15l-3.5-2.5-3.5 2.5-3.5-2.5L5 20V5a1.5 1.5 0 0 1 1.5-1.5z" />
-    <path d="M9 8h6M9 12h6" />
+    <path d="M6 3.25h12a1 1 0 0 1 1 1v16.5l-2.17-1.5-2.16 1.5L12.5 19l-2.17 1.75L8.17 19 6 20.75z" />
+    <path d="M9 8h6M9 11.5h6M9 15h4" />
+  </Icon>
+);
+
+// Banknote — "เบิกค่าใช้จ่าย" (Expense Claim / reimbursement).
+export const BanknoteIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="2.5" y="6.5" width="19" height="11" rx="2.5" />
+    <circle cx="12" cy="12" r="2.5" />
+    <path d="M6 12h.01M18 12h.01" />
+  </Icon>
+);
+
+// Calculator — "คำนวณค่าเดินทาง" (the tool computes distance / allowance / fuel).
+export const CalculatorIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="4.5" y="2.5" width="15" height="19" rx="2.5" />
+    <path d="M8 6.5h8" />
+    <path d="M8 11h.01M12 11h.01M16 11h.01M8 14.5h.01M12 14.5h.01M16 14.5v3.5M8 18h.01M12 18h.01" />
   </Icon>
 );
 
@@ -75,9 +93,8 @@ export const CarIcon = (p: IconProps) => (
 
 export const SettingsIcon = (p: IconProps) => (
   <Icon {...p}>
-    <path d="M9 20.5H7a2 2 0 0 1-2-2v-2.4c-.9-.5-1.6-1.3-2-2.2l.5-2.5c.4-.9 1.1-1.7 2-2.2V6.8" />
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
     <circle cx="12" cy="12" r="3" />
-    <path d="M12 4.5v2M12 17.5v2M19 12h1.5M3.5 12H5M16.9 7.1l1-1M6.1 17.9l1-1M16.9 16.9l1 1M6.1 6.1l1 1" />
   </Icon>
 );
 
@@ -148,6 +165,33 @@ export const ShieldIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 3.5l7 3v5.5c0 4.5-3 7.5-7 8.5-4-1-7-4-7-8.5V6.5z" />
     <path d="M9 12.5l2 2 4-4.5" />
+  </Icon>
+);
+
+// Shield with a person — "Admin Center" (elevated access / user administration).
+export const ShieldUserIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3.5l7 3v5c0 4.4-3 7.6-7 8.7-4-1.1-7-4.3-7-8.7v-5z" />
+    <circle cx="12" cy="10" r="2.2" />
+    <path d="M8.4 16.4a3.8 3.8 0 0 1 7.2 0" />
+  </Icon>
+);
+
+// Document with a check — "ใบรับรองแทนใบเสร็จ" (a certifying form).
+export const FileCheckIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+    <path d="M14 3v5h5" />
+    <path d="m9 14.5 2 2 4-4" />
+  </Icon>
+);
+
+// Clipboard with a check — "ตรวจสอบ SOC" (audit / verification workflow).
+export const ClipboardCheckIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="8" y="2.5" width="8" height="4" rx="1.2" />
+    <path d="M16 4.5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2h2" />
+    <path d="m9 13.5 2 2 4-4" />
   </Icon>
 );
 

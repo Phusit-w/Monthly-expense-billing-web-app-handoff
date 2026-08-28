@@ -32,7 +32,7 @@ export default function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
       aria-label="สลับธีมสว่าง / มืด"
       title={dark ? "ธีมมืด — กดเพื่อสลับเป็นสว่าง" : "ธีมสว่าง — กดเพื่อสลับเป็นมืด"}
       onClick={toggle}
-      className="ui-btn relative h-7 w-[52px] shrink-0 rounded-full border border-line bg-chip transition-colors"
+      className="ui-btn relative h-7 w-[52px] shrink-0 rounded-full border border-line bg-chip transition-colors hover:bg-hover hover:border-muted"
     >
       <span
         className="absolute left-0.5 top-0.5 grid size-6 place-items-center rounded-full

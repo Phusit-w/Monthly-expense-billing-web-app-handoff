@@ -108,7 +108,7 @@ export default function EditorToolbar({
           <button
             onClick={onCreateFA018}
             title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
-            className="ui-btn whitespace-nowrap rounded-input bg-lavender px-3.5 py-2 text-[13px] font-medium text-black transition-colors hover:brightness-95"
+            className="ui-btn whitespace-nowrap rounded-input bg-lavender px-3.5 py-2 text-[13px] font-medium text-black transition-colors hover:bg-[#a3abf3] active:bg-[#8f99ee]"
           >
             สร้างฟอร์มใบรับรองแทนใบเสร็จ →
           </button>
