@@ -26,9 +26,14 @@ const sizes: Record<Size, string> = {
 
 const variants: Record<Variant, string> = {
   // Poppins, orange — the mockup's primary CTA
+  // text-black, not text-ink: bg-accent stays orange in dark mode, so the
+  // label must stay dark rather than flip to the light ink token.
   primary:
-    "bg-accent text-ink font-display font-bold hover:bg-[#f08d10] active:bg-[#e08207]",
-  dark: "bg-ink text-white hover:bg-[#1a1a1a] active:bg-[#050505]",
+    "bg-accent text-black font-display font-bold hover:bg-[#f08d10] active:bg-[#e08207]",
+  // text-ground (not text-white): under the dark theme `bg-ink` flips to a
+  // near-white fill, so the label must flip with it. opacity hover works in
+  // both themes without another inversion step.
+  dark: "bg-ink text-ground hover:opacity-90 active:opacity-80",
   outline:
     "border border-line bg-surface text-label hover:bg-hover hover:text-ink",
   ghost: "bg-transparent text-label hover:bg-hover hover:text-ink",

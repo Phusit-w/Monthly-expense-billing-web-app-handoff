@@ -16,7 +16,7 @@ import type { EmployeeSnapshot, SavedEmployeeEntry } from "@/lib/types";
 const inputClass =
   "w-full rounded-field border border-line bg-surface px-4 py-3 text-sm text-ink outline-none " +
   "transition-[border-color,box-shadow] duration-150 " +
-  "focus:border-[#181818] focus:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]";
+  "focus:border-ink focus:shadow-[0_0_0_3px_var(--ring-focus)]";
 
 // The "ข้อมูลพนักงาน (บันทึกไว้ใช้ซ้ำ)" card. Purely local React state:
 // nothing is written anywhere just from typing. The only DB writes are the

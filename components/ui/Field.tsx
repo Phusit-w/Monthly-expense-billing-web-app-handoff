@@ -39,7 +39,7 @@ export default function Field({
       <div
         className="flex items-center gap-2.5 rounded-field border border-line bg-surface px-4
           transition-[border-color,box-shadow] duration-150
-          focus-within:border-[#181818] focus-within:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]"
+          focus-within:border-ink focus-within:shadow-[0_0_0_3px_var(--ring-focus)]"
       >
         {leftIcon ? (
           <span className="shrink-0 text-muted">{leftIcon}</span>

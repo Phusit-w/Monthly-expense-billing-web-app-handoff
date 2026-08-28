@@ -12,7 +12,7 @@ import { useTravelCostCalculator } from "@/lib/useTravelCostCalculator";
 const inputClass =
   "w-full rounded-field border border-line bg-surface px-3.5 py-2.5 text-sm text-ink outline-none " +
   "transition-[border-color,box-shadow] duration-150 " +
-  "focus:border-[#181818] focus:shadow-[0_0_0_3px_rgb(0_0_0/0.04)]";
+  "focus:border-ink focus:shadow-[0_0_0_3px_var(--ring-focus)]";
 
 const labelClass = "mb-1.5 block text-[13px] font-medium text-label";
 
@@ -63,7 +63,7 @@ export default function TravelCalculator() {
 
   function tabClass(active: boolean) {
     return `ui-btn rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
-      active ? "bg-ink text-white" : "text-muted hover:text-ink"
+      active ? "bg-ink text-ground" : "text-muted hover:text-ink"
     }`;
   }
 
@@ -79,7 +79,7 @@ export default function TravelCalculator() {
 
         <div className="flex items-center gap-3 rounded-card bg-peach px-5 py-4">
           <span className="text-[13px] font-medium text-[#7a5a2e]">ต้นทาง:</span>
-          <span className="text-sm">{TRAVEL_ORIGIN}</span>
+          <span className="text-sm text-black">{TRAVEL_ORIGIN}</span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 self-start rounded-field bg-chip p-1.5">

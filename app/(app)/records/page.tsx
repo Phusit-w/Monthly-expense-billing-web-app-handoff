@@ -107,7 +107,7 @@ export default async function HistoryPage() {
             </Link>
             <Link
               href="/bill/entry/fa017"
-              className="rounded-field bg-accent px-5 py-3 font-display text-[13.5px] font-bold text-ink no-underline transition-colors hover:bg-[#f08d10]"
+              className="rounded-field bg-accent px-5 py-3 font-display text-[13.5px] font-bold text-black no-underline transition-colors hover:bg-[#f08d10]"
             >
               + Expense Claim
             </Link>

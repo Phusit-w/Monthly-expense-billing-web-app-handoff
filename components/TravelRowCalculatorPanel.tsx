@@ -14,7 +14,7 @@ import { useTravelCostCalculator } from "@/lib/useTravelCostCalculator";
 // same-render setState the caller's onApply performs directly on this row.
 const compactInputClass =
   "w-full rounded-input border border-line bg-surface px-2.5 py-1.5 text-xs text-ink outline-none " +
-  "focus:border-[#181818]";
+  "focus:border-ink";
 
 export default function TravelRowCalculatorPanel({
   onApply,
@@ -37,7 +37,7 @@ export default function TravelRowCalculatorPanel({
 
   function tabClass(active: boolean) {
     return `ui-btn rounded-input px-2.5 py-1 text-[11px] font-medium transition-colors ${
-      active ? "bg-ink text-white" : "text-muted hover:text-ink"
+      active ? "bg-ink text-ground" : "text-muted hover:text-ink"
     }`;
   }
 

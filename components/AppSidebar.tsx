@@ -116,7 +116,7 @@ export default function AppSidebar() {
                 >
                   <span
                     className={`grid size-12 shrink-0 place-items-center rounded-chip transition-colors
-                      ${active ? "bg-white text-ink" : "bg-transparent text-[#8b8b8b] group-hover:bg-white group-hover:text-ink"}`}
+                      ${active ? "bg-white text-black" : "bg-transparent text-[#8b8b8b] group-hover:bg-white group-hover:text-black"}`}
                   >
                     <Icon size={22} />
                   </span>

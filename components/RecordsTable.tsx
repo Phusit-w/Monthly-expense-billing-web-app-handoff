@@ -164,7 +164,7 @@ export default function RecordsTable({
               onClick={() => setTypeFilter(f.key)}
               className={`ui-btn rounded-[11px] px-4 py-2 text-[13px] font-medium transition-colors ${
                 typeFilter === f.key
-                  ? "bg-ink text-white"
+                  ? "bg-ink text-ground"
                   : "text-muted hover:text-ink"
               }`}
             >

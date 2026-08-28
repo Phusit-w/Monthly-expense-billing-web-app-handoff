@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS, isNavItemActive } from "@/lib/nav";
 import { BellIcon, ChevronRightIcon } from "@/components/icons";
+import ThemeToggle from "@/components/ThemeToggle";
+import type { Theme } from "@/lib/theme";
 
 // The redesign's top bar: a breadcrumb on the left, a notification bell and
 // the signed-in user's avatar on the right. Notifications are not a real
@@ -27,7 +29,13 @@ function initials(name: string): string {
   return (parts[0][0] ?? "") + (parts[1][0] ?? "");
 }
 
-export default function AppTopBar({ displayName }: { displayName: string | null }) {
+export default function AppTopBar({
+  displayName,
+  theme,
+}: {
+  displayName: string | null;
+  theme: Theme;
+}) {
   const pathname = usePathname();
   const crumb = crumbForPath(pathname);
 
@@ -44,6 +52,7 @@ export default function AppTopBar({ displayName }: { displayName: string | null 
       </div>
 
       <div className="ml-auto flex items-center gap-3.5">
+        <ThemeToggle initialTheme={theme} />
         <button
           type="button"
           aria-label="การแจ้งเตือน"
@@ -54,7 +63,7 @@ export default function AppTopBar({ displayName }: { displayName: string | null 
         </button>
 
         <div className="flex items-center gap-2.5">
-          <span className="grid size-11 place-items-center rounded-full bg-peach text-sm font-bold text-ink">
+          <span className="grid size-11 place-items-center rounded-full bg-peach text-sm font-bold text-black">
             {initials(displayName ?? "")}
           </span>
           {displayName ? (

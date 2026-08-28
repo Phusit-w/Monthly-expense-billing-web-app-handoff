@@ -40,6 +40,11 @@
   --color-danger: #b3261e;
   --color-danger-border: #ffd7d5;
 
+  /* Focus ring — the soft glow behind a focused input's border. A token so
+     it can flip to a light glow under the dark theme (a near-black glow is
+     invisible on a dark surface). */
+  --ring-focus: rgb(0 0 0 / 0.04);
+
   /* Radii */
   --radius-input: 13px;
   --radius-field: 14px;
@@ -54,6 +59,42 @@
   --shadow-paper: 0 4px 24px rgb(0 0 0 / 0.15);
   --shadow-dropdown: 0 12px 32px rgb(0 0 0 / 0.18);
 }
+
+/* Dark theme — scoped to the app shell only (app/(app)/layout.tsx puts
+   data-theme on `.app-shell-root`). /login has no `.app-shell-root` so it
+   stays light, and the A4 `.paper` re-anchors its own #fff/#111 below so
+   the printed sheet is unaffected. Tailwind v4's `bg-ground` / `text-ink`
+   / … compile to `var(--color-…)`, so redefining the custom properties
+   here retints every utility with no per-component edits. accent / peach /
+   lavender are intentionally left at their light values (the orange CTA
+   stays orange; peach/lavender read as bright accent tiles on the dark
+   ground, and the dark text on them stays legible). */
+.app-shell-root[data-theme="dark"] {
+  --color-ground: #14151a;
+  --color-surface: #1e1f26;
+  --color-ink: #f2f3f5;
+  --color-rail: #0d0e12;
+
+  --color-muted: #8b8d97;
+  --color-label: #a2a4ad;
+  --color-subtle: #c9cbd2;
+
+  --color-line: #2f3037;
+  --color-divider: #26272d;
+  --color-chip: #2a2b33;
+  --color-hover: #2f3039;
+
+  /* Brighter than the light #b3261e so "ลบ" / "ล้างข้อมูล" text + border
+     clear contrast against the dark surface. */
+  --color-danger: #e5645c;
+  --color-danger-border: #5b2a27;
+
+  --ring-focus: rgb(255 255 255 / 0.09);
+
+  --shadow-card: 0 6px 20px rgb(0 0 0 / 0.4);
+  --shadow-dropdown: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
 
 /* Base reset ported from the design source's <helmet> block. */
 html,
@@ -76,6 +117,14 @@ body {
 
   a:hover {
     color: #1e429f;
+  }
+
+  /* Genuine inline text links (e.g. the Google Maps link on /travel) — the
+     blue above is too dark on the dark ground. Kept inside @layer base so
+     `text-ink` on <Link>s styled as buttons/cards/nav (utilities layer)
+     still wins over it, exactly as it does for the light rule above. */
+  .app-shell-root[data-theme="dark"] a {
+    color: #6ea8fe;
   }
 }
 

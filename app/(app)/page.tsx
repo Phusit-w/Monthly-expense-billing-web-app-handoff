@@ -33,7 +33,7 @@ const TILES: Tile[] = [
     desc: "F-FA-017 · เบิกค่าใช้จ่ายที่มีใบเสร็จ พร้อมคำนวณค่าเดินทางในตัว",
     cta: "เปิดฟอร์ม →",
     icon: ReceiptIcon,
-    tile: "bg-peach",
+    tile: "bg-peach text-black",
   },
   {
     href: "/bill/entry/fa018",
@@ -41,7 +41,7 @@ const TILES: Tile[] = [
     desc: "F-FA-018 · สำหรับค่าใช้จ่ายที่ไม่มีบิล เช่น ค่ารถ ค่าที่จอดรถ",
     cta: "เปิดฟอร์ม →",
     icon: FileTextIcon,
-    tile: "bg-lavender",
+    tile: "bg-lavender text-black",
   },
   {
     href: "/travel",
@@ -49,7 +49,7 @@ const TILES: Tile[] = [
     desc: "คิดระยะทาง เบี้ยเลี้ยง และค่าน้ำมันตามอัตราบริษัท",
     cta: "เปิดเครื่องมือ →",
     icon: CarIcon,
-    tile: "bg-chip",
+    tile: "bg-chip text-ink",
   },
   {
     href: "/records",
@@ -57,7 +57,7 @@ const TILES: Tile[] = [
     desc: "บิลที่บันทึกไว้ทั้งหมด ค้นหา แก้ไข ทำซ้ำ และพิมพ์",
     cta: "เปิดรายการ →",
     icon: ListIcon,
-    tile: "bg-chip",
+    tile: "bg-chip text-ink",
   },
   {
     href: "#",
@@ -65,7 +65,7 @@ const TILES: Tile[] = [
     desc: "ตรวจสอบเอกสารอ้างอิงและ Statement of Compliance",
     cta: "ยังใช้งานไม่ได้",
     icon: ShieldIcon,
-    tile: "bg-chip",
+    tile: "bg-chip text-ink",
     soon: true,
   },
 ];
@@ -86,7 +86,7 @@ export default function AppsLauncherPage() {
           const body = (
             <>
               <div
-                className={`grid size-11 place-items-center rounded-chip ${t.tile} text-ink`}
+                className={`grid size-11 place-items-center rounded-chip ${t.tile}`}
               >
                 <Icon size={20} />
               </div>
