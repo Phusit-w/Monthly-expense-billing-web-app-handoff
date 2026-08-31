@@ -6,14 +6,12 @@ import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";
 
 type AdminUser = { id: string; username: string; displayName: string; role: string; isActive: boolean; mustChangePassword: boolean; createdAt: string };
-type ActionResult = { ok: boolean; error?: string; temporaryPassword?: string; adminSet?: boolean; forceChange?: boolean };
+type ActionResult = { ok: boolean; error?: string; temporaryPassword?: string; username?: string };
 
 function messageFor(result: ActionResult) {
   if (!result.ok) return result.error ?? "ไม่สำเร็จ";
   if (result.temporaryPassword) return `รหัสผ่านชั่วคราว (แสดงครั้งเดียว): ${result.temporaryPassword}`;
-  if (result.adminSet) return result.forceChange
-    ? "ตั้งรหัสผ่านให้แล้ว — ผู้ใช้ต้องเปลี่ยนรหัสตอน login ครั้งแรก"
-    : "ตั้งรหัสผ่านให้แล้ว — ผู้ใช้ใช้รหัสนี้ได้เลย";
+  if (result.username) return `รีเซ็ตรหัสผ่าน ${result.username} แล้ว — ผู้ที่ใช้บัญชีนี้อยู่จะถูกให้ login ใหม่ด้วยรหัสใหม่`;
   return "บันทึกเรียบร้อย";
 }
 
@@ -46,7 +44,7 @@ function UserRow({ user: u, pending, start, onResult }: {
   onResult: (r: ActionResult) => void;
 }) {
   const [newPassword, setNewPassword] = useState("");
-  const [keepPassword, setKeepPassword] = useState(false);
+  const canReset = newPassword.trim().length > 0;
 
   return <tr className="border-b border-line last:border-0 align-top">
     <td className="p-4"><div className="font-medium">{u.displayName}</div><div className="text-muted">{u.username}{u.mustChangePassword ? " · รอเปลี่ยนรหัสผ่าน" : ""}</div></td>
@@ -58,23 +56,18 @@ function UserRow({ user: u, pending, start, onResult }: {
           type="text"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          placeholder="รหัสใหม่ (เว้นว่าง = สุ่มให้)"
+          placeholder="รหัสผ่านใหม่"
           autoComplete="off"
-          className="w-56 rounded-input border border-line bg-surface p-2 text-sm"
+          className="w-52 rounded-input border border-line bg-surface p-2 text-sm"
         />
-        <label className="flex items-center gap-1.5 text-xs text-muted">
-          <input type="checkbox" checked={keepPassword} disabled={!newPassword.trim()} onChange={(e) => setKeepPassword(e.target.checked)} />
-          ใช้ได้เลย
-        </label>
-        <Button size="sm" variant="outline" disabled={pending} onClick={() => start(async () => {
-          const custom = newPassword.trim();
-          const r = await resetUserPassword(u.id, custom ? { newPassword: custom, keepPassword } : undefined);
+        <Button size="sm" variant="outline" disabled={pending || !canReset} onClick={() => start(async () => {
+          const r = await resetUserPassword(u.id, newPassword.trim());
           onResult(r);
-          if (r.ok) { setNewPassword(""); setKeepPassword(false); }
-        })}>{newPassword.trim() ? "ตั้งรหัสผ่าน" : "รีเซ็ตรหัสผ่าน"}</Button>
+          if (r.ok) setNewPassword("");
+        })}>รีเซ็ตรหัสผ่าน</Button>
         <Button size="sm" variant={u.isActive ? "danger" : "outline"} disabled={pending} onClick={() => start(async () => onResult(await setUserActive(u.id, !u.isActive)))}>{u.isActive ? "ปิดบัญชี" : "เปิดบัญชี"}</Button>
       </div>
-      <p className="mt-1 text-[11px] text-muted">รหัสอย่างน้อย 10 ตัว มีตัวอักษรกับตัวเลข · ค่าเริ่มต้นบังคับให้ผู้ใช้เปลี่ยนรหัสตอน login ครั้งแรก</p>
+      <p className="mt-1 text-[11px] text-muted">กรอกรหัสผ่านใหม่ (อย่างน้อย 10 ตัว มีตัวอักษรกับตัวเลข) แล้วกดรีเซ็ต · ผู้ที่ใช้บัญชีนี้อยู่จะต้อง login ใหม่</p>
     </td>
   </tr>;
 }
