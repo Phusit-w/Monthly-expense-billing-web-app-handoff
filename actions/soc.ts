@@ -64,7 +64,6 @@ export async function confirmSocJob(jobId: string) {
     prisma.socJob.update({ where: { id: jobId }, data: { status: "CONFIRMED", stage: "รอสร้างเอกสาร", progress: 90, confirmedAt: new Date(), errorMessage: null } }),
     prisma.socAuditEvent.create({ data: { jobId, actorId: actor.id, action: "JOB_CONFIRMED" } }),
   ]);
-  await writeAudit({ actorId: actor.id, action: "SOC_RETRIED", entityType: "SOC_JOB", entityId: jobId, summary: `สั่งประมวลผลงาน ${job.title} ใหม่` });
   revalidatePath(`/soc/${jobId}`);
   revalidatePath("/soc");
 }
