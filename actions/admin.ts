@@ -44,11 +44,28 @@ export async function setUserRole(userId: string, role: "USER" | "ADMIN") {
   revalidatePath("/admin/users"); return { ok: true as const };
 }
 
-export async function resetUserPassword(userId: string) {
+function isStrongPassword(value: string) {
+  // same rule as the self-service /change-password flow (actions/auth.ts)
+  return value.length >= 10 && /[A-Za-z]/.test(value) && /\d/.test(value);
+}
+
+export async function resetUserPassword(userId: string, opts?: { newPassword?: string; keepPassword?: boolean }) {
   const actor = await requireRole("ADMIN");
+  const custom = opts?.newPassword?.trim();
+
+  if (custom) {
+    if (!isStrongPassword(custom)) return { ok: false as const, error: "รหัสผ่านต้องยาวอย่างน้อย 10 ตัว และมีตัวอักษรกับตัวเลข" };
+    const forceChange = !opts?.keepPassword;
+    const user = await prisma.user.update({ where: { id: userId }, data: { passwordHash: hashPassword(custom), mustChangePassword: forceChange, sessionVersion: { increment: 1 } } });
+    await writeAudit({ actorId: actor.id, targetUserId: user.id, action: "USER_PASSWORD_RESET", entityType: "USER", entityId: user.id, summary: `ตั้งรหัสผ่านให้ ${user.username}${forceChange ? "" : " (ใช้ได้เลย ไม่บังคับเปลี่ยน)"}` });
+    revalidatePath("/admin/users");
+    return { ok: true as const, adminSet: true, forceChange };
+  }
+
   const password = temporaryPassword();
   const user = await prisma.user.update({ where: { id: userId }, data: { passwordHash: hashPassword(password), mustChangePassword: true, sessionVersion: { increment: 1 } } });
   await writeAudit({ actorId: actor.id, targetUserId: user.id, action: "USER_PASSWORD_RESET", entityType: "USER", entityId: user.id, summary: `รีเซ็ตรหัสผ่าน ${user.username}` });
+  revalidatePath("/admin/users");
   return { ok: true as const, temporaryPassword: password };
 }
 
