@@ -4,8 +4,10 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 
-function isStrong(v: string) {
-  return v.length >= 10 && /[A-Za-z]/.test(v) && /\d/.test(v);
+const PASSWORD_MIN_LENGTH = 6;
+
+function meetsPolicy(v: string) {
+  return v.length >= PASSWORD_MIN_LENGTH;
 }
 
 export default function ResetPasswordModal({
@@ -26,11 +28,11 @@ export default function ResetPasswordModal({
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
 
-  const tooWeak = pw.length > 0 && !isStrong(pw);
+  const tooShort = pw.length > 0 && !meetsPolicy(pw);
   const mismatch = confirm.length > 0 && pw !== confirm;
-  const valid = isStrong(pw) && pw === confirm;
-  const error = tooWeak
-    ? "รหัสผ่านต้องยาวอย่างน้อย 10 ตัว และมีตัวอักษรกับตัวเลข"
+  const valid = meetsPolicy(pw) && pw === confirm;
+  const error = tooShort
+    ? `รหัสผ่านต้องยาวอย่างน้อย ${PASSWORD_MIN_LENGTH} ตัว`
     : mismatch
       ? "รหัสผ่านทั้งสองช่องไม่ตรงกัน"
       : "";
@@ -73,7 +75,7 @@ export default function ResetPasswordModal({
           />
         </label>
         {error ? <p role="alert" className="text-xs text-danger">{error}</p>
-          : <p className="text-xs text-muted">อย่างน้อย 10 ตัว มีตัวอักษรกับตัวเลข</p>}
+          : <p className="text-xs text-muted">อย่างน้อย {PASSWORD_MIN_LENGTH} ตัว</p>}
         <div className="mt-2 flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={pending}>ยกเลิก</Button>
           <Button type="submit" size="sm" disabled={!valid || pending}>ยืนยันการรีเซ็ตรหัสผ่าน</Button>

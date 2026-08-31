@@ -44,9 +44,10 @@ export async function setUserRole(userId: string, role: "USER" | "ADMIN") {
   revalidatePath("/admin/users"); return { ok: true as const };
 }
 
-function isStrongPassword(value: string) {
-  // same rule as the self-service /change-password flow (actions/auth.ts)
-  return value.length >= 10 && /[A-Za-z]/.test(value) && /\d/.test(value);
+const PASSWORD_MIN_LENGTH = 6;
+
+function passwordMeetsPolicy(value: string) {
+  return value.length >= PASSWORD_MIN_LENGTH;
 }
 
 // Admin sets the account's new password directly. Bumping sessionVersion
@@ -57,7 +58,7 @@ export async function resetUserPassword(userId: string, newPassword: string) {
   const actor = await requireRole("ADMIN");
   const password = (newPassword ?? "").trim();
   if (!password) return { ok: false as const, error: "กรุณากรอกรหัสผ่านใหม่" };
-  if (!isStrongPassword(password)) return { ok: false as const, error: "รหัสผ่านต้องยาวอย่างน้อย 10 ตัว และมีตัวอักษรกับตัวเลข" };
+  if (!passwordMeetsPolicy(password)) return { ok: false as const, error: `รหัสผ่านต้องยาวอย่างน้อย ${PASSWORD_MIN_LENGTH} ตัว` };
   const user = await prisma.user.update({ where: { id: userId }, data: { passwordHash: hashPassword(password), mustChangePassword: false, passwordChangedAt: new Date(), sessionVersion: { increment: 1 } } });
   await writeAudit({ actorId: actor.id, targetUserId: user.id, action: "USER_PASSWORD_RESET", entityType: "USER", entityId: user.id, summary: `รีเซ็ตรหัสผ่าน ${user.username}` });
   revalidatePath("/admin/users");
