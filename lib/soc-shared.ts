@@ -22,5 +22,5 @@ export const SOC_STATUS_LABELS: Record<string, string> = {
 
 export const CHECK_LABELS: Record<string, string> = {
   match: "ตรง", mismatch: "ไม่ตรง", review: "ต้องตรวจทาน", not_found: "ไม่พบเลขหน้า",
-  unverifiable: "ยืนยันไม่ได้", not_applicable: "ไม่เกี่ยวข้อง",
+  unverifiable: "ยืนยันไม่ได้", not_applicable: "ไม่ต้องตรวจ",
 };

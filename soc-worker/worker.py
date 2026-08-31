@@ -56,7 +56,7 @@ STORAGE_ROOT = Path(os.environ.get("SOC_STORAGE_ROOT", str(Path.cwd() / "data" /
 POLL_SECONDS = int(os.environ.get("SOC_WORKER_POLL_SECONDS", "3"))
 CHECK_LABELS = {
     "match": "ตรง", "mismatch": "ไม่ตรง", "review": "ต้องตรวจทาน",
-    "not_found": "ไม่พบเลขหน้า", "unverifiable": "ยืนยันไม่ได้", "not_applicable": "ไม่เกี่ยวข้อง",
+    "not_found": "ไม่พบเลขหน้า", "unverifiable": "ยืนยันไม่ได้", "not_applicable": "ไม่ต้องตรวจ",
 }
 COLORS = {
     "match": "C6EFCE", "mismatch": "FFC7CE", "review": "FFEB9C",
