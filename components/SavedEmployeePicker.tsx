@@ -1,11 +1,12 @@
 "use client";
 
+import SearchSelect from "@/components/SearchSelect";
 import type { SavedEmployeeEntry } from "@/lib/types";
 
-// Explicit "pick from saved" control, shared by EntryEmployeeFields.tsx and
-// ProfileCard.tsx. Picking an option fills in the rest of that person's
-// saved details via onSelect; value always resets to "" right after a pick
-// so this stays a reusable trigger rather than displaying the last choice.
+// Type-to-search "pick from saved" control, shared by EntryEmployeeFields.tsx
+// and ProfileCard.tsx. Picking an entry fills in the rest of that person's
+// saved details via onSelect; the field clears itself after a pick so it
+// stays a reusable trigger.
 export default function SavedEmployeePicker({
   savedEmployees,
   onSelect,
@@ -14,26 +15,17 @@ export default function SavedEmployeePicker({
   onSelect: (saved: SavedEmployeeEntry) => void;
 }) {
   return (
-    <select
-      value=""
-      onChange={(e) => {
-        const name = e.target.value;
-        if (!name) return;
+    <SearchSelect
+      options={savedEmployees.map((s) => s.name)}
+      onPick={(name) => {
         const saved = savedEmployees.find((s) => s.name === name);
         if (saved) onSelect(saved);
-        e.target.value = "";
       }}
       disabled={savedEmployees.length === 0}
-      title="เลือกรายชื่อพนักงานที่เคยบันทึกไว้"
-      className="rounded-chip border border-line bg-surface px-3.5 py-2 text-xs font-medium text-label
+      placeholder="ค้นหา / เลือกรายชื่อที่บันทึกไว้"
+      className="w-[220px] max-w-full rounded-chip border border-line bg-surface px-3.5 py-2 text-xs font-medium text-label
+        outline-none focus:border-ink focus:shadow-[0_0_0_3px_var(--ring-focus)]
         disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      <option value="">เลือกรายชื่อที่บันทึกไว้ ▾</option>
-      {savedEmployees.map((s) => (
-        <option key={s.name} value={s.name}>
-          {s.name}
-        </option>
-      ))}
-    </select>
+    />
   );
 }

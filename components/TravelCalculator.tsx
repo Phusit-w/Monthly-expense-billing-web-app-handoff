@@ -23,6 +23,9 @@ export default function TravelCalculator() {
   const {
     mode,
     setMode,
+    tripType,
+    setTripType,
+    oneWayAmount,
     query,
     setQuery,
     showList,
@@ -91,6 +94,18 @@ export default function TravelCalculator() {
           </button>
         </div>
 
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[13px] font-medium text-label">ลักษณะการเดินทาง</span>
+          <div className="flex gap-1.5 rounded-field bg-chip p-1.5">
+            <button className={tabClass(tripType === "oneway")} onClick={() => setTripType("oneway")}>
+              ไปอย่างเดียว
+            </button>
+            <button className={tabClass(tripType === "roundtrip")} onClick={() => setTripType("roundtrip")}>
+              ไป-กลับ (× 2)
+            </button>
+          </div>
+        </div>
+
         {mode === "fixed" ? (
           <Card className="p-6">
             <label className={labelClass}>ปลายทาง (พิมพ์เพื่อค้นหา)</label>
@@ -133,13 +148,19 @@ export default function TravelCalculator() {
             </div>
 
             {selected && (
-              <div className="mt-4 rounded-field bg-[#f8f8f8] px-4 py-3.5">
+              <div className="mt-4 rounded-field bg-ground px-4 py-3.5">
                 <div className="text-[13px] text-label">{selected.name}</div>
                 <div className="mt-1 text-[13px] text-label">
                   ระยะทาง: {selected.distanceKm} กม.
+                  {tripType === "roundtrip" && " (ไป-กลับ)"}
                 </div>
                 <div className="mt-1.5 font-display text-[22px] font-bold">
                   {fmt(resultAmount, 0)} บาท
+                  {tripType === "roundtrip" && (
+                    <span className="ml-2 text-[13px] font-medium text-label">
+                      ({fmt(oneWayAmount, 0)} × 2)
+                    </span>
+                  )}
                 </div>
               </div>
             )}
@@ -215,9 +236,14 @@ export default function TravelCalculator() {
               </label>
             </div>
 
-            <div className="mt-4 rounded-field bg-[#f8f8f8] px-4 py-3.5">
+            <div className="mt-4 rounded-field bg-ground px-4 py-3.5">
               <div className="font-display text-[22px] font-bold">
                 {fmt(resultAmount, 0)} บาท
+                {tripType === "roundtrip" && (
+                  <span className="ml-2 text-[13px] font-medium text-label">
+                    ({fmt(oneWayAmount, 0)} × 2 ไป-กลับ)
+                  </span>
+                )}
               </div>
               {meterResult.breakdown.length > 0 && (
                 <div className="mt-2.5 text-xs text-label">
@@ -227,6 +253,12 @@ export default function TravelCalculator() {
                       <span>{fmt(b.amount)}</span>
                     </div>
                   ))}
+                  {tripType === "roundtrip" && (
+                    <div className="mt-1 flex justify-between border-t border-divider py-0.5 pt-1 font-medium">
+                      <span>ไป-กลับ (× 2)</span>
+                      <span>{fmt(resultAmount)}</span>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="mt-2.5 text-[11.5px] text-danger">
@@ -269,7 +301,10 @@ export default function TravelCalculator() {
           <div>
             2. อัตราตามตารางมีผล ณ วันที่ {RATES_EFFECTIVE_DATE} เป็นต้นไป จนกว่าจะมีการเปลี่ยนแปลง
           </div>
-          <div>3. เป็นค่าเดินทางเที่ยวเดียว ไม่รวมค่าทางด่วน/ค่าที่จอดรถ</div>
+          <div>
+            3. อัตราตามตารางเป็นค่าเดินทางเที่ยวเดียว — เลือก &quot;ไป-กลับ&quot; ด้านบนเพื่อคิดเป็น 2 เท่า
+            ไม่รวมค่าทางด่วน/ค่าที่จอดรถ
+          </div>
           <div>4. พนักงานที่ได้รับสวัสดิการค่าเดินทางตามระเบียบบริษัทอยู่แล้ว ไม่เข้าเงื่อนไขนี้</div>
           <div>
             5. กรณีคำนวณด้วย Taxi Meter:

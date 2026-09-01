@@ -1,29 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { deleteSavedEmployee, rememberLastEmployee, saveEmployeeForReuse } from "@/actions/profile";
+import CollapsibleEntryRow from "@/components/CollapsibleEntryRow";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SavedItemPicker from "@/components/SavedItemPicker";
 import EntryEmployeeFields from "@/components/EntryEmployeeFields";
 import SavedListManager from "@/components/SavedListManager";
 import TravelRowCalculatorPanel from "@/components/TravelRowCalculatorPanel";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { dmyFromISODate, todayISODate } from "@/lib/draft";
-import { DEFAULT_ROWS_FA017, DEFAULT_ROWS_FA018, PAGE_ROWS, SHOW_PROJECT_FIELD } from "@/lib/constants";
-import { num } from "@/lib/format";
+import { DEFAULT_ROWS_FA017, PAGE_ROWS, SHOW_PROJECT_FIELD } from "@/lib/constants";
+import { fmt, num } from "@/lib/format";
 import { fa017RowTotal } from "@/lib/totals";
-import { emptyItemFA017, emptyItemFA018, isFA017ItemEmpty, padItems } from "@/lib/types";
+import { emptyItemFA017, isFA017ItemEmpty, padItems } from "@/lib/types";
 import type {
   Draft,
   EmployeeSnapshot,
   FA017Item,
-  FA018Item,
   ItemField,
   SavedEmployeeEntry,
   SavedItemEntry,
 } from "@/lib/types";
 import { entryDraftKey } from "@/lib/entryDraft";
 import type { EntryDraftFA017 } from "@/lib/entryDraft";
+import { armNavGuard, disarmNavGuard } from "@/lib/navGuard";
 import { pendingTravelEntryKey } from "@/lib/travelRates";
 import type { PendingTravelEntry } from "@/lib/travelRates";
 import { useSavedItems } from "@/lib/useSavedItems";
@@ -111,6 +114,22 @@ export default function EntryFormFA017({
   // gives a last chance to catch that.
   const [pendingSaveRow, setPendingSaveRow] = useState<number | null>(null);
   const [items, setItems] = useState<FA017Item[]>(freshItems);
+  // Which expense-line cards are collapsed (by row index). Add/remove-row
+  // only touch the end of the list, so index keys stay stable enough; a
+  // stale entry for a since-removed index is harmless.
+  const [collapsedRows, setCollapsedRows] = useState<Set<number>>(() => new Set());
+  function toggleRow(i: number) {
+    setCollapsedRows((s) => {
+      const n = new Set(s);
+      if (n.has(i)) n.delete(i);
+      else n.add(i);
+      return n;
+    });
+  }
+  const allRowsCollapsed = items.length > 0 && items.every((_, i) => collapsedRows.has(i));
+  function toggleAllRows() {
+    setCollapsedRows(allRowsCollapsed ? new Set() : new Set(items.map((_, i) => i)));
+  }
   // "DATE :" — feeds FA017Form's own DATE: field (top-right of the info
   // table) once handed off to BillEditor. Defaults to today, same as this
   // form always did before this field existed, but is now user-editable
@@ -260,6 +279,18 @@ export default function EntryFormFA017({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restored, employee, items, dateISO]);
 
+  // Prompt (via the shared app-shell guard, lib/navGuard.ts) before the
+  // sidebar links or the browser Back button drop anything typed in here.
+  // Same pristine gate as the autosave above.
+  const guardToken = useId();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (isFormPristine()) disarmNavGuard(guardToken);
+    else armNavGuard(guardToken, pathname);
+    return () => disarmNavGuard(guardToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employee, items, dateISO, guardToken, pathname]);
+
   // Reused by the save effect above (to prune a drained draft) and by the
   // "เริ่มกรอกใหม่" button's visibility (no point offering to clear a form
   // that already has nothing in it). dateISO is compared against
@@ -290,6 +321,7 @@ export default function EntryFormFA017({
     setDateISO(todayISODate());
     setSavingRow(null);
     setJustSavedRow(null);
+    setCollapsedRows(new Set());
   }
 
   function setEmpField(field: "name" | "position" | "department" | "employeeNo", value: string) {
@@ -384,62 +416,6 @@ export default function EntryFormFA017({
     onCreate(draft);
   }
 
-  // "สร้างฟอร์มใบรับรองแทนใบเสร็จ →" — hands the same rows off to an FA018 draft instead,
-  // carrying over วันที่ → วันที่, Description of Expenses → รายการ,
-  // Project/CC → เลขที่โครงการ, and a row's amount → จำนวนเงิน. Receipt
-  // (which FA018 has no equivalent for) is dropped. DATE: does carry over even though FA018Form has no
-  // visible field for it (see this file's "DATE :" state comment) — the
-  // Draft still stores monthName/monthYear, which RecordsTable's history
-  // view groups by, so the date the user actually picked here should win
-  // over silently defaulting to today.
-  //
-  // amount uses fa017RowTotal (every category column summed: Gasoline,
-  // Hotel, Entertain, Mobile, Transport & Express way, Other, and Local
-  // Currency Amount), not just localAmt — people commonly put a row's
-  // amount under Transport & Express way, Gasoline, etc. instead of
-  // specifically "Local Currency Amount", and an amount-only-from-localAmt
-  // mapping silently dropped those, handing off a FA018 row with a
-  // description but a blank/zero amount.
-  //
-  // Same onCreate the FA017 handleCreate above uses (not a new tab — that
-  // was tried and reverted per request: window.open + sessionStorage was
-  // one more moving part than this needed, and complicated "ย้อนกลับ" for
-  // no real benefit). EntryFlow.tsx renders this same EntryFormFA017
-  // instance underneath whichever draft is active, so passing a FA018-typed
-  // draft to the same onCreate still works (BillEditor picks its form from
-  // draft.type, not from which page it's on) — and its "ย้อนกลับ" un-hiding
-  // *this* entry form (rather than /bill/entry/fa018) is exactly the
-  // "go back to FA017" behavior wanted here, for free.
-  function handleCreateFA018() {
-    // Still "leaving the FA017 entry form" (per this function's own doc
-    // comment above) — clear FA017's own draft key, same as handleCreate.
-    // FA018's key is untouched; this handoff never went through
-    // EntryFormFA018 at all.
-    sessionStorage.removeItem(entryDraftKey("FA017"));
-    const draft: Draft = {
-      id: null,
-      updatedAt: null,
-      type: "FA018",
-      ...dmyFromISODate(dateISO),
-      employee,
-      remark: "",
-      items: padItems(
-        items.map((it): FA018Item => {
-          const total = fa017RowTotal(it);
-          return {
-            date: it.date,
-            desc: it.desc,
-            projectNo: it.projectCC,
-            amount: total ? total.toFixed(2) : "",
-          };
-        }),
-        DEFAULT_ROWS_FA018,
-        emptyItemFA018
-      ),
-    };
-    onCreate(draft);
-  }
-
   // Same clear-on-focus-if-zero / snap-to-2-decimals-on-blur behavior
   // FA017Form.tsx's amountFieldProps already uses, kept local here (not
   // extracted to lib/format.ts) since FA017Form's own copy is likewise
@@ -515,14 +491,19 @@ export default function EntryFormFA017({
         <div className="text-base font-medium">รายการค่าใช้จ่าย</div>
         <div className="flex flex-col gap-3">
           {items.map((it, i) => (
-            <div
+            <CollapsibleEntryRow
               key={i}
-              className="rounded-field border border-line p-3.5 text-[13px]"
+              index={i}
+              collapsed={collapsedRows.has(i)}
+              onToggle={() => toggleRow(i)}
+              summary={
+                it.desc.trim() || (
+                  <span className="italic text-muted">ยังไม่ได้กรอกรายละเอียด</span>
+                )
+              }
+              trailing={`รวม ${fmt(fa017RowTotal(it))}`}
             >
               <div className="mb-2.5 flex flex-wrap gap-3">
-                <div className="w-9 self-center font-bold text-muted">
-                  #{i + 1}
-                </div>
                 <div className="min-w-[150px] flex-1">
                   <label className={labelClass}>วันที่</label>
                   <input
@@ -570,47 +551,31 @@ export default function EntryFormFA017({
                     className={`${inputClass} resize-none overflow-hidden leading-relaxed whitespace-pre-wrap break-words`}
                   />
                   {isDescriptionLong(it.desc) && (
-                    <div className="mt-1 text-[11px] text-[#9a6700]">
+                    <div className="mt-1 text-[11px] text-accent">
                       รายละเอียดยาวมาก อาจทำให้พิมพ์ออกมาเกิน 1 หน้ากระดาษ แนะนำให้สรุปให้สั้นลง
                     </div>
                   )}
-                  {/* Picks a saved Description by exact text — a plain
-                      <input list=…>/<datalist> pair (used everywhere else
-                      for this "type or pick a saved key" interaction) isn't
-                      an option here since HTML's `list` attribute only works
-                      on <input>, not <textarea> (needed above for
-                      auto-growing Description). Same substitution
-                      FA017Form.tsx's compact print table already makes for
-                      this same constraint. Value always resets back to ""
-                      right after a pick so this stays a reusable trigger
-                      rather than displaying whatever was last chosen. */}
+                  {/* A separate type-to-search trigger for picking a saved
+                      Description (SavedItemPicker: <input list>/<datalist>) —
+                      the Description field itself above is a <textarea> for
+                      auto-growing, and HTML's `list` attribute only works on
+                      <input>, so it can't host the datalist directly.
+                      Picking one fills this row's other fields from the
+                      match and clears itself. */}
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    {savedItemList.length > 0 && (
-                      <select
-                        value=""
-                        onChange={(e) => {
-                          const desc = e.target.value;
-                          if (!desc) return;
-                          updateItem(i, "desc", desc);
-                          const saved = findSavedItem(desc);
-                          if (saved) {
-                            Object.entries(saved.data).forEach(([field, fieldValue]) =>
-                              updateItem(i, field as ItemField, fieldValue)
-                            );
-                          }
-                          e.target.value = "";
-                        }}
-                        title="เลือกรายการที่เคยบันทึกไว้"
-                        className="max-w-full rounded-chip border border-dashed border-line bg-surface px-3 py-1.5 text-[11px] text-label"
-                      >
-                        <option value="">เลือกรายการที่บันทึกไว้…</option>
-                        {savedItemList.map((entry) => (
-                          <option key={entry.desc} value={entry.desc}>
-                            {entry.desc}
-                          </option>
-                        ))}
-                      </select>
-                    )}
+                    <SavedItemPicker
+                      savedItems={savedItemList}
+                      onPick={(desc) => {
+                        updateItem(i, "desc", desc);
+                        const saved = findSavedItem(desc);
+                        if (saved) {
+                          Object.entries(saved.data).forEach(([field, fieldValue]) =>
+                            updateItem(i, field as ItemField, fieldValue)
+                          );
+                        }
+                      }}
+                      className="max-w-full rounded-chip border border-dashed border-line bg-surface px-3 py-1.5 text-[11px] text-label outline-none focus:border-ink"
+                    />
                     <button
                       type="button"
                       onClick={() => setPendingSaveRow(i)}
@@ -672,7 +637,7 @@ export default function EntryFormFA017({
                   </div>
                 ))}
               </div>
-            </div>
+            </CollapsibleEntryRow>
           ))}
         </div>
 
@@ -682,24 +647,22 @@ export default function EntryFormFA017({
           onDelete={removeSavedItem}
         />
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={addRow}>
             + เพิ่มรายการ
           </Button>
           <Button variant="danger" size="sm" onClick={removeLastRow}>
             − ลบรายการ
           </Button>
+          {items.length > 1 && (
+            <Button variant="outline" size="sm" onClick={toggleAllRows}>
+              {allRowsCollapsed ? "ขยายทุกรายการ" : "ย่อทุกรายการ"}
+            </Button>
+          )}
         </div>
       </Card>
 
       <div className="flex flex-wrap justify-end gap-2.5">
-        <Button
-          variant="outline"
-          onClick={handleCreateFA018}
-          title="สร้างฟอร์มใบรับรองแทนใบเสร็จจากรายการชุดนี้ (วันที่, Description of Expenses, Project / CC, จำนวนเงิน)"
-        >
-          สร้างฟอร์มใบรับรองแทนใบเสร็จ →
-        </Button>
         <Button variant="primary" onClick={handleCreate}>
           สร้างฟอร์ม Expense Claim →
         </Button>

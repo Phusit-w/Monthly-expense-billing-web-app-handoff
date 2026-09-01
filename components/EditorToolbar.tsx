@@ -4,19 +4,20 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
 // The editor's top bar (Claude Design "Turn 4a" — a white rounded card
-// above the untouched black-and-white A4 paper). "ย้อนกลับ" (onBack) and
-// "ดาวน์โหลด PDF" (onDownloadPdf) are later additions to the original
-// ยกเลิก / พิมพ์ / บันทึก set — see BillEditor.tsx for what each does.
+// above the untouched black-and-white A4 paper). See BillEditor.tsx for
+// what each button does. "พิมพ์ / PDF" (onPrint) is the only way to get a
+// PDF: the browser's print dialog has a "Save as PDF" destination that
+// renders the sheet with Chrome's real layout engine. Former "ดาวน์โหลด
+// PDF" (html2canvas), "← ย้อนกลับ" and "ยกเลิก" buttons were all removed;
+// leaving the editor is now the browser Back (with its unsaved-changes
+// guard) or the sidebar (the draft is autosaved either way).
 export default function EditorToolbar({
   paperWidth,
   heading,
   auditLine,
-  onBack,
-  onCancel,
   onPrint,
-  onDownloadPdf,
-  downloadingPdf,
   onCreateFA018,
+  onCreateFA017,
   onSave,
   saving,
   addRow,
@@ -25,13 +26,11 @@ export default function EditorToolbar({
   paperWidth: string;
   heading: string;
   auditLine?: string;
-  onBack: () => void;
-  onCancel: () => void;
   onPrint: () => void;
-  onDownloadPdf: () => void;
-  downloadingPdf: boolean;
-  // Only passed for an FA017 draft — undefined hides the button entirely.
+  // onCreateFA018 only for an FA017 draft, onCreateFA017 only for an FA018
+  // draft — undefined hides that button entirely.
   onCreateFA018?: () => void;
+  onCreateFA017?: () => void;
   onSave: () => void;
   saving: boolean;
   addRow: () => void;
@@ -72,37 +71,11 @@ export default function EditorToolbar({
         <Button
           variant="outline"
           size="sm"
-          className="whitespace-nowrap"
-          onClick={onBack}
-          title="กลับไปหน้ากรอกข้อมูล"
-        >
-          ← ย้อนกลับ
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="whitespace-nowrap"
-          onClick={onCancel}
-        >
-          ยกเลิก
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
           className="whitespace-nowrap border-ink text-ink"
           onClick={onPrint}
+          title="เปิดหน้าต่างพิมพ์ของเบราว์เซอร์ — เลือกปลายทางเป็น “Save as PDF” เพื่อบันทึกเป็นไฟล์ PDF"
         >
           พิมพ์ / PDF
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="whitespace-nowrap border-ink text-ink"
-          onClick={onDownloadPdf}
-          disabled={downloadingPdf}
-          title="ดาวน์โหลดเป็นไฟล์ PDF โดยตรง (ไม่ต้องผ่านหน้าต่างพิมพ์)"
-        >
-          {downloadingPdf ? "กำลังสร้าง PDF…" : "ดาวน์โหลด PDF"}
         </Button>
         {onCreateFA018 && (
           <button
@@ -111,6 +84,15 @@ export default function EditorToolbar({
             className="ui-btn whitespace-nowrap rounded-input bg-lavender px-3.5 py-2 text-[13px] font-medium text-black transition-colors hover:brightness-95"
           >
             สร้างฟอร์มใบรับรองแทนใบเสร็จ →
+          </button>
+        )}
+        {onCreateFA017 && (
+          <button
+            onClick={onCreateFA017}
+            title="สร้างฟอร์ม Expense Claim จากรายการชุดนี้ (วันที่, รายการ, เลขที่โครงการ, จำนวนเงิน)"
+            className="ui-btn whitespace-nowrap rounded-input bg-lavender px-3.5 py-2 text-[13px] font-medium text-black transition-colors hover:brightness-95"
+          >
+            สร้างฟอร์ม Expense Claim →
           </button>
         )}
         <Button

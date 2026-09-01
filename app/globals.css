@@ -185,6 +185,36 @@ button.btn-danger:not(:disabled):not(.ui-btn):active {
   color: #111;
 }
 
+/* The A4 form sheet — every value in it, Thai text and Latin/digits alike —
+   renders in CordiaUPC instead of the app UI's IBM Plex Sans Thai / Poppins,
+   to match the look of the equivalent printed office forms. CordiaUPC ships
+   with Windows and MS Office, so on this intranet's client machines it is
+   already present; it is referenced by name only (no web-font file is
+   bundled). "Cordia New" is the same face under the name some systems use;
+   the remaining names and generics keep the sheet readable on a machine
+   that has none of them. Applies on screen and in the printed / Save-as-PDF
+   output alike. The app shell around the sheet (sidebar, toolbar, dialogs)
+   is untouched.
+
+   font-size-adjust: CordiaUPC's glyphs are far shorter than the previous
+   font at the same px size (measured x-height ratio ~0.34 vs IBM Plex Sans
+   Thai's ~0.52), which made every hard-coded px size in FA017Form/FA018Form
+   render tiny and faint. font-size-adjust:0.50 tells the browser to scale
+   the actual glyphs up until their x-height is half the font-size — i.e.
+   back to roughly the old visual size and stroke weight — without touching
+   any of the (carefully column-width-tuned) px values. Supported in current
+   Chrome/Edge/Firefox/Safari; older engines ignore it and just fall back to
+   the un-adjusted (small) rendering. Tune the number up/down if the form
+   should read larger/smaller. */
+.paper,
+.paper input,
+.paper select,
+.paper textarea {
+  font-family: "CordiaUPC", "Cordia New", "Angsana New", "TH Sarabun New",
+    var(--font-sans), Arial, sans-serif;
+  font-size-adjust: 0.5;
+}
+
 @media print {
   .paper {
     margin: 0 !important;

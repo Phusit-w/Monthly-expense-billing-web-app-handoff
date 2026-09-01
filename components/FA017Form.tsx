@@ -28,7 +28,7 @@ import SavedListManager from "@/components/SavedListManager";
 // push short single-line ones down to a different vertical position
 // instead of a shared line. whiteSpace: "nowrap" forces every header onto
 // one line.
-const th: React.CSSProperties = { border: "1px solid #000", padding: "4px 2px", fontSize: 10, lineHeight: 1.2, verticalAlign: "top", whiteSpace: "nowrap" };
+const th: React.CSSProperties = { border: "1px solid #000", padding: "4px 2px", fontSize: 11, lineHeight: 1.2, verticalAlign: "top", whiteSpace: "nowrap" };
 // The Receipt..Other 8 headers are equal-width columns (see COL_PCT),
 // each ~7.77-7.78% (~81px of content room) after Description was cut
 // further to fund this span. Matching the header row's base 10px is
@@ -40,9 +40,9 @@ const th: React.CSSProperties = { border: "1px solid #000", padding: "4px 2px", 
 // the actual text run against the cell's content box (fractional px, no
 // rounding) showed it was genuinely wider than the box at 7.25px and
 // only clears it with margin at 6.75px, which is what's used here.
-const thExpenseHead: React.CSSProperties = { ...th, fontSize: 9 };
-const thDescriptionHead: React.CSSProperties = { ...th, fontSize: 9, textAlign: "center" };
-const thLocalCurrencyHead: React.CSSProperties = { ...th, fontSize: 9 };
+const thExpenseHead: React.CSSProperties = { ...th, fontSize: 11 };
+const thDescriptionHead: React.CSSProperties = { ...th, fontSize: 12, textAlign: "center" };
+const thLocalCurrencyHead: React.CSSProperties = { ...th, fontSize: 11 };
 // Vertical padding trimmed to hug the label text more tightly (was 5px,
 // leaving a visibly taller box than the text needed). Horizontal padding
 // and every column's width (colgroup, shared with the table below) are
@@ -55,14 +55,22 @@ const infoTd: React.CSSProperties = { border: "1px solid #000", padding: "2px 8p
 // to fit, matching the item header row's 10px instead of a size unique
 // to just these two cells.
 const infoTdNarrowCol: React.CSSProperties = { ...infoTd, fontSize: 10 };
-const cellTd: React.CSSProperties = { border: "1px solid #000", padding: "1px 3px" };
+// verticalAlign:middle centres a single-line value in a row made taller by
+// a multi-line Description beside it; the 3px top/bottom padding keeps text
+// (Thai upper vowel marks especially) off the cell's borders.
+const cellTd: React.CSSProperties = { border: "1px solid #000", padding: "3px 3px", verticalAlign: "middle" };
 // Spacer rows around Total: same bordered grid as every other row (one <td>
 // per column, so the vertical lines still line up with the columns above),
 // but padding/line-height stripped and height pinned to 4px so the row
 // itself reads as a thin divider rather than a normal data row.
 const spacerTd: React.CSSProperties = { border: "1px solid #000", padding: 0, height: 10, lineHeight: 0, fontSize: 1 };
 
+// display:block (not the inline-block an <input>/<textarea> is by default)
+// so the cell's verticalAlign:middle actually centres it — an inline
+// control sits on the text baseline instead and rides up against the top
+// border in a tall row.
 const cellInput = (align?: "right" | "center"): React.CSSProperties => ({
+  display: "block",
   width: "100%",
   boxSizing: "border-box",
   border: "none",
@@ -125,11 +133,19 @@ const totalNumTd: React.CSSProperties = { border: "1px solid #000", padding: 5, 
 // (Yes/No)" on one line at the header row's 9px — the 2.80 that funds it
 // is cut from Description (28.05 -> 25.25, still fits the one-line company
 // name). Gasoline through Other (indices 3-9) stay at the original ~5.7%
-// each. Date (index 0) is untouched — it holds a live day/month/year
-// control, same as DATE: above.
+// each. Date (index 0) was widened 7.94 -> 10.44 (the 2.50 taken from
+// Description, 25.25 -> 22.75, which still comfortably fits the one-line
+// company name) so its live day/month/year control can carry a legible
+// font size instead of the cramped 8px it needed at the old width.
+// Project/CC (index 3) and Transport & Express way (index 8) each widened
+// +1.00 so the header row can carry a legible ~11px font without the
+// longest labels ("Project / CC", "Express way") overflowing their column;
+// the 2.00 comes off Local Currency Amount (index 10, -1.30) and Thai Baht
+// Total (index 11, -0.70), both of which still hold their own headers with
+// room to spare at that size.
 const COL_PCT = SHOW_PROJECT_FIELD
-  ? [7.94, 25.25, 8.53, 5.73, 5.73, 5.73, 5.73, 5.73, 5.72, 5.72, 9.45, 8.74]
-  : [7.94, 27.37, 10.91, 8.61, 4.22, 4.22, 4.22, 4.22, 4.22, 10.11, 9.74]; // Project/CC's 4.22% just dropped (this branch isn't used anywhere in the app today)
+  ? [10.44, 22.75, 8.53, 6.73, 5.73, 5.73, 5.73, 5.73, 6.72, 5.72, 8.15, 8.04]
+  : [10.44, 24.87, 10.91, 8.61, 4.22, 4.22, 4.22, 4.22, 4.22, 10.11, 9.74]; // Project/CC's 4.22% just dropped (this branch isn't used anywhere in the app today)
 
 // The Excel source's "Description" column is actually two real columns (B
 // and C) merged together everywhere EXCEPT the top two signature boxes,
@@ -138,7 +154,7 @@ const COL_PCT = SHOW_PROJECT_FIELD
 // The 4.15/5.85 split (originally summing to Description's 10.00, then to
 // 33.00) is scaled the same way to Description's current 25.25, and the
 // tail mirrors COL_PCT's indices 2-11 so both tables' columns still align.
-const SIG_COL_PCT = [7.94, 10.48, 14.77, 8.53, 5.73, 5.73, 5.73, 5.73, 5.73, 5.72, 5.72, 9.45, 8.74];
+const SIG_COL_PCT = [10.44, 10.48, 12.27, 8.53, 6.73, 5.73, 5.73, 5.73, 5.73, 6.72, 5.72, 8.15, 8.04];
 
 // The per-row Date column used to be a native <input type="date">, whose
 // picker/format follows the browser's locale (often mm/dd/yyyy) and whose
@@ -727,7 +743,7 @@ export default function FA017Form({
                   <input
                     value={draft.employee.employeeNo}
                     onChange={(e) => setEmpField("employeeNo", e.target.value)}
-                    style={{ width: "100%", boxSizing: "border-box", border: "none", background: "transparent", font: "inherit" }}
+                    style={{ width: "100%", boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", textAlign: "center" }}
                   />
                 </td>
               </tr>
@@ -788,9 +804,9 @@ export default function FA017Form({
                       value={d}
                       onChange={(e) => updateItem(i, "date", joinDMY(e.target.value, m, y))}
                       className="no-spin"
-                      style={{ width: 14, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 8, padding: 0, textAlign: "center" }}
+                      style={{ width: 20, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 11, padding: 0, textAlign: "center" }}
                     />
-                    {(d || m || y) && <span style={{ fontSize: 10 }}>/</span>}
+                    {(d || m || y) && <span style={{ fontSize: 11 }}>/</span>}
                     <input
                       type="number"
                       min={1}
@@ -798,15 +814,15 @@ export default function FA017Form({
                       value={m}
                       onChange={(e) => updateItem(i, "date", joinDMY(d, e.target.value, y))}
                       className="no-spin"
-                      style={{ width: 14, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 8, padding: 0, textAlign: "center" }}
+                      style={{ width: 20, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 11, padding: 0, textAlign: "center" }}
                     />
-                    {(d || m || y) && <span style={{ fontSize: 10 }}>/</span>}
+                    {(d || m || y) && <span style={{ fontSize: 11 }}>/</span>}
                     <input
                       type="number"
                       value={y}
                       onChange={(e) => updateItem(i, "date", joinDMY(d, m, e.target.value))}
                       className="no-spin"
-                      style={{ width: 26, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 8, padding: 0, textAlign: "center" }}
+                      style={{ width: 34, boxSizing: "border-box", border: "none", background: "transparent", font: "inherit", fontSize: 11, padding: 0, textAlign: "center" }}
                     />
                   </div>
                 </td>
@@ -911,7 +927,7 @@ export default function FA017Form({
                     value={it.receipt}
                     onChange={(e) => updateItem(i, "receipt", e.target.value)}
                     className="no-arrow"
-                    style={{ border: "none", background: "transparent", font: "inherit", fontSize: TABLE_FONT_SIZE, textAlign: "center" }}
+                    style={{ border: "none", background: "transparent", font: "inherit", fontSize: TABLE_FONT_SIZE, textAlign: "center", verticalAlign: "middle" }}
                   >
                     <option value=""></option>
                     <option value="Y">Yes</option>

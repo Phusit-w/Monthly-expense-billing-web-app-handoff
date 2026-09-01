@@ -12,7 +12,12 @@ import { useSavedItems } from "@/lib/useSavedItems";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import SavedListManager from "@/components/SavedListManager";
 
+// display:block (not the inline-block an <input>/<textarea> is by default)
+// so the cell's verticalAlign:middle actually centres it — an inline
+// control sits on the text baseline and rides up against the top border in
+// a tall row.
 const cellInput: React.CSSProperties = {
+  display: "block",
   width: "100%",
   boxSizing: "border-box",
   border: "none",
@@ -21,7 +26,9 @@ const cellInput: React.CSSProperties = {
 };
 
 const th: React.CSSProperties = { border: "1px solid #000", padding: 6 };
-const td: React.CSSProperties = { border: "1px solid #000", padding: "2px 4px" };
+// 3px top/bottom padding + verticalAlign:middle keeps every value centred in
+// its cell and clear of the borders (Thai upper vowel marks included).
+const td: React.CSSProperties = { border: "1px solid #000", padding: "3px 4px", verticalAlign: "middle" };
 
 // วันที่ / รายการ / เลขที่โครงการ / จำนวนเงิน — matches the item table
 // header's existing 12%/16%/15% explicit widths, with รายการ taking the
@@ -567,7 +574,7 @@ export default function FA018Form({
                   <input
                     value={it.projectNo}
                     onChange={(e) => updateItem(i, "projectNo", e.target.value)}
-                    style={cellInput}
+                    style={{ ...cellInput, textAlign: "center" }}
                   />
                 </td>
                 <td style={td}>
