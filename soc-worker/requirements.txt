@@ -1,3 +1,7 @@
 psycopg[binary]==3.2.9
 python-docx==1.2.0
 pypdf==6.0.0
+# Optional on-prem OCR path selected with SOC_OCR_PROVIDER=tesseract.
+pymupdf==1.28.2
+pytesseract==0.3.13
+Pillow==12.3.0

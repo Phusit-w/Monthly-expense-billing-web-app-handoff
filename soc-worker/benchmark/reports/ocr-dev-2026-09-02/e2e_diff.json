@@ -1,0 +1,968 @@
+{
+  "job_id": "c713156543b944fa6b176c0ee",
+  "before_rows": 327,
+  "after_rows": 327,
+  "distribution": {
+    "keywordMatch": {
+      "before": {
+        "match": 238,
+        "review": 51,
+        "unverifiable": 27,
+        "not_found": 11
+      },
+      "after": {
+        "match": 256,
+        "review": 59,
+        "not_found": 11,
+        "unverifiable": 1
+      }
+    },
+    "ruleVerdict": {
+      "before": {
+        "pass": 150,
+        "needs_review": 137,
+        "insufficient_evidence": 36,
+        "conflict": 3,
+        "better": 1
+      },
+      "after": {
+        "needs_review": 156,
+        "pass": 155,
+        "insufficient_evidence": 11,
+        "conflict": 4,
+        "better": 1
+      }
+    },
+    "finalReferenceCheck": {
+      "before": {
+        "match": 151,
+        "review": 137,
+        "unverifiable": 25,
+        "not_found": 11,
+        "mismatch": 3
+      },
+      "after": {
+        "match": 156,
+        "review": 156,
+        "not_found": 11,
+        "mismatch": 4
+      }
+    },
+    "finalHeadingTitleCheck": {
+      "before": {
+        "not_applicable": 323,
+        "unverifiable": 3,
+        "match": 1
+      },
+      "after": {
+        "not_applicable": 323,
+        "unverifiable": 3,
+        "match": 1
+      }
+    },
+    "finalContentRelevance": {
+      "before": {
+        "related": 266,
+        "unverifiable": 38,
+        "review": 23
+      },
+      "after": {
+        "related": 287,
+        "review": 28,
+        "unverifiable": 12
+      }
+    },
+    "aiConfidence": {
+      "before": {
+        "medium": 238,
+        "low": 78,
+        "high": 11
+      },
+      "after": {
+        "medium": 256,
+        "low": 60,
+        "high": 11
+      }
+    }
+  },
+  "changed": [
+    {
+      "row": 50,
+      "item": "๑.๓.๒๐",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 16",
+      "cited_pages": [
+        16
+      ],
+      "cites_scanned_page": false,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 51,
+      "item": "๑.๓.๒๑",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 16",
+      "cited_pages": [
+        16
+      ],
+      "cites_scanned_page": false,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 79,
+      "item": "1.4.22",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 16",
+      "cited_pages": [
+        16
+      ],
+      "cites_scanned_page": false,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 80,
+      "item": "1.4.23",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 16",
+      "cited_pages": [
+        16
+      ],
+      "cites_scanned_page": false,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 212,
+      "item": "๔.๕",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 103",
+      "cited_pages": [
+        103
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Claim names a brand/model that was not found on the cited page(s). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 213,
+      "item": "๔.๕.๑",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 103",
+      "cited_pages": [
+        103
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 214,
+      "item": "๔.๕.๒",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 101",
+      "cited_pages": [
+        101
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "The cited page compares multiple product models, but the SOC row does not identify which model is offered. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 215,
+      "item": "๔.๕.๓",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 104",
+      "cited_pages": [
+        104
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Thai/English prose claim with no extractable numeric, brand or standard-code signal. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 216,
+      "item": "๔.๕.๔",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 105",
+      "cited_pages": [
+        105
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Thai/English prose claim with no extractable numeric, brand or standard-code signal. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 217,
+      "item": "๔.๕.5",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 106, 109",
+      "cited_pages": [
+        106,
+        109
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "pass"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "All quantitative requirements reconciled against independent datasheet evidence. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 249,
+      "item": "๔.๗.๔",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 126, 127",
+      "cited_pages": [
+        126,
+        127
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "All named standard codes / feature terms (and any brand) were found on an independent datasheet page; no numeric requirement to check.",
+      "reason_after": "All named standard codes / feature terms (and any brand) were found on an independent datasheet page; no numeric requirement to check. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 250,
+      "item": "๔.๗.๔.๑",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 126, 127",
+      "cited_pages": [
+        126,
+        127
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "needs_review",
+          "pass"
+        ],
+        "finalReferenceCheck": [
+          "review",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "A quantitative requirement could not be confirmed.",
+      "reason_after": "All quantitative requirements reconciled against independent datasheet evidence. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 272,
+      "item": "4.8.1",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 132",
+      "cited_pages": [
+        132
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Claim names a brand/model that was not found on the cited page(s). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 273,
+      "item": "4.8.1.1",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 133",
+      "cited_pages": [
+        133
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "pass"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "The claim text appears near-verbatim on an independent datasheet page (p.133). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 274,
+      "item": "4.8.1.2",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 133",
+      "cited_pages": [
+        133
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "pass"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "The claim text appears near-verbatim on an independent datasheet page (p.133). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 275,
+      "item": "4.8.1.3",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 133",
+      "cited_pages": [
+        133
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 276,
+      "item": "4.8.1.4",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 132",
+      "cited_pages": [
+        132
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "conflict"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "mismatch"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Datasheet text contradicts the claim: 512GB vs evidence 256GB Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 277,
+      "item": "4.8.1.5",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 132, 133",
+      "cited_pages": [
+        132,
+        133
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement had no comparable value on the cited page(s). A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 278,
+      "item": "4.8.1.6",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 136",
+      "cited_pages": [
+        136
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Claim names a brand/model that was not found on the cited page(s). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 279,
+      "item": "4.8.1.7",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 135",
+      "cited_pages": [
+        135
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A named standard code / feature term was not found on the cited page(s). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 280,
+      "item": "4.8.1.8",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 135",
+      "cited_pages": [
+        135
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement had no comparable value on the cited page(s). A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 281,
+      "item": "4.8.1.9",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 138",
+      "cited_pages": [
+        138
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "pass"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "match"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "The claim text appears near-verbatim on an independent datasheet page (p.138). Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 282,
+      "item": "4.8.1.10",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 134",
+      "cited_pages": [
+        134
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement had no comparable value on the cited page(s). A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 283,
+      "item": "4.8.1.11",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 137",
+      "cited_pages": [
+        137
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "match"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ],
+        "aiConfidence": [
+          "low",
+          "medium"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Claim names a brand/model that was not found on the cited page(s). A quantitative requirement had no comparable value on the cited page(s). A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 284,
+      "item": "4.8.1.12",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 133",
+      "cited_pages": [
+        133
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "A quantitative requirement had no comparable value on the cited page(s). A quantitative requirement could not be confirmed. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 285,
+      "item": "4.8.1.13",
+      "row_type": "content_row",
+      "reference_text": "CASRI Product Brochure, page 137",
+      "cited_pages": [
+        137
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "keywordMatch": [
+          "unverifiable",
+          "review"
+        ],
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ],
+        "finalContentRelevance": [
+          "unverifiable",
+          "related"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Thai/English prose claim with no extractable numeric, brand or standard-code signal. Evidence includes OCR text — treat numeric/brand matches with care."
+    },
+    {
+      "row": 299,
+      "item": "4.8.2.13",
+      "row_type": "product_identity_row",
+      "reference_text": "CASRI Product Brochure, page 150, 151",
+      "cited_pages": [
+        150,
+        151
+      ],
+      "cites_scanned_page": true,
+      "deltas": {
+        "ruleVerdict": [
+          "insufficient_evidence",
+          "needs_review"
+        ],
+        "finalReferenceCheck": [
+          "unverifiable",
+          "review"
+        ]
+      },
+      "reason_before": "No cited page yielded usable text (blank / scanned image — OCR required).",
+      "reason_after": "Claim names a brand/model that was not found on the cited page(s). Evidence includes OCR text — treat numeric/brand matches with care."
+    }
+  ],
+  "improved_to_pass_or_match": [
+    217,
+    250,
+    273,
+    274,
+    281
+  ]
+}

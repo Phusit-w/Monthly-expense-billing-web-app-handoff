@@ -1,0 +1,1125 @@
+{
+  "pdf": "datasheet-udon-h3c-r2.pdf",
+  "pages": [
+    17,
+    18,
+    20,
+    102,
+    105,
+    108,
+    128,
+    133,
+    137,
+    150,
+    151
+  ],
+  "grid": {
+    "dpi": [
+      180,
+      300
+    ],
+    "psm": [
+      "6",
+      "3",
+      "4"
+    ],
+    "lang": [
+      "tha+eng",
+      "eng"
+    ]
+  },
+  "results": [
+    {
+      "dpi": 180,
+      "psm": "6",
+      "lang": "tha+eng",
+      "total_secs": 40.2,
+      "secs_per_page": 3.65,
+      "min_chars": 27,
+      "median_chars": 1085,
+      "max_chars": 3633,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.023,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 4.74,
+          "chars": 3633,
+          "thai_frac": 0.002,
+          "sample": "LRQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales an"
+        },
+        {
+          "page": 18,
+          "secs": 4.43,
+          "chars": 3457,
+          "thai_frac": 0.002,
+          "sample": "LRQA Certificate identity number: 10731411 Certificate Schedule bocation 000 tivities ---- ...... อ Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Bi"
+        },
+        {
+          "page": 20,
+          "secs": 2.97,
+          "chars": 1415,
+          "thai_frac": 0.005,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedul Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID "
+        },
+        {
+          "page": 102,
+          "secs": 4.06,
+          "chars": 959,
+          "thai_frac": 0.048,
+          "sample": "NEW GERMAN RACK นั๕ Highlights เ ti | ง | i Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air ve"
+        },
+        {
+          "page": 105,
+          "secs": 4.22,
+          "chars": 785,
+          "thai_frac": 0.064,
+          "sample": "Provides natural air convention within the cabinet. ห จ . = Two ball bearing heavy duty type with glass fiber reinforced a> liam plastic Impeller. Me ๑ Wy @> | Die-cast aluminum housing with ABS plast"
+        },
+        {
+          "page": 108,
+          "secs": 3.58,
+          "chars": 1092,
+          "thai_frac": 0.031,
+          "sample": ") ATEN . >» Optional 50งง :]1]]]]22 111แ11แ1890 Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, includin"
+        },
+        {
+          "page": 128,
+          "secs": 3.9,
+          "chars": 539,
+          "thai_frac": 0.103,
+          "sample": "Sli e im design, amazing performance gp QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions a"
+        },
+        {
+          "page": 133,
+          "secs": 2.75,
+          "chars": 1085,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display -ProMotion technology with adaptive ref"
+        },
+        {
+          "page": 137,
+          "secs": 4.21,
+          "chars": 1848,
+          "thai_frac": 0.001,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.75,
+          "chars": 27,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 4"
+        },
+        {
+          "page": 151,
+          "secs": 2.63,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLo"
+        }
+      ]
+    },
+    {
+      "dpi": 180,
+      "psm": "6",
+      "lang": "eng",
+      "total_secs": 31.5,
+      "secs_per_page": 2.86,
+      "min_chars": 28,
+      "median_chars": 1084,
+      "max_chars": 3634,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 3.99,
+          "chars": 3634,
+          "thai_frac": 0.0,
+          "sample": "LRQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales an"
+        },
+        {
+          "page": 18,
+          "secs": 3.53,
+          "chars": 3443,
+          "thai_frac": 0.0,
+          "sample": "LRQA Certificate identity number: 10731411 Certificate Schedule bocation 000 tivities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and"
+        },
+        {
+          "page": 20,
+          "secs": 2.48,
+          "chars": 1415,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedul Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID "
+        },
+        {
+          "page": 102,
+          "secs": 2.61,
+          "chars": 955,
+          "thai_frac": 0.0,
+          "sample": "NEW GERMAN RACK NA sonra Highlights ri ti | s | i Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase "
+        },
+        {
+          "page": 105,
+          "secs": 2.79,
+          "chars": 777,
+          "thai_frac": 0.0,
+          "sample": "Provides natural air convention within the cabinet. op mn . = Two ball bearing heavy duty type with glass fiber reinforced a> liam plastic Impeller. Me @ Wy @> | Die-cast aluminum housing with ABS pla"
+        },
+        {
+          "page": 108,
+          "secs": 2.46,
+          "chars": 1084,
+          "thai_frac": 0.0,
+          "sample": "_) ATEN . >» Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the Single Person Easy I"
+        },
+        {
+          "page": 128,
+          "secs": 2.65,
+          "chars": 542,
+          "thai_frac": 0.0,
+          "sample": "Sli e im design, amazing performance gp QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions a"
+        },
+        {
+          "page": 133,
+          "secs": 2.68,
+          "chars": 1085,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display -ProMotion technology with adaptive ref"
+        },
+        {
+          "page": 137,
+          "secs": 3.36,
+          "chars": 1917,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.81,
+          "chars": 28,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 ey"
+        },
+        {
+          "page": 151,
+          "secs": 2.1,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLoop"
+        }
+      ]
+    },
+    {
+      "dpi": 180,
+      "psm": "3",
+      "lang": "tha+eng",
+      "total_secs": 30.2,
+      "secs_per_page": 2.75,
+      "min_chars": 32,
+      "median_chars": 960,
+      "max_chars": 3648,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.006,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 5.12,
+          "chars": 3648,
+          "thai_frac": 0.002,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 4.66,
+          "chars": 3450,
+          "thai_frac": 0.001,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and "
+        },
+        {
+          "page": 20,
+          "secs": 2.97,
+          "chars": 1407,
+          "thai_frac": 0.0,
+          "sample": "| R Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID i"
+        },
+        {
+          "page": 102,
+          "secs": 2.57,
+          "chars": 850,
+          "thai_frac": 0.028,
+          "sample": "A < NEW GERMANRACK © yO. G3 รว3 0 Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air v"
+        },
+        {
+          "page": 105,
+          "secs": 2.36,
+          "chars": 699,
+          "thai_frac": 0.034,
+          "sample": "หๆนย เขแอส13 เผยพยง .6แ VENTILATING FAN Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing wit"
+        },
+        {
+          "page": 108,
+          "secs": 2.06,
+          "chars": 987,
+          "thai_frac": 0.004,
+          "sample": ">> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the Single Person Easy Installatio"
+        },
+        {
+          "page": 128,
+          "secs": 2.03,
+          "chars": 308,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 1.97,
+          "chars": 960,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1. 12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4. Wide color ("
+        },
+        {
+          "page": 137,
+          "secs": 2.65,
+          "chars": 1858,
+          "thai_frac": 0.001,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 1.86,
+          "chars": 32,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 [315 |"
+        },
+        {
+          "page": 151,
+          "secs": 1.92,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "EcoLoop™ Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentia"
+        }
+      ]
+    },
+    {
+      "dpi": 180,
+      "psm": "3",
+      "lang": "eng",
+      "total_secs": 24.0,
+      "secs_per_page": 2.18,
+      "min_chars": 28,
+      "median_chars": 960,
+      "max_chars": 3649,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 2.92,
+          "chars": 3649,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 2.82,
+          "chars": 3450,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and "
+        },
+        {
+          "page": 20,
+          "secs": 1.89,
+          "chars": 1407,
+          "thai_frac": 0.0,
+          "sample": "| R Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID i"
+        },
+        {
+          "page": 102,
+          "secs": 1.84,
+          "chars": 846,
+          "thai_frac": 0.0,
+          "sample": "A < NEW GERMANRACK © yO. G3 SERIES Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air "
+        },
+        {
+          "page": 105,
+          "secs": 1.84,
+          "chars": 698,
+          "thai_frac": 0.0,
+          "sample": "MOWY LYOdXI ANWIYI9 6h VENTILATING FAN Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with"
+        },
+        {
+          "page": 108,
+          "secs": 2.35,
+          "chars": 989,
+          "thai_frac": 0.0,
+          "sample": ">> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the Single Person Easy Installatio"
+        },
+        {
+          "page": 128,
+          "secs": 2.32,
+          "chars": 308,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 2.22,
+          "chars": 960,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1. 12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4. Wide color ("
+        },
+        {
+          "page": 137,
+          "secs": 2.23,
+          "chars": 1891,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 1.82,
+          "chars": 28,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 ra"
+        },
+        {
+          "page": 151,
+          "secs": 1.7,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "EcoLoop™ Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials"
+        }
+      ]
+    },
+    {
+      "dpi": 180,
+      "psm": "4",
+      "lang": "tha+eng",
+      "total_secs": 31.5,
+      "secs_per_page": 2.86,
+      "min_chars": 32,
+      "median_chars": 977,
+      "max_chars": 3623,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.007,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 5.05,
+          "chars": 3623,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 4.75,
+          "chars": 3450,
+          "thai_frac": 0.001,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and "
+        },
+        {
+          "page": 20,
+          "secs": 2.92,
+          "chars": 1409,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID"
+        },
+        {
+          "page": 102,
+          "secs": 2.29,
+          "chars": 849,
+          "thai_frac": 0.028,
+          "sample": "< NEW GERMAN RACK Y oO. G3 รว3 0 Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air ve"
+        },
+        {
+          "page": 105,
+          "secs": 2.35,
+          "chars": 703,
+          "thai_frac": 0.019,
+          "sample": "VENTILATING FAN Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guar"
+        },
+        {
+          "page": 108,
+          "secs": 2.78,
+          "chars": 1032,
+          "thai_frac": 0.011,
+          "sample": ">> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the Single Person Easy Installatio"
+        },
+        {
+          "page": 128,
+          "secs": 2.8,
+          "chars": 340,
+          "thai_frac": 0.018,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 2.2,
+          "chars": 977,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1. 12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4.8.1.5 Wide co"
+        },
+        {
+          "page": 137,
+          "secs": 2.46,
+          "chars": 1858,
+          "thai_frac": 0.001,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 1.9,
+          "chars": 32,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 [315 |"
+        },
+        {
+          "page": 151,
+          "secs": 1.97,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLo"
+        }
+      ]
+    },
+    {
+      "dpi": 180,
+      "psm": "4",
+      "lang": "eng",
+      "total_secs": 23.6,
+      "secs_per_page": 2.15,
+      "min_chars": 28,
+      "median_chars": 978,
+      "max_chars": 3623,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 2.82,
+          "chars": 3623,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 2.76,
+          "chars": 3450,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and "
+        },
+        {
+          "page": 20,
+          "secs": 1.96,
+          "chars": 1409,
+          "thai_frac": 0.0,
+          "sample": "| RQA Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehiclemon motor vehicle electronic identification products, digital plate/smart chip plate, RFID"
+        },
+        {
+          "page": 102,
+          "secs": 2.13,
+          "chars": 845,
+          "thai_frac": 0.0,
+          "sample": "< NEW GERMAN RACK Y oO. G3 SERIES Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air v"
+        },
+        {
+          "page": 105,
+          "secs": 1.87,
+          "chars": 700,
+          "thai_frac": 0.0,
+          "sample": "VENTILATING FAN Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guar"
+        },
+        {
+          "page": 108,
+          "secs": 1.97,
+          "chars": 1029,
+          "thai_frac": 0.0,
+          "sample": ">> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the Single Person Easy Installatio"
+        },
+        {
+          "page": 128,
+          "secs": 1.96,
+          "chars": 339,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 1.9,
+          "chars": 978,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1. 12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4.8.1.5 Wide co"
+        },
+        {
+          "page": 137,
+          "secs": 2.31,
+          "chars": 1891,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’? Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.09,
+          "chars": 28,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 ra"
+        },
+        {
+          "page": 151,
+          "secs": 1.83,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLoop"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "6",
+      "lang": "tha+eng",
+      "total_secs": 42.1,
+      "secs_per_page": 3.83,
+      "min_chars": 27,
+      "median_chars": 1082,
+      "max_chars": 3638,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.019,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 6.26,
+          "chars": 3638,
+          "thai_frac": 0.008,
+          "sample": "เจดพ“ Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: เธอ 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 5.72,
+          "chars": 3461,
+          "thai_frac": 0.009,
+          "sample": "เจดพ“ Certificate identity number: 10731411 Certificate Schedule Location: /- 1ง 7ววววววูวว ญิยอรธ ววว7 1ฝ Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. "
+        },
+        {
+          "page": 20,
+          "secs": 4.05,
+          "chars": 1438,
+          "thai_frac": 0.01,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate Schedul Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, RF"
+        },
+        {
+          "page": 102,
+          "secs": 3.17,
+          "chars": 940,
+          "thai_frac": 0.043,
+          "sample": "NEW GERMAN RACK ๕ Highlights LP / i พ | | ย Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air ve"
+        },
+        {
+          "page": 105,
+          "secs": 3.39,
+          "chars": 893,
+          "thai_frac": 0.05,
+          "sample": "Provides natural air convention within the cabinet. ห - ญ่ ศัณ > | = ry Two ball bearing heavy duty type with glass fiber reinforced ie Ng hi ส ร% ง plastic Impeller. @ เ” @ YA. ae) tin ๕ด | Die-cast "
+        },
+        {
+          "page": 108,
+          "secs": 2.67,
+          "chars": 1082,
+          "thai_frac": 0.04,
+          "sample": ".) ATEN Simply Better Connections™ >) Optional 2ูฉฏมวโยโวไปไปฤฆทฆฒฮฝ ฝฬฝฬฝ Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits t"
+        },
+        {
+          "page": 128,
+          "secs": 3.46,
+          "chars": 441,
+          "thai_frac": 0.044,
+          "sample": "li e Slim design, ๑ amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions "
+        },
+        {
+          "page": 133,
+          "secs": 2.8,
+          "chars": 1083,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display -ProMotion technology with adaptive ref"
+        },
+        {
+          "page": 137,
+          "secs": 4.44,
+          "chars": 1903,
+          "thai_frac": 0.004,
+          "sample": "Learn more about Apple Pay ธเแพ19 Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 3.37,
+          "chars": 27,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 |"
+        },
+        {
+          "page": 151,
+          "secs": 2.82,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLo"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "6",
+      "lang": "eng",
+      "total_secs": 42.4,
+      "secs_per_page": 3.85,
+      "min_chars": 27,
+      "median_chars": 1051,
+      "max_chars": 3631,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 4.3,
+          "chars": 3631,
+          "thai_frac": 0.0,
+          "sample": "LRQ/\\ Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales a"
+        },
+        {
+          "page": 18,
+          "secs": 5.0,
+          "chars": 3439,
+          "thai_frac": 0.0,
+          "sample": "LRQ/\\ Certificate identity number: 10731411 Certificate Schedule Location: 00 Hities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and "
+        },
+        {
+          "page": 20,
+          "secs": 3.53,
+          "chars": 1439,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate Schedul Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, RFI"
+        },
+        {
+          "page": 102,
+          "secs": 3.85,
+          "chars": 931,
+          "thai_frac": 0.0,
+          "sample": "NEW GERMAN RACK NA sxcecnan Highlights LP J i a i Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase "
+        },
+        {
+          "page": 105,
+          "secs": 4.34,
+          "chars": 901,
+          "thai_frac": 0.0,
+          "sample": "Provides natural air convention within the cabinet. m - o (% > | = ry Two ball bearing heavy duty type with glass fiber reinforced ie Ng hi -~ BZ EY plastic Impeller. @ _“yV @ YA. ae) tin (Gvm) Die-ca"
+        },
+        {
+          "page": 108,
+          "secs": 4.14,
+          "chars": 1051,
+          "thai_frac": 0.0,
+          "sample": "_) ATEN Simply Better Connections™ >) Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including"
+        },
+        {
+          "page": 128,
+          "secs": 4.12,
+          "chars": 441,
+          "thai_frac": 0.0,
+          "sample": "li e Slim design, e amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions "
+        },
+        {
+          "page": 133,
+          "secs": 3.19,
+          "chars": 1083,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display -ProMotion technology with adaptive ref"
+        },
+        {
+          "page": 137,
+          "secs": 4.24,
+          "chars": 1931,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’° Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.92,
+          "chars": 27,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 |"
+        },
+        {
+          "page": 151,
+          "secs": 2.83,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLoop"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "3",
+      "lang": "tha+eng",
+      "total_secs": 47.4,
+      "secs_per_page": 4.31,
+      "min_chars": 37,
+      "median_chars": 1007,
+      "max_chars": 3629,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.014,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 9.5,
+          "chars": 3629,
+          "thai_frac": 0.002,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: เธอ 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales"
+        },
+        {
+          "page": 18,
+          "secs": 6.93,
+          "chars": 3432,
+          "thai_frac": 0.004,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road an"
+        },
+        {
+          "page": 20,
+          "secs": 4.78,
+          "chars": 1392,
+          "thai_frac": 0.004,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, R"
+        },
+        {
+          "page": 102,
+          "secs": 4.08,
+          "chars": 883,
+          "thai_frac": 0.059,
+          "sample": "NEW GERMAN RACK ร๒\"๒รภณญา G3 รง 0 Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air v"
+        },
+        {
+          "page": 105,
+          "secs": 3.31,
+          "chars": 734,
+          "thai_frac": 0.027,
+          "sample": "Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guard 7.0 mm. thickn"
+        },
+        {
+          "page": 108,
+          "secs": 2.8,
+          "chars": 1036,
+          "thai_frac": 0.013,
+          "sample": "เฉไมซม Simply Better Connections™ >> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including "
+        },
+        {
+          "page": 128,
+          "secs": 2.99,
+          "chars": 387,
+          "thai_frac": 0.034,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 3.32,
+          "chars": 1007,
+          "thai_frac": 0.004,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1.12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? ม ge — ชา Wide c"
+        },
+        {
+          "page": 137,
+          "secs": 4.52,
+          "chars": 1859,
+          "thai_frac": 0.003,
+          "sample": "Learn more about Apple Pay ธเแพ19 Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.59,
+          "chars": 37,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 48215 | 150"
+        },
+        {
+          "page": 151,
+          "secs": 2.59,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "EcoLoop™ Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentia"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "3",
+      "lang": "eng",
+      "total_secs": 40.0,
+      "secs_per_page": 3.64,
+      "min_chars": 32,
+      "median_chars": 1004,
+      "max_chars": 3628,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 3.54,
+          "chars": 3628,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales "
+        },
+        {
+          "page": 18,
+          "secs": 3.37,
+          "chars": 3430,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and"
+        },
+        {
+          "page": 20,
+          "secs": 2.49,
+          "chars": 1391,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, RF"
+        },
+        {
+          "page": 102,
+          "secs": 2.6,
+          "chars": 885,
+          "thai_frac": 0.0,
+          "sample": "NEW GERMAN RACK 1s:on MAN’ G3 SERIES Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase ai"
+        },
+        {
+          "page": 105,
+          "secs": 2.68,
+          "chars": 733,
+          "thai_frac": 0.0,
+          "sample": "Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guard 7.0 mm. thickn"
+        },
+        {
+          "page": 108,
+          "secs": 3.63,
+          "chars": 1029,
+          "thai_frac": 0.0,
+          "sample": "WEN Simply Better Connections™ >> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the"
+        },
+        {
+          "page": 128,
+          "secs": 6.53,
+          "chars": 389,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 3.82,
+          "chars": 1004,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1.12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? a ge — on Wide c"
+        },
+        {
+          "page": 137,
+          "secs": 3.9,
+          "chars": 1892,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’° Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 3.97,
+          "chars": 32,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 ea 150"
+        },
+        {
+          "page": 151,
+          "secs": 3.45,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "EcoLoop™ Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "4",
+      "lang": "tha+eng",
+      "total_secs": 51.6,
+      "secs_per_page": 4.69,
+      "min_chars": 37,
+      "median_chars": 1073,
+      "max_chars": 3629,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.012,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 12.78,
+          "chars": 3629,
+          "thai_frac": 0.002,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: เธอ 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales"
+        },
+        {
+          "page": 18,
+          "secs": 11.01,
+          "chars": 3432,
+          "thai_frac": 0.004,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road an"
+        },
+        {
+          "page": 20,
+          "secs": 3.99,
+          "chars": 1392,
+          "thai_frac": 0.004,
+          "sample": "] เจด“ิ Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, R"
+        },
+        {
+          "page": 102,
+          "secs": 3.01,
+          "chars": 858,
+          "thai_frac": 0.031,
+          "sample": "< NEW GERMAN RACK Y ๑ G3 SERIES ไฝ Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air "
+        },
+        {
+          "page": 105,
+          "secs": 3.29,
+          "chars": 751,
+          "thai_frac": 0.048,
+          "sample": "Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guard 7.0 mm. thickn"
+        },
+        {
+          "page": 108,
+          "secs": 3.2,
+          "chars": 1074,
+          "thai_frac": 0.04,
+          "sample": "เฉไมซม Simply Better Connections™ >> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including "
+        },
+        {
+          "page": 128,
+          "secs": 2.79,
+          "chars": 317,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 3.54,
+          "chars": 1073,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1.12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4.8.1.5 Wide col"
+        },
+        {
+          "page": 137,
+          "secs": 3.31,
+          "chars": 1861,
+          "thai_frac": 0.004,
+          "sample": "Learn more about Apple Pay ธเแพ19 Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.2,
+          "chars": 37,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 48215 | 150"
+        },
+        {
+          "page": 151,
+          "secs": 2.45,
+          "chars": 207,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5 (297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLo"
+        }
+      ]
+    },
+    {
+      "dpi": 300,
+      "psm": "4",
+      "lang": "eng",
+      "total_secs": 30.7,
+      "secs_per_page": 2.79,
+      "min_chars": 32,
+      "median_chars": 1062,
+      "max_chars": 3628,
+      "pages_over_200_chars": 10,
+      "mean_thai_frac": 0.0,
+      "per_page": [
+        {
+          "page": 17,
+          "secs": 4.28,
+          "chars": 3628,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate of Approval The scope of this approval is applicable to: ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 Design, development, manufacture, sales "
+        },
+        {
+          "page": 18,
+          "secs": 3.37,
+          "chars": 3430,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate Schedule Location Activities Zhejiang Dahua Vision Technology Co., Ltd. ISO 9001:2015, ISO 14001:2015, ISO 45001:2018 No. 1399 Binxing Road and"
+        },
+        {
+          "page": 20,
+          "secs": 2.57,
+          "chars": 1391,
+          "thai_frac": 0.0,
+          "sample": "| RQ/A Certificate identity number: 10731411 Certificate Schedule Location Activities (Automobile/motor vehicle/non motor vehicle electronic identification products, digital plate/smart chip plate, RF"
+        },
+        {
+          "page": 102,
+          "secs": 2.63,
+          "chars": 841,
+          "thai_frac": 0.0,
+          "sample": "< NEW GERMAN RACK Y a G3 SERIES Highlights Structure: All parts can be Door: Strong with U-shaped Doors: Zero Gap Zeal design disassembled and assembled, fold & Increased thickness to increase air ven"
+        },
+        {
+          "page": 105,
+          "secs": 2.34,
+          "chars": 748,
+          "thai_frac": 0.0,
+          "sample": "Provides natural air convention within the cabinet. Two ball bearing heavy duty type with glass fiber reinforced plastic Impeller. Die-cast aluminum housing with ABS plastic black guard 7.0 mm. thickn"
+        },
+        {
+          "page": 108,
+          "secs": 2.57,
+          "chars": 1062,
+          "thai_frac": 0.0,
+          "sample": "WEN Simply Better Connections™ >> Optional Single Person Easy Installation Kit Slideaway™ LCD KVM switches allow you to choose from a host of optional rack mount kits to meet your needs, including the"
+        },
+        {
+          "page": 128,
+          "secs": 2.74,
+          "chars": 317,
+          "thai_frac": 0.0,
+          "sample": "Slim design, amazing performance. QMC features Samsung's thinnest UHD Signage display, delivering aesthetic appeal to businesses while maximizing space utilization. Improved internal solutions and a u"
+        },
+        {
+          "page": 133,
+          "secs": 2.37,
+          "chars": 1074,
+          "thai_frac": 0.0,
+          "sample": "Magnetic connector Smart Connector Thunderbolt / USB 4 In the Box iPad Pro 4.8. 1.12 Polishing cloth in nano-texture display glass option Display Ultra Retina XDR display Tandem OLED? 4.8.1.5 Wide col"
+        },
+        {
+          "page": 137,
+          "secs": 3.01,
+          "chars": 1889,
+          "thai_frac": 0.0,
+          "sample": "Learn more about Apple Pay Siri’° Get help with everyday tasks like sending messages, setting reminders, and more Activate hands-free with only your voice using “Siri” or “Hey Siri,” or use Type to Si"
+        },
+        {
+          "page": 150,
+          "secs": 2.27,
+          "chars": 32,
+          "thai_frac": 0.0,
+          "sample": "Dell Wireless Mouse-WM126 ea 150"
+        },
+        {
+          "page": 151,
+          "secs": 2.57,
+          "chars": 205,
+          "thai_frac": 0.0,
+          "sample": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4.5297) A sustainably made, everyday backpack with a large, full-access front opening and protection features that shield your laptop and essentials. EcoLoop"
+        }
+      ]
+    }
+  ]
+}

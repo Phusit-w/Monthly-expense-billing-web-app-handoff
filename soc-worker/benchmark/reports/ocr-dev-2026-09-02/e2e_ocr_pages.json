@@ -1,0 +1,1030 @@
+{
+  "pages": [
+    {
+      "page": 1,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Multi-lens Ultra HD Integrated Array Camera\nCASRI-AP16-116-30\nProduct Introduction\nCASRI-AP16-116-30 Multi-lens integrated device incorporates 14 independent 4K ultra-\nhigh-definition camera units. Adopting a multi-lens array paired with AI deep learning\nalgorithms, it overcomes the physical limitations of traditional "
+    },
+    {
+      "page": 2,
+      "fidelity": "text",
+      "chars": 41,
+      "text": "Acquisition Resolution 116 million pixels"
+    },
+    {
+      "page": 3,
+      "fidelity": "text",
+      "chars": 51,
+      "text": "IPv4/IPv6, HTTP, RTSP, RTCP, RTP, TCP/IP, UDP, DHCP"
+    },
+    {
+      "page": 4,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Launched by Dahua Technology, Dahua WizMind is a full portfolio \nof solutions composed of project-oriented products including IPC,\nIVSS,NVR, PTZ, XVR, Thermal and softw ar e platform which adopts\nindustry-leading deep learning algorithms. Focusing on customer's\nrequirements, WizMind provides precise, reliable and compr"
+    },
+    {
+      "page": 5,
+      "fidelity": "text",
+      "chars": 27,
+      "text": "smart pan-tilt c orr ection"
+    },
+    {
+      "page": 6,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "Digital Zoom 16x"
+    },
+    {
+      "page": 8,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Launched by Dahua Technology, Dahua WizMind is a full portfolio \nof solutions composed of project-oriented products including IPC,\nIVSS,NVR, PTZ, XVR, Thermal and softw ar e platform which adopts\nindustry-leading deep learning algorithms. Focusing on customer's\nrequirements, WizMind provides precise, reliable and compr"
+    },
+    {
+      "page": 9,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "Image Sensor 1/1"
+    },
+    {
+      "page": 10,
+      "fidelity": "text",
+      "chars": 48,
+      "text": "Motion De t ection OFF/ON (4 areas, rectangular)"
+    },
+    {
+      "page": 12,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Launched by Dahua Technology, Dahua WizMind is a full portfolio \nof solutions composed of project-oriented products including IPC,\nIVSS,NVR, PTZ, XVR, Thermal and softw ar e platform which adopts\nindustry-leading deep learning algorithms. Focusing on customer's\nrequirements, WizMind provides precise, reliable and compr"
+    },
+    {
+      "page": 13,
+      "fidelity": "text",
+      "chars": 27,
+      "text": "smart pan-tilt c orr ection"
+    },
+    {
+      "page": 14,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "Digital Zoom 16x"
+    },
+    {
+      "page": 16,
+      "fidelity": "ocr",
+      "chars": 244,
+      "text": "LRQA Current issue date: 18 November 2025 Original approval(s) Expiry date: 9 January 2028 ISO 9001 - 1 December 2021 Certificate identity number: 10731411 ISO 14001- 1 December 2021 ISO 45001 - 1 December 2021 = = Certificate of Approval เรร 1"
+    },
+    {
+      "page": 21,
+      "fidelity": "text",
+      "chars": 73,
+      "text": "The Satellite High-Precision Combined Positioning Vehicle Terminal (CATM-"
+    },
+    {
+      "page": 26,
+      "fidelity": "text",
+      "chars": 36,
+      "text": "Satellite Positioning BeiDou B1I,B2a"
+    },
+    {
+      "page": 29,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Specification Parameters\nSpecifications parameter\nModel CATM-ADS-B01\nApplicable scene ADS-B signal receiver, airspace monitoring\nReceive frequency 1090 MHz 2.2.1\nWorking temperature -40 - +85°C 2.2.4\nWorking humidity 30%-80% RH\nElectromagnetic comp\natibility\nRTCA DO-260/260A/260B 2.2.5\nSize 310*195*78 mm\nData output fo"
+    },
+    {
+      "page": 39,
+      "fidelity": "text",
+      "chars": 87,
+      "text": "At the same time, when the airport has a daytime visibility of 10000 lx, an atmospheric"
+    },
+    {
+      "page": 40,
+      "fidelity": "text",
+      "chars": 86,
+      "text": "b) Stand number / stand entry or exit time information (By connecting with data of the"
+    },
+    {
+      "page": 42,
+      "fidelity": "text",
+      "chars": 75,
+      "text": "It also supports the export function of recorded video and picture data and"
+    },
+    {
+      "page": 47,
+      "fidelity": "text",
+      "chars": 33,
+      "text": "3 Runway Incursion Alert Software"
+    },
+    {
+      "page": 49,
+      "fidelity": "text",
+      "chars": 88,
+      "text": "runways, taxiways located between the applicable runway holding positions and the actual"
+    },
+    {
+      "page": 50,
+      "fidelity": "text",
+      "chars": 89,
+      "text": "The system implements a two-tier warning mechanism for vehicle incursion risks: Incursion"
+    },
+    {
+      "page": 51,
+      "fidelity": "text",
+      "chars": 85,
+      "text": "Supports simultaneous alerts for multiple events, displaying all vehicles involved in"
+    },
+    {
+      "page": 52,
+      "fidelity": "text",
+      "chars": 89,
+      "text": "It can store video data for efficient retrieval and back up the data for at least 60 days"
+    },
+    {
+      "page": 54,
+      "fidelity": "text",
+      "chars": 83,
+      "text": "Monitors the movement of aircraft and vehicles within the jurisdiction in real time"
+    },
+    {
+      "page": 55,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "-23-\ndesignated area, its moving trajectory can be automatically tracked.\nCan define the airspace alert boundaries when there is a vehicle Intrude into the\ndesignated area and track the movement path of the vehicle.\n② TerminalRight-Click Menu\nBy right-clicking on a flight or vehicle terminal, a context menu appears for"
+    },
+    {
+      "page": 56,
+      "fidelity": "text",
+      "chars": 78,
+      "text": "Supports querying for the current locations of vehicles, flights, and airports"
+    },
+    {
+      "page": 59,
+      "fidelity": "text",
+      "chars": 37,
+      "text": "5 Route Simulation for the Apron Area"
+    },
+    {
+      "page": 60,
+      "fidelity": "text",
+      "chars": 63,
+      "text": "① Displays vehicle locations within the apron area in real time"
+    },
+    {
+      "page": 61,
+      "fidelity": "text",
+      "chars": 54,
+      "text": "IV Aircraft Stand Guidance Equipment Management System"
+    },
+    {
+      "page": 62,
+      "fidelity": "text",
+      "chars": 85,
+      "text": "multi-dimensional AI target classification and recognition model, which can recognize"
+    },
+    {
+      "page": 63,
+      "fidelity": "text",
+      "chars": 15,
+      "text": " Aircraft type"
+    },
+    {
+      "page": 66,
+      "fidelity": "text",
+      "chars": 39,
+      "text": "5 Video & GIS Data Storage and Playback"
+    },
+    {
+      "page": 67,
+      "fidelity": "text",
+      "chars": 52,
+      "text": "refined configuration of software access permissions"
+    },
+    {
+      "page": 68,
+      "fidelity": "text",
+      "chars": 89,
+      "text": "The system establishes a cluster working mode to support taking over the operation of the"
+    },
+    {
+      "page": 69,
+      "fidelity": "text",
+      "chars": 81,
+      "text": "The system check (High Availability & Hot Standby) supports the construction of a"
+    },
+    {
+      "page": 70,
+      "fidelity": "text",
+      "chars": 90,
+      "text": "The system is capable of distributed and redundant storage for operational data records by"
+    },
+    {
+      "page": 74,
+      "fidelity": "text",
+      "chars": 29,
+      "text": "H3C UniServer R4900 G7 Server"
+    },
+    {
+      "page": 76,
+      "fidelity": "text",
+      "chars": 95,
+      "text": "SP Platform: 32 DDR5 RDIMM Slots, 6400 MT/s Data Rate, 16 DDR5 MRDIMM Slots, 8000MT/s Data Rate"
+    },
+    {
+      "page": 77,
+      "fidelity": "text",
+      "chars": 17,
+      "text": "CPU Speciﬁcations"
+    },
+    {
+      "page": 78,
+      "fidelity": "text",
+      "chars": 135,
+      "text": "this fe ature, or reference the system specifications (motherboard, processor, chipset, power supply, HDD, graphics controller, memory,"
+    },
+    {
+      "page": 79,
+      "fidelity": "text",
+      "chars": 36,
+      "text": "Product model H3C UniServer R4900 G7"
+    },
+    {
+      "page": 80,
+      "fidelity": "text",
+      "chars": 14,
+      "text": "SAS3-10K-UCC-1"
+    },
+    {
+      "page": 81,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "0231AH7G UN-SSD-480G-\nSATA-S4620-UCC\nnull:2.5inch;Capacity:480GB;Interface:S\nATA;Interface Speed:6Gb/s;Rotation\nSpeed:No\ndata;IOPS:85/48K;Throughput:No\ndata;MTBF:2 million\nhours;DWPD:4.7DWPD@5years;Power\nConsumption:No data;Total\nWrite:4117.2TB;Manufacturer:INTEL,SO\nLIDIGM;Description:480GB 6Gb/s SATA\n3.5in MU S4620 SS"
+    },
+    {
+      "page": 82,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "0 X4 Copper Interface"
+    },
+    {
+      "page": 83,
+      "fidelity": "text",
+      "chars": 81,
+      "text": "(3) 10/100/1000Base-T autosensing Ethernet ports 1 through 4 (from left to right)"
+    },
+    {
+      "page": 85,
+      "fidelity": "text",
+      "chars": 36,
+      "text": "The power supplies are hot swappable"
+    },
+    {
+      "page": 86,
+      "fidelity": "text",
+      "chars": 29,
+      "text": "H3C UniServer R4950 G7 Server"
+    },
+    {
+      "page": 87,
+      "fidelity": "text",
+      "chars": 100,
+      "text": "H3C UniServer R4950 G7 rack server is a new generation of enterprise-class high-performance 2U dual-"
+    },
+    {
+      "page": 88,
+      "fidelity": "text",
+      "chars": 49,
+      "text": "Memory Up to 24 DDR5 memory slots, up to 6400MT/s"
+    },
+    {
+      "page": 89,
+      "fidelity": "text",
+      "chars": 112,
+      "text": "The AMD EPYC 9135 is a server/workstation processor with 16 cores, launched in October 2024, at an MSRP of $1214"
+    },
+    {
+      "page": 90,
+      "fidelity": "text",
+      "chars": 162,
+      "text": "TITAN Ada, which uses the same GPU but has all 18432 shaders enabled, NVIDIA has disabled some shading units on the L20 to reach the product's target shader count"
+    },
+    {
+      "page": 91,
+      "fidelity": "text",
+      "chars": 29,
+      "text": "H3C UniServer R4900 G7 Server"
+    },
+    {
+      "page": 93,
+      "fidelity": "text",
+      "chars": 95,
+      "text": "SP Platform: 32 DDR5 RDIMM Slots, 6400 MT/s Data Rate, 16 DDR5 MRDIMM Slots, 8000MT/s Data Rate"
+    },
+    {
+      "page": 94,
+      "fidelity": "text",
+      "chars": 17,
+      "text": "CPU Speciﬁcations"
+    },
+    {
+      "page": 95,
+      "fidelity": "text",
+      "chars": 36,
+      "text": "Product model H3C UniServer R4900 G7"
+    },
+    {
+      "page": 96,
+      "fidelity": "text",
+      "chars": 14,
+      "text": "SAS-7K2-UCL-2h"
+    },
+    {
+      "page": 97,
+      "fidelity": "text",
+      "chars": 13,
+      "text": "SAS3-RI-UCS-M"
+    },
+    {
+      "page": 98,
+      "fidelity": "text",
+      "chars": 37,
+      "text": "Interface 620F-B2 LP Ethernet Adapter"
+    },
+    {
+      "page": 100,
+      "fidelity": "text",
+      "chars": 36,
+      "text": "The power supplies are hot swappable"
+    },
+    {
+      "page": 101,
+      "fidelity": "ocr",
+      "chars": 42,
+      "text": "Main Structure: Electro-galvanized steel 2"
+    },
+    {
+      "page": 103,
+      "fidelity": "ocr",
+      "chars": 320,
+      "text": "แพด Manny’ export RACK Standard Width 600mm. โย Tr --I 02 | . | | | | | = | | | / | | เพน6 | 1 ! โร FRONT ew FRONT VIEW W/0 DOOR soe view SIDE VIEW W/0 PANEL FEAR VW ศีๆ ธะ เร or view ‘oP view w/o cover base View BASE Vew wo PLATE ORDERING INFORMATION Z 15บ 850 (รพ-60615 อซรมพ-60815 อรมพ-60915 ซอรม-61015 เซรม-61115 ว7บ"
+    },
+    {
+      "page": 104,
+      "fidelity": "ocr",
+      "chars": 166,
+      "text": "(0 POWER DISTRIBUTION บพเก | ฯ11\"02เกเภภเณ EXPORT N ACK FEATURES > © Applications Provided universal outlet which is suitable for network equipment, > ~ computer, etc"
+    },
+    {
+      "page": 105,
+      "fidelity": "ocr",
+      "chars": 87,
+      "text": "= Two ball bearing heavy duty type with glass fiber reinforced a> liam plastic Impeller"
+    },
+    {
+      "page": 106,
+      "fidelity": "ocr",
+      "chars": 178,
+      "text": "® ATEN Simply Better Connections™ The CL5808/CL5816 Slideaway Dual Rail LCD KVM Switch are control units that allow access to multiple computers from two PS/2 or USB KVM consoles"
+    },
+    {
+      "page": 109,
+      "fidelity": "ocr",
+      "chars": 320,
+      "text": "_) ATEN Simply Better Connections” Specifications: Function | CL5808 | CL5816 Computer Direct 58ธ5 16 Connections Max 256 (via Daisy-chain) 512 (via Daisy-chain) Port Selection OSD, Hotkeys, Pushbuttons External Console Port 1 x SPHD-18 Male (Yellow) External Mouse Port 1 x USB Type-A Female (White) KVM Ports 8 x SPHD-"
+    },
+    {
+      "page": 111,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "the ultimate solutions\nPowermatic Co., Ltd.\n50/1 Soi Tiwanon 40, Tiwanon Rd., Thasai, Amphur Muang, Nonthaburi 11000.\nTel: 0-2952-4400, Fax: 0-2952-3899 www.powermatic.co.th\n TIS. 1291 Part 1-2553TIS. 1291 Part 2-2553\nTIS. 1291 Part 3-2555\nTECHNICAL SPECIFICATION\nAuthorized Distributor: All brands and logos are registe"
+    },
+    {
+      "page": 112,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "Dell Pro Max Tower T2"
+    },
+    {
+      "page": 114,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "Memory configurations supported ● 8 GB: 1 x 8 GB, DDR5, 5600 MT/s, UDIMM, Non-ECC,"
+    },
+    {
+      "page": 115,
+      "fidelity": "text",
+      "chars": 44,
+      "text": "Network port One RJ45 ethernet port (1 Gbps)"
+    },
+    {
+      "page": 116,
+      "fidelity": "text",
+      "chars": 122,
+      "text": "The following table lists the wired ethernet Local Area Network (LAN) specifications of your Dell Pro Max Tower T2 FCT2250"
+    },
+    {
+      "page": 117,
+      "fidelity": "text",
+      "chars": 74,
+      "text": "2 2230 solid-state drive, Class 35 PCIe Gen4 x4 NVMe, up to 64 GT/s 256 GB"
+    },
+    {
+      "page": 118,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "● Windows 11 Pro"
+    },
+    {
+      "page": 119,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241068/intel-core-ultra-7-processor-265-30m-cache-up-to-5-30-ghz/specifications"
+    },
+    {
+      "page": 120,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "NVIDIA RTX PRO 4500 Blackwell Workstation Edition | Datasheet | 1\nTransform Workflows With Next-Level \nWorkstation Performance\nAs AI continues to advance at an incredible pace, industries face mounting pressure \nto harness its transformative power and adopt tools capable of handling generative \nAI, real-time simulation"
+    },
+    {
+      "page": 121,
+      "fidelity": "text",
+      "chars": 51,
+      "text": "NVIDIA, the NVIDIA logo, CUDA, RTX, and RTX PRO are"
+    },
+    {
+      "page": 122,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "[XM-LTechnologies Search Dell Premier ^SS-GET ON TEC... V Cart\nShop Sell v Benefits v Marketing Learn Manage Get Help\ntn) / Accessories & Peripherals / PC Accessories / Dell Wired Keyboard -KB216 -Thai -Black\nTech Specs Features & Design Drivers, Manuals & Support\nDell Wired Keyboard - KB216 - Thai - Black\nThis keyboar"
+    },
+    {
+      "page": 123,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "[XM-LTechnologies Search Dell Premier ^SS-GET ON TEC... V Cart\nShop Sell v Benefits v Marketing Learn Manage Get Help\ntnt / Accessories & Peripherals / PC Accessories / Dell Optical Mouse -MS116 -Black\nTech Specs Features & Design Drivers, Manuals & Support\nDell Optical Mouse - MS116 - Black\nThe Dell’Optical Mouse - MS"
+    },
+    {
+      "page": 124,
+      "fidelity": "text",
+      "chars": 75,
+      "text": "/ Monitors & Monitor Accessories / Computer Monitors / Dell 32 Plus Monitor"
+    },
+    {
+      "page": 125,
+      "fidelity": "text",
+      "chars": 44,
+      "text": "(ft / Accessories / SAS Hard Drives / Dell 1"
+    },
+    {
+      "page": 126,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "About Samsung Electronics Co., Ltd.\nSamsung Electronics Co., Ltd. inspires the world and shapes the future with transformative ideas and technologies. The company is redefining the worlds of \nTVs, smartphones, wearable devices, tablets, digital appliances, medical equipment, network systems, and semiconductor and LED s"
+    },
+    {
+      "page": 127,
+      "fidelity": "ocr",
+      "chars": 320,
+      "text": "SAMSUNG Shop mobilephone Display Coolingsystem household appliances One-stop service 85\" Standalone Signage 1ห60 Cortact us feature spec support compare 85\" Standalone Signage QMC ด ม ty ( LH85QMCEBGCXXT 1 ‘ . จ 1 ปเพล Slim Depth ; ; จ a 4 1 Even Bezel จ x “4 ; 44 1 Centered VESA Holes | @ Select screen size. ชะๆ / SPR"
+    },
+    {
+      "page": 132,
+      "fidelity": "ocr",
+      "chars": 73,
+      "text": "Documentation 0 แ= / -~ rol กพฎ์ ไฟ- iPad Pro 11-inch (M5) - Tech Specs 4"
+    },
+    {
+      "page": 133,
+      "fidelity": "ocr",
+      "chars": 319,
+      "text": "s with 256GB or 512GB storage: | 9-core CPU with 3 super cores and 6 efficiency cores: -10-core GPU Neural Accelerators Hardware-accelerated ray tracing 16-core Neural Engine 153GB/s memory bandwidth 11268 unified memory, Models with 1TB or 2TB storage: 10-core CPU with 4 super cores and 6 efficiency cores 10-core GPU"
+    },
+    {
+      "page": 134,
+      "fidelity": "ocr",
+      "chars": 319,
+      "text": "Learn more about Apple Intelligence Camera Digital zoom up to 5x Five-element lens Adaptive True Tone flash Panorama (up to 63MP) Sapphire crystal lens cover Autofocus with Focus Pixels Smart HDR 4 Wide color capture for photos and Live Photos Advanced red-eye correction Photo geotagging Auto image stabilization Burst"
+    },
+    {
+      "page": 135,
+      "fidelity": "ocr",
+      "chars": 320,
+      "text": "0 fps Cinematic video stabilization (1080p and 720p) Wide color capture for photos and Live Photos Lens correction Retina Flash with True Tone Auto image stabilization Burst mode Video Calling® FaceTime video Center Stage iPad to any FaceTime-enabled device over Wi-Fi or cellular Share experiences like movies, TV, musi"
+    },
+    {
+      "page": 136,
+      "fidelity": "ocr",
+      "chars": 277,
+      "text": "Face ID Enabled by TrueDepth camera for facial recognition Unlock iPad Secure personal data within apps Make purchases from the iTunes Store, App Store, and Apple Books Apple Pay Pay with your iPad using Face ID within apps and on the web Send and receive money in Messages 136"
+    },
+    {
+      "page": 137,
+      "fidelity": "ocr",
+      "chars": 320,
+      "text": "nd helpful Learn more about Siri Charging and Expansion _ Thunderbolt 1กโ Charging DisplayPort Thunderbolt 3 (up to 40Gb/s) USB 4 (up to 40Gb/s) USB 3 (up to 10Gb/s) Display Support Supports full native resolution on the built-in display at millions of colors Supports one external display with up to 6K resolution at 60"
+    },
+    {
+      "page": 138,
+      "fidelity": "ocr",
+      "chars": 100,
+      "text": "2026/8/7 10:51 Magic Keyboard for iPad Pro 11-inch - Tech Specs - Apple Support (AU) Documentation 4"
+    },
+    {
+      "page": 139,
+      "fidelity": "text",
+      "chars": 15,
+      "text": "Dell Pro Max 16"
+    },
+    {
+      "page": 141,
+      "fidelity": "text",
+      "chars": 47,
+      "text": "Intel Core Ultra 7 255H Intel Core Ultra 7 265H"
+    },
+    {
+      "page": 142,
+      "fidelity": "text",
+      "chars": 57,
+      "text": "Processor Intel Core Ultra 5/7/9 non-vPro/vPro processors"
+    },
+    {
+      "page": 143,
+      "fidelity": "text",
+      "chars": 81,
+      "text": "Memory configurations supported ● 16 GB: 2 x 8 GB, DDR5, 5600 MT/s, SoDIMM, dual-"
+    },
+    {
+      "page": 144,
+      "fidelity": "text",
+      "chars": 30,
+      "text": "Transfer rate 10/100/1000 Mbps"
+    },
+    {
+      "page": 145,
+      "fidelity": "text",
+      "chars": 60,
+      "text": "2 2230 solid state drive Gen 4 x4 PCIe NVMe 256 GB or 512 GB"
+    },
+    {
+      "page": 146,
+      "fidelity": "text",
+      "chars": 67,
+      "text": "Camera type FHD RGB camera FHD RGB and IR camera 8M MIPI RGB and IR"
+    },
+    {
+      "page": 147,
+      "fidelity": "text",
+      "chars": 28,
+      "text": "ExpressCharge mode Supported"
+    },
+    {
+      "page": 148,
+      "fidelity": "text",
+      "chars": 34,
+      "text": "Display specifications (continued)"
+    },
+    {
+      "page": 149,
+      "fidelity": "text",
+      "chars": 39,
+      "text": "NVIDIA RTX Pro 500 Blackwell 6 GB GDDR7"
+    },
+    {
+      "page": 151,
+      "fidelity": "ocr",
+      "chars": 44,
+      "text": "Dell 14-16 EcoLoop Backpack - CP3724 KkKKI 4"
+    },
+    {
+      "page": 153,
+      "fidelity": "text",
+      "chars": 193,
+      "text": "H3C IE4320-EI Series \nDin-rail Industrial \nEthernet Switches \n \n \nRelease Date: April, 2025 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nNew H3C Technologies Co., Limited \n153"
+    },
+    {
+      "page": 157,
+      "fidelity": "text",
+      "chars": 103,
+      "text": "H3C IE4320-EI series industrial switches integrated the switching, routing, ring network protection and"
+    },
+    {
+      "page": 159,
+      "fidelity": "text",
+      "chars": 58,
+      "text": "H3C IE4320-EI Series Din-rail Industrial Ethernet Switches"
+    },
+    {
+      "page": 161,
+      "fidelity": "text",
+      "chars": 17,
+      "text": "MAC Address Table"
+    },
+    {
+      "page": 162,
+      "fidelity": "text",
+      "chars": 24,
+      "text": "IPv4/IPv6 Multicast VLAN"
+    },
+    {
+      "page": 163,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "H3C IE4320 -8T2P2X-EI Industrial Ethernet Switch with 8*10/100/1000 BASE -T Ports,"
+    },
+    {
+      "page": 165,
+      "fidelity": "text",
+      "chars": 100,
+      "text": "broadcast, multicast, or unknown unicast traffic on the interface exceeds this threshold, the system"
+    },
+    {
+      "page": 166,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "1 \n \n \nH3C S5136S-EI Series Enhanced Gigabit \nAccess Switches \n \n \n \n \nProduct overview \nH3C S5136S-EI Series Switches - A high-performance, cost-effective and easy to deploy access switching solution that \noffers enhanced security, high-density GE uplinks, static route, RIP, OSPF, SDN and IRF enabled, flexible managem"
+    },
+    {
+      "page": 170,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "5 \nProduct Description Product Photograph \nS5136S-24S8T4X-EI: \n24 x 100/1000BASE-X SFP Ports, 8 x \n10/100/1000BASE-T Combo Ports, 4 x \n1G/10GBASE-X SFP+ Ports, 2 x power module \nslots \n \nS5136S-48ST4X-EI: \n24 x 10/100/1000BASE-T Ports, 24 x \n100/1000BASE-X SFP Ports, and 4 x \n1G/10GBASE-X SFP+ Ports,Without Power \nSupp"
+    },
+    {
+      "page": 171,
+      "fidelity": "text",
+      "chars": 118,
+      "text": "H3C S5136S-EI series switches support innovative single-port triple-authentication function, the access authentication"
+    },
+    {
+      "page": 172,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "7 \nmodes supported by different clients are different. For example, some clients can only perform MAC address es \nAuthentication (such as the printer terminal), and some user host for 802.1X authentication, and some user hosts only \nwant to access through the Web portal authentication. In order to flexibly adapt to the"
+    },
+    {
+      "page": 175,
+      "fidelity": "text",
+      "chars": 54,
+      "text": "Maximum stacking bandwidth 16Gbps 80Gbps 16Gbps 80Gbps"
+    },
+    {
+      "page": 177,
+      "fidelity": "text",
+      "chars": 40,
+      "text": "Port-based/VLAN-based MAC learning limit"
+    },
+    {
+      "page": 179,
+      "fidelity": "text",
+      "chars": 103,
+      "text": "Traffic classification based on source MAC, destination MAC, source IP, destination IP, port, protocol,"
+    },
+    {
+      "page": 180,
+      "fidelity": "text",
+      "chars": 27,
+      "text": "MFF (MAC-forced forwarding)"
+    },
+    {
+      "page": 181,
+      "fidelity": "text",
+      "chars": 23,
+      "text": "Web-based configuration"
+    },
+    {
+      "page": 183,
+      "fidelity": "text",
+      "chars": 23,
+      "text": "MAC address entries 16K"
+    },
+    {
+      "page": 185,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "Layer 2-LAN Switching"
+    },
+    {
+      "page": 186,
+      "fidelity": "text",
+      "chars": 188,
+      "text": "H3C S5170-EI Series \nIntelligent Gigabit Access \nSwitches \nRelease Date: Nov, 2022 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nNew H3C Technologies Co., Limited \n186"
+    },
+    {
+      "page": 187,
+      "fidelity": "text",
+      "chars": 85,
+      "text": "S5170-28S-EI: 24 x 10/100/1000BASE-T Ethernet ports, 4 x 1G/10G BASE-X SFP Plus ports"
+    },
+    {
+      "page": 194,
+      "fidelity": "text",
+      "chars": 19,
+      "text": "Protocol-based VLAN"
+    },
+    {
+      "page": 196,
+      "fidelity": "text",
+      "chars": 31,
+      "text": "SNMPv1/v2c/v3 and Web-based NMS"
+    },
+    {
+      "page": 197,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "H3C S5170-EI Series Intelligent Gigabit Access Switches \n \n \n \n11 \nPerformance Specification \nEntries S5170-EI Series Switches \nMAC address entries 32768 \nVLAN table 4094 \nVLAN interface 32 \nIPv4 routing entries 6144 \nIPv4 ARP entries 4096 \nIPv4 ACL entries \nVFP:512 \nIngress:1280 \nEgress:512 \nIPv4 multicast L2 entries "
+    },
+    {
+      "page": 202,
+      "fidelity": "text",
+      "chars": 24,
+      "text": "RFC 5424 Syslog Protocol"
+    },
+    {
+      "page": 205,
+      "fidelity": "text",
+      "chars": 23,
+      "text": "F1000-AI-25 F1000-AI-35"
+    },
+    {
+      "page": 208,
+      "fidelity": "text",
+      "chars": 68,
+      "text": "DDoS attacks such as SYN flood, UDP flood, DNS flood, and ICMP flood"
+    },
+    {
+      "page": 210,
+      "fidelity": "text",
+      "chars": 81,
+      "text": "IPv6 data forwarding, IPv6 static routing and dynamic routing, and IPv6 multicast"
+    },
+    {
+      "page": 212,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "Interface Module"
+    },
+    {
+      "page": 213,
+      "fidelity": "text",
+      "chars": 46,
+      "text": "Operation modes Route, transparent, and hybrid"
+    },
+    {
+      "page": 217,
+      "fidelity": "text",
+      "chars": 46,
+      "text": "Configuration synchronization of two firewalls"
+    },
+    {
+      "page": 218,
+      "fidelity": "text",
+      "chars": 54,
+      "text": "F1000-AI-05 H3C SecPath F1000-AI-05 Firewall Appliance"
+    },
+    {
+      "page": 222,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Security zone\nAllows you to configure security zones based on interfaces and VLANs.\nPacket nitering\nAllows you to apply standard or advanced ACLs between security zones to filter packets based on information contained in the packets, such as UDP and TCP port numbers. You can also\nconfigure time ranges during which pack"
+    },
+    {
+      "page": 223,
+      "fidelity": "text",
+      "chars": 115,
+      "text": "Supports multiple NAT modes, enabling efficient address translation between private networks and the public network"
+    },
+    {
+      "page": 225,
+      "fidelity": "text",
+      "chars": 98,
+      "text": "manage { { http I https I ping I ssh I telnet } { inbound I outbound } I { netconf-http I netconf-"
+    },
+    {
+      "page": 228,
+      "fidelity": "text",
+      "chars": 18,
+      "text": "o Configure syslog"
+    },
+    {
+      "page": 229,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "Reserved2 Reserved fields.\nReserved3\nFast log\nThe fast log output feature enables fast output of logs to log hosts.\nTypically, logs generated by a service module are first sent to the information center, which then outputs the logs to the specified\ndestination (such as to log hosts). When fast log output is configured,"
+    },
+    {
+      "page": 230,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "Dell Pro Max Tower T2"
+    },
+    {
+      "page": 234,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "Memory configurations supported ● 8 GB: 1 x 8 GB, DDR5, 5600 MT/s, UDIMM, Non-ECC,"
+    },
+    {
+      "page": 235,
+      "fidelity": "text",
+      "chars": 44,
+      "text": "Network port One RJ45 ethernet port (1 Gbps)"
+    },
+    {
+      "page": 236,
+      "fidelity": "text",
+      "chars": 57,
+      "text": "● One full-height, full-length Gen4 x4 PCIe open-end slot"
+    },
+    {
+      "page": 237,
+      "fidelity": "text",
+      "chars": 74,
+      "text": "2 2230 solid-state drive, Class 35 PCIe Gen4 x4 NVMe, up to 64 GT/s 256 GB"
+    },
+    {
+      "page": 238,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "● Windows 11 Pro"
+    },
+    {
+      "page": 239,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 240,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 243,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "RTX PRO are trademarks and/or registered trademarks of NVIDIA Corporation in the U"
+    },
+    {
+      "page": 244,
+      "fidelity": "text",
+      "chars": 141,
+      "text": "fn) / Accessories & Peripherals / WiFi and Networking / Dell Intel X710-T2L Dual Port 10GbE BASE-T Adapter, PCIe Full Height Customer Install"
+    },
+    {
+      "page": 247,
+      "fidelity": "text",
+      "chars": 37,
+      "text": "Learn why Intel vPro is the unrivaled"
+    },
+    {
+      "page": 248,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "Dell Pro Max Tower T2"
+    },
+    {
+      "page": 252,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "Memory configurations supported ● 8 GB: 1 x 8 GB, DDR5, 5600 MT/s, UDIMM, Non-ECC,"
+    },
+    {
+      "page": 253,
+      "fidelity": "text",
+      "chars": 44,
+      "text": "Network port One RJ45 ethernet port (1 Gbps)"
+    },
+    {
+      "page": 254,
+      "fidelity": "text",
+      "chars": 57,
+      "text": "● One full-height, full-length Gen4 x4 PCIe open-end slot"
+    },
+    {
+      "page": 255,
+      "fidelity": "text",
+      "chars": 74,
+      "text": "2 2230 solid-state drive, Class 35 PCIe Gen4 x4 NVMe, up to 64 GT/s 256 GB"
+    },
+    {
+      "page": 256,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "● Windows 11 Pro"
+    },
+    {
+      "page": 257,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 258,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 261,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "RTX PRO are trademarks and/or registered trademarks of NVIDIA Corporation in the U"
+    },
+    {
+      "page": 262,
+      "fidelity": "text",
+      "chars": 141,
+      "text": "fn) / Accessories & Peripherals / WiFi and Networking / Dell Intel X710-T2L Dual Port 10GbE BASE-T Adapter, PCIe Full Height Customer Install"
+    },
+    {
+      "page": 265,
+      "fidelity": "text",
+      "chars": 37,
+      "text": "Learn why Intel vPro is the unrivaled"
+    },
+    {
+      "page": 266,
+      "fidelity": "text",
+      "chars": 21,
+      "text": "Dell Pro Max Tower T2"
+    },
+    {
+      "page": 270,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "Memory configurations supported ● 8 GB: 1 x 8 GB, DDR5, 5600 MT/s, UDIMM, Non-ECC,"
+    },
+    {
+      "page": 271,
+      "fidelity": "text",
+      "chars": 44,
+      "text": "Network port One RJ45 ethernet port (1 Gbps)"
+    },
+    {
+      "page": 272,
+      "fidelity": "text",
+      "chars": 57,
+      "text": "● One full-height, full-length Gen4 x4 PCIe open-end slot"
+    },
+    {
+      "page": 273,
+      "fidelity": "text",
+      "chars": 74,
+      "text": "2 2230 solid-state drive, Class 35 PCIe Gen4 x4 NVMe, up to 64 GT/s 256 GB"
+    },
+    {
+      "page": 274,
+      "fidelity": "text",
+      "chars": 16,
+      "text": "● Windows 11 Pro"
+    },
+    {
+      "page": 275,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 276,
+      "fidelity": "text",
+      "chars": 114,
+      "text": "com/content/www/us/en/products/sku/241674/intel-core-ultra-5-processor-235-24m-cache-up-to-5-00-ghz/specifications"
+    },
+    {
+      "page": 279,
+      "fidelity": "text",
+      "chars": 82,
+      "text": "RTX PRO are trademarks and/or registered trademarks of NVIDIA Corporation in the U"
+    },
+    {
+      "page": 280,
+      "fidelity": "text",
+      "chars": 141,
+      "text": "fn) / Accessories & Peripherals / WiFi and Networking / Dell Intel X710-T2L Dual Port 10GbE BASE-T Adapter, PCIe Full Height Customer Install"
+    },
+    {
+      "page": 283,
+      "fidelity": "text",
+      "chars": 37,
+      "text": "Learn why Intel vPro is the unrivaled"
+    },
+    {
+      "page": 284,
+      "fidelity": "text",
+      "chars": 320,
+      "text": "วันที่ 21 สิงหาคม 2569 \n \nเรื่อง หนังสือรับรองผลิตภัณฑ์ โครงการประกวดราคาซื้อระบบอ านวยความสะดวกและความปลอดภัย ลานจอด\nอากาศยาน ท่าอากาศยานอุดรธานี ต าบลหมากแข้ง อ าเภอเมืองอุดรธานี จังหวัดอุดรธานี 1 ระบบ ครั้งที่ 2 \nเรียน คณะกรรมการพิจารณาผลการประกวดราคาอิเล็กทรอนิกส์ฯ \nอ้างถึง ประกาศประกวดราคาโครงการประกวดราคาซื้อระบบ"
+    },
+    {
+      "page": 286,
+      "fidelity": "text",
+      "chars": 61,
+      "text": "5 อุปกรณที่นำเสนอในโครงการ มี Refresh Rate ไมนอยกวา 60 Hz"
+    }
+  ]
+}
