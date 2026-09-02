@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
+import { billDraftKey, readBillDraft } from "@/lib/billDraftStorage";
 import BillEditor from "@/components/BillEditor";
 import EntryFormFA017 from "@/components/EntryFormFA017";
 import EntryFormFA018 from "@/components/EntryFormFA018";
@@ -49,6 +50,22 @@ export default function EntryFlow({
   // *this* EntryFlow's entry form (always EntryFormFA017 here) is exactly
   // "go back to the FA017 page", for free.
   const [handoffDraft, setHandoffDraft] = useState<Draft | null>(null);
+
+  // Reload recovery: if BillEditor stashed an unsaved review draft for this
+  // tab (lib/billDraftStorage.ts), jump straight back into the review editor
+  // with it — a reload otherwise remounts this component with handoffDraft
+  // null and shows the empty entry form, losing everything. Both keys are
+  // checked because EntryFormFA017's secondary button hands off a FA018
+  // draft from a type: "FA017" flow. (This only recovers the *review* stage;
+  // a draft still being typed into the friendly form above isn't persisted.)
+  useLayoutEffect(() => {
+    const saved =
+      readBillDraft(billDraftKey({ id: null, type })) ??
+      readBillDraft(billDraftKey({ id: null, type: type === "FA017" ? "FA018" : "FA017" }));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (saved) setHandoffDraft(saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

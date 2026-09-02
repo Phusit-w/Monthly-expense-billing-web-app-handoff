@@ -1,19 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { deleteSavedEmployee, rememberLastEmployee, saveEmployeeForReuse } from "@/actions/profile";
+import CollapsibleEntryRow from "@/components/CollapsibleEntryRow";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SavedItemPicker from "@/components/SavedItemPicker";
 import EntryEmployeeFields from "@/components/EntryEmployeeFields";
 import SavedListManager from "@/components/SavedListManager";
 import TravelRowCalculatorPanel from "@/components/TravelRowCalculatorPanel";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { currentDMY } from "@/lib/draft";
+import { fmt, num } from "@/lib/format";
 import { DEFAULT_ROWS_FA018, PAGE_ROWS } from "@/lib/constants";
 import { emptyItemFA018, isFA018ItemEmpty, padItems } from "@/lib/types";
 import type { Draft, EmployeeSnapshot, FA018Item, SavedEmployeeEntry, SavedItemEntry } from "@/lib/types";
 import { entryDraftKey } from "@/lib/entryDraft";
 import type { EntryDraftFA018 } from "@/lib/entryDraft";
+import { armNavGuard, disarmNavGuard } from "@/lib/navGuard";
 import { pendingTravelEntryKey } from "@/lib/travelRates";
 import type { PendingTravelEntry } from "@/lib/travelRates";
 import { useSavedItems } from "@/lib/useSavedItems";
@@ -59,6 +64,21 @@ export default function EntryFormFA018({
   const [justSavedRow, setJustSavedRow] = useState<number | null>(null);
   const [pendingSaveRow, setPendingSaveRow] = useState<number | null>(null);
   const [items, setItems] = useState<FA018Item[]>(freshItems);
+  // Which expense-line cards are collapsed (by row index) — see
+  // CollapsibleEntryRow. Add/remove-row only touch the list's end.
+  const [collapsedRows, setCollapsedRows] = useState<Set<number>>(() => new Set());
+  function toggleRow(i: number) {
+    setCollapsedRows((s) => {
+      const n = new Set(s);
+      if (n.has(i)) n.delete(i);
+      else n.add(i);
+      return n;
+    });
+  }
+  const allRowsCollapsed = items.length > 0 && items.every((_, i) => collapsedRows.has(i));
+  function toggleAllRows() {
+    setCollapsedRows(allRowsCollapsed ? new Set() : new Set(items.map((_, i) => i)));
+  }
   const [restored, setRestored] = useState(false);
   const restoreAppliedRef = useRef(false);
 
@@ -133,6 +153,18 @@ export default function EntryFormFA018({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restored, employee, items]);
 
+  // Prompt (via the shared app-shell guard, lib/navGuard.ts) before the
+  // sidebar links or the browser Back button drop anything typed in here.
+  // Same pristine gate as the autosave above.
+  const guardToken = useId();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (isFormPristine()) disarmNavGuard(guardToken);
+    else armNavGuard(guardToken, pathname);
+    return () => disarmNavGuard(guardToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employee, items, guardToken, pathname]);
+
   function isFormPristine(): boolean {
     return JSON.stringify(employee) === JSON.stringify(profile) && items.every(isFA018ItemEmpty);
   }
@@ -148,6 +180,7 @@ export default function EntryFormFA018({
     setItems(freshItems());
     setSavingRow(null);
     setJustSavedRow(null);
+    setCollapsedRows(new Set());
   }
 
   function setEmpField(field: "name" | "position" | "department" | "employeeNo", value: string) {
@@ -258,13 +291,19 @@ export default function EntryFormFA018({
         <div className="text-base font-medium">รายการค่าใช้จ่าย</div>
         <div className="flex flex-col gap-3">
           {items.map((it, i) => (
-            <div
+            <CollapsibleEntryRow
               key={i}
-              className="flex flex-wrap gap-3 rounded-field border border-line p-3.5 text-[13px]"
+              index={i}
+              collapsed={collapsedRows.has(i)}
+              onToggle={() => toggleRow(i)}
+              summary={
+                it.desc.trim() || (
+                  <span className="italic text-muted">ยังไม่ได้กรอกรายการ</span>
+                )
+              }
+              trailing={`${fmt(num(it.amount))} บาท`}
             >
-              <div className="w-9 self-center font-bold text-muted">
-                #{i + 1}
-              </div>
+              <div className="flex flex-wrap gap-3">
               <div className="min-w-[150px] flex-1">
                 <label className={labelClass}>วันที่</label>
                 <input
@@ -302,32 +341,19 @@ export default function EntryFormFA018({
                   className={`${inputClass} resize-none overflow-hidden leading-relaxed whitespace-pre-wrap break-words`}
                 />
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  {savedItemList.length > 0 && (
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        const desc = e.target.value;
-                        if (!desc) return;
-                        updateItem(i, "desc", desc);
-                        const saved = findSavedItem(desc);
-                        if (saved) {
-                          Object.entries(saved.data).forEach(([field, fieldValue]) =>
-                            updateItem(i, field as keyof FA018Item, fieldValue)
-                          );
-                        }
-                        e.target.value = "";
-                      }}
-                      title="เลือกรายการที่เคยบันทึกไว้"
-                      className="max-w-full rounded-chip border border-dashed border-line bg-surface px-3 py-1.5 text-[11px] text-label"
-                    >
-                      <option value="">เลือกรายการที่บันทึกไว้…</option>
-                      {savedItemList.map((entry) => (
-                        <option key={entry.desc} value={entry.desc}>
-                          {entry.desc}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                  <SavedItemPicker
+                    savedItems={savedItemList}
+                    onPick={(desc) => {
+                      updateItem(i, "desc", desc);
+                      const saved = findSavedItem(desc);
+                      if (saved) {
+                        Object.entries(saved.data).forEach(([field, fieldValue]) =>
+                          updateItem(i, field as keyof FA018Item, fieldValue)
+                        );
+                      }
+                    }}
+                    className="max-w-full rounded-chip border border-dashed border-line bg-surface px-3 py-1.5 text-[11px] text-label outline-none focus:border-ink"
+                  />
                   <button
                     type="button"
                     onClick={() => setPendingSaveRow(i)}
@@ -376,7 +402,8 @@ export default function EntryFormFA018({
                   className={inputClass}
                 />
               </div>
-            </div>
+              </div>
+            </CollapsibleEntryRow>
           ))}
         </div>
 
@@ -386,13 +413,18 @@ export default function EntryFormFA018({
           onDelete={removeSavedItem}
         />
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={addRow}>
             + เพิ่มรายการ
           </Button>
           <Button variant="danger" size="sm" onClick={removeLastRow}>
             − ลบรายการ
           </Button>
+          {items.length > 1 && (
+            <Button variant="outline" size="sm" onClick={toggleAllRows}>
+              {allRowsCollapsed ? "ขยายทุกรายการ" : "ย่อทุกรายการ"}
+            </Button>
+          )}
         </div>
       </Card>
 

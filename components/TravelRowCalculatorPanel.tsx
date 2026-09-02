@@ -52,7 +52,7 @@ export default function TravelRowCalculatorPanel({
         คำนวณค่าเดินทาง {open ? "▲" : "▼"}
       </button>
       {open && (
-        <div className="mt-2 w-full rounded-field border border-line bg-[#f8f8f8] px-3 py-2.5">
+        <div className="mt-2 w-full rounded-field border border-line bg-ground px-3 py-2.5">
           <div className="mb-2 flex gap-1.5 rounded-input bg-chip p-1">
             <button
               type="button"
@@ -67,6 +67,23 @@ export default function TravelRowCalculatorPanel({
               className={tabClass(calc.mode === "meter")}
             >
               Taxi Meter
+            </button>
+          </div>
+
+          <div className="mb-2 flex gap-1.5 rounded-input bg-chip p-1">
+            <button
+              type="button"
+              onClick={() => calc.setTripType("oneway")}
+              className={tabClass(calc.tripType === "oneway")}
+            >
+              ไปอย่างเดียว
+            </button>
+            <button
+              type="button"
+              onClick={() => calc.setTripType("roundtrip")}
+              className={tabClass(calc.tripType === "roundtrip")}
+            >
+              ไป-กลับ
             </button>
           </div>
 
@@ -171,7 +188,13 @@ export default function TravelRowCalculatorPanel({
 
           <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
             <div className="text-[13px] font-bold">
-              {calc.hasResult ? `${fmt(calc.resultAmount, 0)} บาท` : "—"}
+              {calc.hasResult
+                ? `${fmt(calc.resultAmount, 0)} บาท${
+                    calc.tripType === "roundtrip"
+                      ? ` (ไป-กลับ · ${fmt(calc.oneWayAmount, 0)}×2)`
+                      : ""
+                  }`
+                : "—"}
             </div>
             <div className="flex gap-1.5">
               <Button

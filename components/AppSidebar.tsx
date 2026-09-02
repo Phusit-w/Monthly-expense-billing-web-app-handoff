@@ -3,10 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import { logout } from "@/actions/auth";
 import { NAV_ITEMS, isNavItemActive } from "@/lib/nav";
+import {
+  disarmAllNavGuards,
+  getNavGuardServerSnapshot,
+  getNavGuardSnapshot,
+  subscribeNavGuard,
+} from "@/lib/navGuard";
 import { LogOutIcon } from "@/components/icons";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import ConfirmLogoutModal from "@/components/ConfirmLogoutModal";
 
 // The floating black navigation rail from the Claude Design mockup + the
@@ -22,6 +29,62 @@ export default function AppSidebar({ role }: { role: string }) {
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const [loggingOut, startLogout] = useTransition();
 
+  // "There are unsaved edits in the form on screen" — set by BillEditor and
+  // the entry forms (lib/navGuard.ts). While true, leaving via a sidebar
+  // link, the logout button or the browser Back button asks first.
+  const { dirty } = useSyncExternalStore(
+    subscribeNavGuard,
+    getNavGuardSnapshot,
+    getNavGuardServerSnapshot,
+  );
+
+  // A navigation held back pending confirmation.
+  const [blocked, setBlocked] = useState<
+    | { kind: "link"; href: string }
+    | { kind: "logout" }
+    | { kind: "back" }
+    | null
+  >(null);
+
+  // Browser Back / Forward while the form has unsaved edits.
+  //
+  // The App Router owns the History API (it patches pushState and consumes
+  // the popstate of any real route change before other listeners see it),
+  // so a listener can't observe — let alone cancel — a plain Back that
+  // leaves the form. The workaround: while dirty, keep one throwaway
+  // history entry on top whose URL is the *same* as the form's. The first
+  // Back pops that instead of navigating anywhere; the router sees no URL
+  // change and stays out of it, so this popstate does reach us. We re-push
+  // it and open the confirm.
+  //
+  // The sentinel is deliberately NOT popped on cleanup: doing so races the
+  // real navigation that usually causes the cleanup (a save's router.push,
+  // a confirmed leave) and can cancel it. It's a harmless leftover — its
+  // URL is the form's, so at worst a later Back lands on the form once and,
+  // if its draft autosave is still around, re-arms this guard.
+  useEffect(() => {
+    if (!dirty) return;
+
+    const pushSentinel = () => {
+      window.history.pushState(
+        { ...window.history.state, __navGuardSentinel: true },
+        "",
+      );
+    };
+    pushSentinel();
+
+    const onPopState = () => {
+      if (!getNavGuardSnapshot().dirty) return;
+      // Our sentinel was just consumed — re-arm so a second Back is caught
+      // too, then ask.
+      pushSentinel();
+      setBlocked({ kind: "back" });
+    };
+    window.addEventListener("popstate", onPopState);
+
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [dirty]);
+
   function handleConfirmLogout() {
     setConfirmingLogout(false);
     startLogout(async () => {
@@ -29,6 +92,38 @@ export default function AppSidebar({ role }: { role: string }) {
       router.push("/login");
       router.refresh();
     });
+  }
+
+  // "ออกโดยไม่บันทึก" — the user accepts losing the in-progress form.
+  function proceedBlocked() {
+    const b = blocked;
+    setBlocked(null);
+    if (!b) return;
+    disarmAllNavGuards();
+
+    if (b.kind === "back") {
+      // We're on the re-pushed sentinel (URL = form). Step back past it and
+      // the form's own entry to where Back was headed. dirty is already
+      // false, so onPopState no-ops on the way through.
+      window.history.go(-2);
+    } else if (b.kind === "link") {
+      // Sentinel is still on top; replace it so the abandoned-form
+      // excursion doesn't linger in history behind the destination.
+      router.replace(b.href);
+    } else {
+      startLogout(async () => {
+        await logout();
+        router.push("/login");
+        router.refresh();
+      });
+    }
+  }
+
+  // "อยู่หน้านี้ต่อ" / "กลับไปที่ฟอร์ม" — stay with the form. The sentinel
+  // was already re-pushed in onPopState (back case) or never left (link /
+  // logout case), so there's nothing to undo.
+  function cancelBlocked() {
+    setBlocked(null);
   }
 
   const labelStyle: React.CSSProperties = {
@@ -111,6 +206,12 @@ export default function AppSidebar({ role }: { role: string }) {
                   href={item.href}
                   title={item.label}
                   aria-current={active ? "page" : undefined}
+                  onNavigate={(e) => {
+                    if (dirty && !active) {
+                      e.preventDefault();
+                      setBlocked({ kind: "link", href: item.href });
+                    }
+                  }}
                   onClick={() => setExpanded(false)}
                   className="group flex items-center gap-3 px-4"
                 >
@@ -134,7 +235,9 @@ export default function AppSidebar({ role }: { role: string }) {
 
         <button
           type="button"
-          onClick={() => setConfirmingLogout(true)}
+          onClick={() =>
+            dirty ? setBlocked({ kind: "logout" }) : setConfirmingLogout(true)
+          }
           disabled={loggingOut}
           title="ออกจากระบบ"
           className="ui-btn group mt-auto flex items-center gap-3 bg-transparent px-4 disabled:opacity-60"
@@ -156,6 +259,21 @@ export default function AppSidebar({ role }: { role: string }) {
         loggingOut={loggingOut}
         onConfirm={handleConfirmLogout}
         onCancel={() => setConfirmingLogout(false)}
+      />
+
+      <ConfirmDialog
+        open={blocked !== null}
+        title={blocked?.kind === "logout" ? "ออกจากระบบ?" : "ออกจากฟอร์มนี้?"}
+        message={
+          blocked?.kind === "logout"
+            ? "ข้อมูลในฟอร์มที่ยังไม่ได้บันทึกจะหายไป ต้องการออกจากระบบใช่หรือไม่?"
+            : "ข้อมูลในฟอร์มที่ยังไม่ได้บันทึกจะหายไป ต้องการออกจากหน้านี้ใช่หรือไม่?"
+        }
+        confirmLabel={blocked?.kind === "logout" ? "ออกจากระบบ" : "ออกโดยไม่บันทึก"}
+        cancelLabel={blocked?.kind === "back" ? "กลับไปที่ฟอร์ม" : "อยู่หน้านี้ต่อ"}
+        danger
+        onConfirm={proceedBlocked}
+        onCancel={cancelBlocked}
       />
     </>
   );

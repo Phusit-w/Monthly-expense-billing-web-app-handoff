@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useId, useLayoutEffect, useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { saveRecord } from "@/actions/records";
+import { billDraftKey, clearBillDraft, readBillDraft, writeBillDraft } from "@/lib/billDraftStorage";
+import { armNavGuard, disarmNavGuard } from "@/lib/navGuard";
 import { fa017RowTotal, fa017Totals, fa018Total } from "@/lib/totals";
 import { fmt } from "@/lib/format";
 import { emptyItemFA017, emptyItemFA018, padItems } from "@/lib/types";
@@ -14,11 +16,9 @@ import type {
   ItemField,
   SavedItemEntry,
 } from "@/lib/types";
-import { exportPagesToPdf } from "@/lib/exportPdf";
 import {
+  DEFAULT_ROWS_FA017,
   DEFAULT_ROWS_FA018,
-  PAGE_HEIGHT_BUDGET_FA017,
-  PAGE_HEIGHT_BUDGET_FA018,
   PAPER_WIDTH_FA017,
   PAPER_WIDTH_FA018,
   THAI_MONTHS,
@@ -41,14 +41,13 @@ export default function BillEditor({
 }: {
   initialDraft: Draft;
   savedItems: SavedItemEntry[];
-  // Overrides "ย้อนกลับ"'s default router.push (below) — needed by
-  // EntryFlow.tsx, which renders this component *in place* of the entry
-  // form on the same URL (see its own comment on why) rather than
-  // navigating to it. router.push to a URL matching the current one is a
-  // no-op in the App Router, so without this override the back button would
-  // silently do nothing whenever BillEditor got here via that swap.
-  // EntryFlow passes a callback that flips its own state back to show the
-  // entry form again instead.
+  // Set only by EntryFlow.tsx, which renders this component *in place* of
+  // its entry form on the same URL. Two uses: it makes the unsaved-changes
+  // guard treat the review as always worth protecting (getting here means
+  // real entry-form input), and the recovery banner's "เริ่มใหม่" calls it
+  // to un-swap back to the (empty) entry form. EntryFlow passes a callback
+  // that flips its own state back. On the standalone /bill routes it's
+  // undefined and neither behaviour applies.
   onBack?: () => void;
   // Audit trail (ExpenseRecordData.createdByName/updatedByName) — undefined
   // for a brand-new, not-yet-saved draft (app/bill/new/[type]/page.tsx),
@@ -60,19 +59,86 @@ export default function BillEditor({
 }) {
   const [draft, setDraft] = useState<Draft>(initialDraft);
   const [pending, startTransition] = useTransition();
-  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [confirmingSave, setConfirmingSave] = useState(false);
   const router = useRouter();
-  // Wraps just the FA017Form/FA018Form output (not Header/EditorToolbar) so
-  // exportPagesToPdf's ".paper" query below can't pick up unrelated markup.
-  const pagesRef = useRef<HTMLDivElement>(null);
-  // Set by handleCreateFA018 right before it flips `draft` over to a fresh
-  // FA018 draft in place (no navigation) — holds the FA017 draft exactly as
-  // it stood at that moment (including any unsaved edits), so handleBack
-  // below can undo the in-place conversion and land back on that same FA017
-  // view, instead of navigating away to the entry form as if "ย้อนกลับ" had
-  // been clicked on a plain FA017 view that was never converted.
-  const preConversionDraftRef = useRef<Draft | null>(null);
+  const pathname = usePathname();
+  const guardToken = useId();
+
+  // Reload / tab close / hard cross-document navigation while there are
+  // unsaved edits: the browser's native "Leave site? Changes you made may
+  // not be saved" prompt. `setDraft` always makes a new object, so
+  // `draft !== initialDraft` is "the user has edited something".
+  //
+  // No popstate/history trap for the browser Back button *here* — in the
+  // Next App Router `window.history.pushState` is patched to drive the
+  // router, so pushing a trap entry stalls client navigation (a sidebar
+  // link hangs on "Rendering"). Instead this feeds the shared app-shell
+  // guard (lib/navGuard.ts); AppSidebar owns a listen-only popstate handler
+  // and intercepts its own nav links to prompt before leaving. beforeunload
+  // below still covers the cases that never reach that guard — reload, tab
+  // close, hard cross-document navigation.
+  const isDirty = draft !== initialDraft;
+  useEffect(() => {
+    if (!isDirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [isDirty]);
+
+  // Arm the shared guard (sidebar links + browser Back) whenever there are
+  // unsaved edits. returnHref = this editor's own URL so "กลับไปที่ฟอร์ม"
+  // can bounce back to it (the autosave stash above then repopulates it).
+  useEffect(() => {
+    if (isDirty) armNavGuard(guardToken, pathname);
+    else disarmNavGuard(guardToken);
+    return () => disarmNavGuard(guardToken);
+  }, [isDirty, pathname, guardToken]);
+
+  // Crash/reload recovery (see lib/billDraftStorage.ts). storageKey is
+  // derived from props, so it's stable for the life of this editor.
+  const storageKey = billDraftKey(initialDraft);
+  const [recovered, setRecovered] = useState(false);
+
+  // Restore a stashed draft on mount, before paint (useLayoutEffect) so
+  // there's no empty→populated flash. Skipped if the underlying saved
+  // record has moved on since the stash was written (someone else saved
+  // it) — its optimistic-lock token wouldn't match, so the stash is
+  // discarded rather than resurrecting edits against a stale version.
+  // The setState here is a one-shot pull of per-tab sessionStorage into
+  // state on mount — client-only, so it can't be a useState initializer
+  // (that would hydration-mismatch) and there's no server snapshot for
+  // useSyncExternalStore. Runs once, hence the empty deps.
+  useLayoutEffect(() => {
+    const saved = readBillDraft(storageKey);
+    if (!saved) return;
+    if (saved.id === initialDraft.id && saved.updatedAt !== initialDraft.updatedAt) {
+      clearBillDraft(storageKey);
+      return;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraft(saved);
+    setRecovered(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Stash on every edit; the pristine initial draft isn't worth writing.
+  useEffect(() => {
+    if (draft === initialDraft) return;
+    writeBillDraft(storageKey, draft);
+  }, [draft, initialDraft, storageKey]);
+
+  // Recovery banner's "เริ่มใหม่จากที่บันทึกไว้": drop the stash and go back
+  // to the clean starting point — the friendly entry form in EntryFlow, or
+  // the saved/blank draft on the standalone editor routes.
+  function discardRecovery() {
+    clearBillDraft(storageKey);
+    setRecovered(false);
+    if (onBack) onBack();
+    else setDraft(initialDraft);
+  }
 
   const paperWidth = draft.type === "FA018" ? PAPER_WIDTH_FA018 : PAPER_WIDTH_FA017;
   const heading = draft.id ? "กำลังแก้ไขรายการ" : "สร้างรายการใหม่";
@@ -142,7 +208,6 @@ export default function BillEditor({
   // an amount-only-from-localAmt mapping silently dropped those, handing
   // off a FA018 row with a description but a blank/zero amount.
   function handleCreateFA018() {
-    preConversionDraftRef.current = draft;
     setDraft((d) => ({
       id: null,
       updatedAt: null,
@@ -168,67 +233,48 @@ export default function BillEditor({
     }));
   }
 
-  function handleCancel() {
-    router.push("/records");
+  // "สร้างฟอร์ม Expense Claim" — the reverse of handleCreateFA018: flips an
+  // FA018 bill over to a fresh FA017 draft in place. วันที่ / รายการ /
+  // เลขที่โครงการ carry over to Date / Description of Expenses / Project /
+  // CC; จำนวนเงิน lands in the "Other" column (FA017 has seven category
+  // columns and nothing here says which — re-categorise in the editor).
+  // Same id: null semantics — only ever creates a new record on save,
+  // never touches the FA018 bill it was built from.
+  function handleCreateFA017() {
+    setDraft((d) => ({
+      id: null,
+      updatedAt: null,
+      type: "FA017",
+      day: d.day,
+      monthName: d.monthName,
+      monthYear: d.monthYear,
+      employee: d.employee,
+      remark: "",
+      items: padItems(
+        (d.items as FA018Item[]).map((it): FA017Item => ({
+          ...emptyItemFA017(),
+          date: it.date,
+          desc: it.desc,
+          projectCC: it.projectNo,
+          other: it.amount,
+        })),
+        DEFAULT_ROWS_FA017,
+        emptyItemFA017
+      ),
+    }));
   }
 
-  // Default "ย้อนกลับ": navigate to the corresponding friendly entry form
-  // (/bill/entry/[type]) rather than browser history — this screen can be
-  // reached via a fresh /bill/new/[type] visit or editing /bill/[id], and
-  // history isn't a reliable "back" for either (there may be no matching
-  // entry-form visit in it at all, e.g. this new-tab handoff route). The
-  // onBack prop overrides this entirely for EntryFlow's in-place swap case
-  // (see this component's onBack doc comment above) — this branch never
-  // runs there. Same tradeoff EntryFlow.tsx's own comment already accepts
-  // elsewhere: this doesn't restore whatever was typed into that entry form
-  // before landing here, it just starts it fresh.
-  //
-  // preConversionDraftRef check comes first and pre-empts both of the above:
-  // if this FA017 view was just flipped to FA018 in place via "สร้างฟอร์ม
-  // ใบรับรองแทนใบเสร็จ" (handleCreateFA018), "ย้อนกลับ" should undo that and
-  // land back on the FA017 view the user was actually just looking at —
-  // not the FA018/FA017 entry form (routing there via initialDraft.type
-  // used to be this function's whole job, back when the only options were
-  // "the entry form" or the onBack override; it was never "restore the
-  // in-place conversion" because nothing captured the pre-conversion draft
-  // to restore).
-  function handleBack() {
-    if (preConversionDraftRef.current) {
-      setDraft(preConversionDraftRef.current);
-      preConversionDraftRef.current = null;
-      return;
-    }
-    if (onBack) {
-      onBack();
-      return;
-    }
-    router.push(`/bill/entry/${initialDraft.type.toLowerCase()}`);
-  }
-
+  // The one and only way to get a PDF out of the editor: the browser's own
+  // print dialog, whose "Save as PDF" destination renders the A4 `.paper`
+  // sheets with Chrome's real layout engine — pixel-identical to the form
+  // on screen. An earlier "ดาวน์โหลด PDF" button rasterised the sheets with
+  // html2canvas for a one-click download with no dialog, but html2canvas
+  // reimplements CSS layout itself and never matched the real render
+  // (text drifting onto the table grid lines, wrapped rows clipped); it was
+  // removed in favour of this. See lib/exportPdf.ts (now unused) for that
+  // history.
   function handlePrint() {
     window.print();
-  }
-
-  function pdfFilename(): string {
-    const name = draft.employee.name.trim().replace(/[\\/:*?"<>|]+/g, "") || "form";
-    return `${draft.type}-${name}-${draft.monthName}-${draft.monthYear}.pdf`;
-  }
-
-  // "ดาวน์โหลด PDF" — separate from handlePrint's window.print() (which
-  // opens the browser's print dialog; saving as PDF there is just one of
-  // several destinations the user has to pick). This downloads the .pdf
-  // file directly in one click, no dialog. See lib/exportPdf.ts.
-  async function handleDownloadPdf() {
-    if (!pagesRef.current || downloadingPdf) return;
-    setDownloadingPdf(true);
-    try {
-      await exportPagesToPdf(pagesRef.current, pdfFilename(), {
-        widthPx: parseFloat(paperWidth),
-        heightPx: draft.type === "FA018" ? PAGE_HEIGHT_BUDGET_FA018 : PAGE_HEIGHT_BUDGET_FA017,
-      });
-    } finally {
-      setDownloadingPdf(false);
-    }
   }
 
   // "บันทึก" (EditorToolbar) opens ConfirmSaveModal instead of saving
@@ -255,6 +301,11 @@ export default function BillEditor({
         );
         return;
       }
+      // Saved — the recovery stash for this draft is now obsolete, and the
+      // edits are no longer "unsaved", so don't let the guard prompt on the
+      // navigation to /records.
+      clearBillDraft(storageKey);
+      disarmNavGuard(guardToken);
       router.push("/records");
     });
   }
@@ -276,17 +327,29 @@ export default function BillEditor({
         paperWidth={paperWidth}
         heading={heading}
         auditLine={auditLine}
-        onBack={handleBack}
-        onCancel={handleCancel}
         onPrint={handlePrint}
-        onDownloadPdf={handleDownloadPdf}
-        downloadingPdf={downloadingPdf}
         onCreateFA018={draft.type === "FA017" ? handleCreateFA018 : undefined}
+        onCreateFA017={draft.type === "FA018" ? handleCreateFA017 : undefined}
         onSave={handleSave}
         saving={pending}
         addRow={addRow}
         removeLastRow={removeLastRow}
       />
+      {recovered && (
+        <div
+          className="no-print mx-auto mb-3 flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-peach px-4 py-2 text-[13px] text-black"
+          style={{ maxWidth: paperWidth }}
+        >
+          <span>กู้คืนข้อมูลที่แก้ไขค้างไว้ (ยังไม่ได้บันทึก) จากครั้งก่อน</span>
+          <button
+            type="button"
+            onClick={discardRecovery}
+            className="ui-btn whitespace-nowrap rounded-chip border border-black/40 px-3 py-1 text-xs font-medium text-black transition-colors hover:bg-black/5"
+          >
+            เริ่มใหม่จากที่บันทึกไว้
+          </button>
+        </div>
+      )}
       {/* FA018's printed form has no "ประจำเดือน" field (removed from
           FA018Form.tsx per an earlier request — see that file's comment),
           but draft.monthName/monthYear are still real data RecordsTable
@@ -336,7 +399,7 @@ export default function BillEditor({
           { label: "ยอดรวม", value: fmt(modalTotal) },
         ]}
       />
-      <div ref={pagesRef}>
+      <div>
         {draft.type === "FA018" ? (
           <FA018Form
             draft={draft}
