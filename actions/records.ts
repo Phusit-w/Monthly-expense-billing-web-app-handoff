@@ -49,15 +49,13 @@ function computeTotal(draft: Draft): number {
 }
 
 export async function listRecords(): Promise<ExpenseRecordData[]> {
-  const actor = await requireActor();
-  // `ownerId` is null on every record saved before per-user ownership
-  // existed — those stay visible to everyone (matching this app's original
-  // "no permission levels" design) rather than disappearing for non-admins.
+  // No per-owner visibility restriction: every logged-in account sees every
+  // record, matching this app's "no permission levels" design — `ownerId`
+  // is recorded for audit purposes only (see createdByName), not used to
+  // gate reads.
+  await requireActor();
   const rows = await prisma.expenseRecord.findMany({
-    where: {
-      deletedAt: null,
-      ...(actor.role === "ADMIN" ? {} : { OR: [{ ownerId: actor.id }, { ownerId: null }] }),
-    },
+    where: { deletedAt: null },
     orderBy: { updatedAt: "desc" },
   });
   return rows.map(serialize);
@@ -132,12 +130,7 @@ export async function saveRecord(
   // (reload before editing further).
   const { record: existing } = await authorizeExpenseRecord(draft.id);
   const result = await prisma.expenseRecord.updateMany({
-    where: {
-      id: draft.id,
-      deletedAt: null,
-      updatedAt: new Date(draft.updatedAt!),
-      ...(actor.role === "ADMIN" ? {} : { OR: [{ ownerId: actor.id }, { ownerId: null }] }),
-    },
+    where: { id: draft.id, deletedAt: null, updatedAt: new Date(draft.updatedAt!) },
     data,
   });
   if (result.count === 0) {
