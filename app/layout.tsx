@@ -23,7 +23,7 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
 });
 
 export const metadata: Metadata = {
-  title: "ระบบบิลค่าใช้จ่ายรายเดือน",
+  title: "ICN APPS",
   description: "ระบบกรอกและพิมพ์แบบฟอร์มเบิกค่าใช้จ่ายรายเดือน (F-FA-017 / F-FA-018)",
 };
 
