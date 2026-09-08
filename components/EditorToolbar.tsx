@@ -5,17 +5,20 @@ import Button from "@/components/ui/Button";
 
 // The editor's top bar (Claude Design "Turn 4a" — a white rounded card
 // above the untouched black-and-white A4 paper). See BillEditor.tsx for
-// what each button does. "พิมพ์ / PDF" (onPrint) is the only way to get a
-// PDF: the browser's print dialog has a "Save as PDF" destination that
-// renders the sheet with Chrome's real layout engine. Former "ดาวน์โหลด
-// PDF" (html2canvas), "← ย้อนกลับ" and "ยกเลิก" buttons were all removed;
-// leaving the editor is now the browser Back (with its unsaved-changes
+// what each button does. Saved records also expose direct server-rendered
+// PDF download; "พิมพ์ / PDF" remains the browser-native fallback. The
+// former html2canvas exporter is intentionally not used because its CSS
+// reimplementation distorted the form. "← ย้อนกลับ" and "ยกเลิก" remain
+// removed; leaving the editor is the browser Back (with its unsaved-changes
 // guard) or the sidebar (the draft is autosaved either way).
 export default function EditorToolbar({
   paperWidth,
   heading,
   auditLine,
   onPrint,
+  onDownloadPdf,
+  downloadingPdf,
+  downloadRequiresSave,
   onCreateFA018,
   onCreateFA017,
   onSave,
@@ -27,6 +30,9 @@ export default function EditorToolbar({
   heading: string;
   auditLine?: string;
   onPrint: () => void;
+  onDownloadPdf: () => void;
+  downloadingPdf?: boolean;
+  downloadRequiresSave?: boolean;
   // onCreateFA018 only for an FA017 draft, onCreateFA017 only for an FA018
   // draft — undefined hides that button entirely.
   onCreateFA018?: () => void;
@@ -68,6 +74,20 @@ export default function EditorToolbar({
       </div>
 
       <div className="ml-auto flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="billing-pdf-download whitespace-nowrap border-ink text-ink"
+          onClick={onDownloadPdf}
+          disabled={downloadingPdf}
+          title={
+            downloadRequiresSave
+              ? "มีข้อมูลที่ยังไม่บันทึก — กดเพื่อเปิดขั้นตอนบันทึกก่อนดาวน์โหลด"
+              : "ดาวน์โหลด PDF จากข้อมูลล่าสุดที่บันทึกไว้"
+          }
+        >
+          {downloadingPdf ? "กำลังสร้าง PDF…" : "ดาวน์โหลด PDF"}
+        </Button>
         <Button
           variant="outline"
           size="sm"

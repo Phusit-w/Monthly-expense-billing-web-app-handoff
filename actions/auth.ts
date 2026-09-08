@@ -12,7 +12,10 @@ export async function login(
   username: string,
   password: string
 ): Promise<{ ok: true; mustChangePassword: boolean } | { ok: false; error: string }> {
-  const trimmedUsername = username.trim();
+  // Usernames are canonicalized to lowercase when accounts are created or
+  // renamed (actions/admin.ts). Apply the same normalization at login so a
+  // user can enter AdminTest or admintest without an exact-case mismatch.
+  const trimmedUsername = username.trim().toLowerCase();
   if (!trimmedUsername || !password) {
     return { ok: false, error: "กรุณากรอก username และ password" };
   }

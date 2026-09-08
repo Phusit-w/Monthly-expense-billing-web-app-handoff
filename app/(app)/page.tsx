@@ -66,6 +66,8 @@ const TILES: Tile[] = [
     cta: "เปิดเครื่องมือ →",
     icon: ClipboardCheckIcon,
     tile: "bg-chip text-ink",
+    // Paused 2026-09-07 — see lib/nav.ts for why.
+    soon: true,
   },
 ];
 

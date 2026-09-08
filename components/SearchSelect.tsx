@@ -52,12 +52,22 @@ export default function SearchSelect({
       if (triggerRef.current?.contains(t) || listRef.current?.contains(t)) return;
       close();
     }
+    function onScroll(e: Event) {
+      // The listener runs in capture mode so it can notice scrollable page
+      // ancestors and close a fixed-position portal that would otherwise be
+      // left behind. A scroll on the dropdown's own overflow panel is valid
+      // interaction, though; closing there made long saved-name/item lists
+      // disappear the moment their scrollbar was used.
+      const target = e.target;
+      if (target instanceof Node && listRef.current?.contains(target)) return;
+      close();
+    }
     document.addEventListener("mousedown", onDown);
-    window.addEventListener("scroll", close, true);
+    window.addEventListener("scroll", onScroll, true);
     window.addEventListener("resize", close);
     return () => {
       document.removeEventListener("mousedown", onDown);
-      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("scroll", onScroll, true);
       window.removeEventListener("resize", close);
     };
   }, [open]);

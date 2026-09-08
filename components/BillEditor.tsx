@@ -7,6 +7,7 @@ import { billDraftKey, clearBillDraft, readBillDraft, writeBillDraft } from "@/l
 import { armNavGuard, disarmNavGuard } from "@/lib/navGuard";
 import { fa017RowTotal, fa017Totals, fa018Total } from "@/lib/totals";
 import { fmt } from "@/lib/format";
+import { downloadBillingPdf } from "@/lib/downloadBillingPdf";
 import { emptyItemFA017, emptyItemFA018, padItems } from "@/lib/types";
 import type {
   Draft,
@@ -60,6 +61,7 @@ export default function BillEditor({
   const [draft, setDraft] = useState<Draft>(initialDraft);
   const [pending, startTransition] = useTransition();
   const [confirmingSave, setConfirmingSave] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const guardToken = useId();
@@ -96,6 +98,16 @@ export default function BillEditor({
     else disarmNavGuard(guardToken);
     return () => disarmNavGuard(guardToken);
   }, [isDirty, pathname, guardToken]);
+
+  // The records table opens a saved bill with ?print=1. Wait for the first
+  // client paint so measured pagination and fonts are in place, then open
+  // the browser print dialog. Direct PDF generation uses ?pdf=1 and never
+  // enters this path.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("print") !== "1") return;
+    const frame = window.requestAnimationFrame(() => window.print());
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   // Crash/reload recovery (see lib/billDraftStorage.ts). storageKey is
   // derived from props, so it's stable for the life of this editor.
@@ -264,17 +276,32 @@ export default function BillEditor({
     }));
   }
 
-  // The one and only way to get a PDF out of the editor: the browser's own
-  // print dialog, whose "Save as PDF" destination renders the A4 `.paper`
-  // sheets with Chrome's real layout engine — pixel-identical to the form
-  // on screen. An earlier "ดาวน์โหลด PDF" button rasterised the sheets with
-  // html2canvas for a one-click download with no dialog, but html2canvas
-  // reimplements CSS layout itself and never matched the real render
-  // (text drifting onto the table grid lines, wrapped rows clipped); it was
-  // removed in favour of this. See lib/exportPdf.ts (now unused) for that
-  // history.
+  // Browser-native print remains the fallback for direct server-side PDF
+  // download. Both paths use Chromium's real CSS layout engine. The old
+  // html2canvas exporter remains intentionally unused because it shifted
+  // text onto grid lines and clipped wrapped rows.
   function handlePrint() {
     window.print();
+  }
+
+  async function handleDownloadPdf() {
+    if (!draft.id || isDirty) {
+      const shouldSave = window.confirm(
+        "มีข้อมูลที่ยังไม่ได้บันทึก ต้องบันทึกก่อนจึงจะดาวน์โหลด PDF ได้\n\nต้องการเปิดขั้นตอนบันทึกตอนนี้หรือไม่?"
+      );
+      if (shouldSave) setConfirmingSave(true);
+      return;
+    }
+    if (downloadingPdf) return;
+    setDownloadingPdf(true);
+    try {
+      await downloadBillingPdf(draft.id, draft.type);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "สร้าง PDF ไม่สำเร็จ";
+      window.alert(`${message}\n\nกรุณาใช้ปุ่ม “พิมพ์ / PDF” เป็นทางสำรอง`);
+    } finally {
+      setDownloadingPdf(false);
+    }
   }
 
   // "บันทึก" (EditorToolbar) opens ConfirmSaveModal instead of saving
@@ -328,6 +355,9 @@ export default function BillEditor({
         heading={heading}
         auditLine={auditLine}
         onPrint={handlePrint}
+        onDownloadPdf={handleDownloadPdf}
+        downloadingPdf={downloadingPdf}
+        downloadRequiresSave={!draft.id || isDirty}
         onCreateFA018={draft.type === "FA017" ? handleCreateFA018 : undefined}
         onCreateFA017={draft.type === "FA018" ? handleCreateFA017 : undefined}
         onSave={handleSave}

@@ -201,6 +201,15 @@ model SocCheckResult {
   aiContentRelevance    String
   aiDetail              String
   aiConfidence          String
+  // Automated results are separated by engine. The legacy ai* columns stay
+  // populated for compatibility with existing review/export code.
+  keywordMatch          String?
+  ruleVerdict           String?
+  aiVerdict             String?
+  semanticEvidence      Json?
+  verdictReason         String?
+  semanticEngineVersion String?
+  benchmarkVersion      String?
   finalReferenceCheck   String
   finalHeadingTitleCheck String
   finalProductIdentity  String

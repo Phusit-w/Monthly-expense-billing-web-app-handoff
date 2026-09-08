@@ -1,28 +1,33 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createUser, resetUserPassword, setUserActive, setUserRole } from "@/actions/admin";
+import { useRouter } from "next/navigation";
+import { changeUsername, createUser, resetUserPassword, setUserActive, setUserRole } from "@/actions/admin";
 import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";
 import ResetPasswordModal from "@/components/ResetPasswordModal";
+import EditUsernameModal from "@/components/EditUsernameModal";
 
 type AdminUser = { id: string; username: string; displayName: string; role: string; isActive: boolean; mustChangePassword: boolean; createdAt: string };
-type ActionResult = { ok: boolean; error?: string; temporaryPassword?: string; username?: string };
+type ActionResult = { ok: boolean; error?: string; message?: string; temporaryPassword?: string; username?: string; selfChanged?: boolean };
 
 function messageFor(result: ActionResult) {
   if (!result.ok) return result.error ?? "ไม่สำเร็จ";
+  if (result.message) return result.message;
   if (result.temporaryPassword) return `รหัสผ่านชั่วคราว (แสดงครั้งเดียว): ${result.temporaryPassword}`;
   if (result.username) return `รีเซ็ตรหัสผ่าน ${result.username} แล้ว — ผู้ที่ใช้บัญชีนี้อยู่จะถูกให้ login ใหม่ด้วยรหัสใหม่`;
   return "บันทึกเรียบร้อย";
 }
 
 export default function AdminUsersManager({ users }: { users: AdminUser[] }) {
+  const router = useRouter();
   const [pending, start] = useTransition();
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [role, setRole] = useState<"USER" | "ADMIN">("USER");
   const [resetTarget, setResetTarget] = useState<AdminUser | null>(null);
+  const [usernameTarget, setUsernameTarget] = useState<AdminUser | null>(null);
   const show = (r: ActionResult) => setMessage(messageFor(r));
 
   return <div className="space-y-6">
@@ -39,6 +44,7 @@ export default function AdminUsersManager({ users }: { users: AdminUser[] }) {
         <td className="p-4"><select className="rounded-input border border-line bg-surface p-2" value={u.role} disabled={pending} onChange={(e) => start(async () => show(await setUserRole(u.id, e.target.value as "USER" | "ADMIN")))}><option>USER</option><option>ADMIN</option></select></td>
         <td className="p-4">{u.isActive ? "ใช้งาน" : "ปิดใช้งาน"}</td>
         <td className="p-4"><div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" disabled={pending} onClick={() => setUsernameTarget(u)}>เปลี่ยน Username</Button>
           <Button size="sm" variant="outline" disabled={pending} onClick={() => setResetTarget(u)}>รีเซ็ตรหัสผ่าน</Button>
           <Button size="sm" variant={u.isActive ? "danger" : "outline"} disabled={pending} onClick={() => start(async () => show(await setUserActive(u.id, !u.isActive)))}>{u.isActive ? "ปิดบัญชี" : "เปิดบัญชี"}</Button>
         </div></td>
@@ -46,7 +52,7 @@ export default function AdminUsersManager({ users }: { users: AdminUser[] }) {
     </tbody></table></div>
 
     <ResetPasswordModal
-      key={resetTarget?.id ?? "none"}
+      key={`reset-password-${resetTarget?.id ?? "none"}`}
       open={resetTarget !== null}
       user={resetTarget}
       pending={pending}
@@ -58,6 +64,24 @@ export default function AdminUsersManager({ users }: { users: AdminUser[] }) {
           const r = await resetUserPassword(target.id, newPassword);
           show(r);
           if (r.ok) setResetTarget(null);
+        });
+      }}
+    />
+    <EditUsernameModal
+      key={`edit-username-${usernameTarget?.id ?? "none"}`}
+      open={usernameTarget !== null}
+      user={usernameTarget}
+      pending={pending}
+      onCancel={() => setUsernameTarget(null)}
+      onConfirm={(nextUsername) => {
+        const target = usernameTarget;
+        if (!target) return;
+        start(async () => {
+          const result = await changeUsername(target.id, nextUsername);
+          show(result);
+          if (!result.ok) return;
+          setUsernameTarget(null);
+          if (result.selfChanged) router.replace("/login");
         });
       }}
     />

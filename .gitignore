@@ -31,6 +31,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+_devserver.log
+
+# python
+__pycache__/
+*.pyc
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -73,3 +78,7 @@ next-env.d.ts
 # deploy archive produced by `git archive` for server transfer — a build
 # artifact, rebuilt each deploy; never version-control it
 /expense-billing-app-deploy.zip
+
+# scratch space for one-off scripts/fixtures used while poking at SOC UAT
+# data by hand — not part of the app, not meant for version control
+/tmp

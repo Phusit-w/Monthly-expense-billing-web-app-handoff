@@ -44,6 +44,47 @@ export async function setUserRole(userId: string, role: "USER" | "ADMIN") {
   revalidatePath("/admin/users"); return { ok: true as const };
 }
 
+export async function changeUsername(userId: string, requestedUsername: string) {
+  const actor = await requireRole("ADMIN");
+  const username = requestedUsername.trim().toLowerCase();
+  if (!/^[a-z0-9._-]{3,40}$/.test(username)) {
+    return { ok: false as const, error: "Username ต้องเป็น a-z, 0-9, จุด ขีดกลาง หรือขีดล่าง 3–40 ตัว" };
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: userId } });
+  if (!target) return { ok: false as const, error: "ไม่พบบัญชีผู้ใช้" };
+  if (target.username === username) return { ok: false as const, error: "Username ใหม่เหมือน Username ปัจจุบัน" };
+  if (await prisma.user.findFirst({ where: { username, id: { not: userId } } })) {
+    return { ok: false as const, error: "Username นี้มีอยู่แล้ว" };
+  }
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { username, sessionVersion: { increment: 1 } },
+    });
+    await writeAudit({
+      actorId: actor.id,
+      targetUserId: user.id,
+      action: "USER_USERNAME_CHANGED",
+      entityType: "USER",
+      entityId: user.id,
+      summary: `เปลี่ยน Username จาก ${target.username} เป็น ${username}`,
+      before: { username: target.username },
+      after: { username },
+    });
+    revalidatePath("/admin");
+    revalidatePath("/admin/users");
+    return {
+      ok: true as const,
+      message: `เปลี่ยน Username จาก ${target.username} เป็น ${username} แล้ว`,
+      selfChanged: actor.id === user.id,
+    };
+  } catch {
+    return { ok: false as const, error: "เปลี่ยน Username ไม่สำเร็จ อาจมีบัญชีอื่นใช้ชื่อนี้แล้ว" };
+  }
+}
+
 const PASSWORD_MIN_LENGTH = 6;
 
 function passwordMeetsPolicy(value: string) {

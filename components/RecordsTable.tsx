@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { deleteRecord, duplicateRecord } from "@/actions/records";
 import { fmt } from "@/lib/format";
 import { THAI_MONTHS } from "@/lib/constants";
+import { downloadBillingPdf } from "@/lib/downloadBillingPdf";
 import type { ExpenseRecordData, RecordType } from "@/lib/types";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -31,6 +32,7 @@ export default function RecordsTable({
 }) {
   const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pdfPendingId, setPdfPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
@@ -123,6 +125,23 @@ export default function RecordsTable({
     });
   }
 
+  async function onDownloadPdf(record: ExpenseRecordData) {
+    if (pdfPendingId) return;
+    setPdfPendingId(record.id);
+    try {
+      await downloadBillingPdf(record.id, record.type);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "สร้าง PDF ไม่สำเร็จ";
+      window.alert(`${message}\n\nกรุณาใช้ปุ่ม “พิมพ์ PDF” เป็นทางสำรอง`);
+    } finally {
+      setPdfPendingId(null);
+    }
+  }
+
+  function onPrintPdf(id: string) {
+    window.open(`/bill/${encodeURIComponent(id)}?print=1`, "_blank", "noopener,noreferrer");
+  }
+
   function confirmDelete() {
     const id = confirmingDeleteId;
     if (!id) return;
@@ -203,7 +222,7 @@ export default function RecordsTable({
                 ยอดรวม{sortArrow("total")}
               </th>
               <th className={th}>แก้ไขล่าสุดโดย</th>
-              <th className={`${th} w-[250px] text-right`}>จัดการ</th>
+              <th className={`${th} min-w-[480px] text-right`}>จัดการ</th>
             </tr>
           </thead>
           <tbody>
@@ -228,6 +247,24 @@ export default function RecordsTable({
                 </td>
                 <td className="border-t border-divider px-3.5 py-2.5">
                   <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="billing-pdf-download whitespace-nowrap border-ink text-ink"
+                      onClick={() => onDownloadPdf(rec)}
+                      disabled={pdfPendingId !== null || pendingId === rec.id}
+                    >
+                      {pdfPendingId === rec.id ? "กำลังสร้าง PDF…" : "ดาวน์โหลด PDF"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="whitespace-nowrap"
+                      onClick={() => onPrintPdf(rec.id)}
+                      disabled={pendingId === rec.id}
+                    >
+                      พิมพ์ PDF
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

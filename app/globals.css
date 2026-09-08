@@ -173,6 +173,17 @@ button.btn-danger:not(:disabled):not(.ui-btn):active {
   border-color: #b3261e !important;
 }
 
+/* Billing's direct PDF action is outline-identical to the adjacent print
+   button while idle, then inverts against the active theme on hover/press:
+   black/white in light mode and white/black in dark mode. Theme tokens keep
+   that behaviour synchronized with ThemeToggle without client-side logic. */
+.billing-pdf-download:not(:disabled):hover,
+.billing-pdf-download:not(:disabled):active {
+  background: var(--color-ink);
+  color: var(--color-ground);
+  border-color: var(--color-ink);
+}
+
 /* The white "paper" sheet a form sits on. Centered with a drop shadow on
    screen (ported from paperMargin/paperShadow in the design source); flush
    to the page with no shadow when printed, replacing the original's
