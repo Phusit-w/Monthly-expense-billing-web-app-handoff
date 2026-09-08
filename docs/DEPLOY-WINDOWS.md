@@ -29,6 +29,7 @@
 **Service ที่ต้องติดตั้ง (2 ตัว — ไม่มีอย่างอื่นแล้ว):**
 - [Node.js **24.x (LTS)**](https://nodejs.org/) — เวอร์ชันอื่นอาจใช้ไม่ได้: Next.js 16 ต้องการ >= 20.9.0, Prisma 7 ต้องการเฉพาะช่วง 20.19+/22.12+/24.0+ เท่านั้น (21.x, 23.x ใช้ไม่ได้)
 - [PostgreSQL **16.x** for Windows](https://www.postgresql.org/download/windows/) — ตัวติดตั้งของ EDB จะลงเป็น Windows Service ให้อัตโนมัติ (ขั้นตอนนี้ต้อง admin เสมอไม่ว่าจะเลือกวิธี A หรือ B ในการรันตัวแอปเอง — ปกติ IT เป็นคนติดตั้ง PostgreSQL ให้ครั้งเดียว)
+- ถ้าต้องอ่าน PDF สแกน: ติดตั้ง Tesseract OCR พร้อม language data `tha` และ `eng` แล้วตั้ง `SOC_OCR_PROVIDER=tesseract`; หากยังไม่พร้อมให้คง `disabled` เพื่อ fail closed
 
 Prisma/Next.js/ไลบรารีอื่นๆ ของแอป **ไม่ต้องติดตั้งแยก** — มากับไฟล์ที่ build เสร็จแล้วในตัวแอปเองทั้งหมด (ดู `FAQ.md`)
 
@@ -41,9 +42,11 @@ CREATE USER expense_billing WITH PASSWORD 'ใส่รหัสผ่านท�
 CREATE DATABASE expense_billing OWNER expense_billing;
 ```
 
-### 2. คัดลอกโปรเจกต์ไปยังเซิร์ฟเวอร์
+### 2. เอาโค้ดเข้าเซิร์ฟเวอร์
 
-คัดลอกทั้งโฟลเดอร์ `expense-billing-app/` ไปยังเซิร์ฟเวอร์ เช่น `C:\apps\expense-billing-app`
+**แนะนำ: วิธี Git** (แก้ปัญหา "stale files" ที่เจอมาแล้วตอนใช้ zip — ไฟล์ที่ถูก rename/ลบระหว่างเวอร์ชันจะไม่ตกค้าง, rollback ก็แค่ `git checkout` commit เดิม) — ทำครั้งแรกตามหัวข้อ **"ตั้งเซิร์ฟเวอร์ใหม่ด้วย Git (ทำครั้งเดียว)"** ท้ายเอกสารนี้ ได้โฟลเดอร์ `C:\Apps\expense-billing-app-deploy-git` (หรือชื่อที่ตั้งไว้) แล้วใช้โฟลเดอร์นั้นแทนที่ `C:\apps\expense-billing-app` ในทุกคำสั่งของเอกสารนี้ที่เหลือ
+
+**ทางเลือกเดิม (ยังใช้ได้ ไม่แนะนำสำหรับเซิร์ฟเวอร์ใหม่):** คัดลอกทั้งโฟลเดอร์ `expense-billing-app/` ไปยังเซิร์ฟเวอร์ตรงๆ เช่น `C:\apps\expense-billing-app` (zip + extract) — ถ้าเวอร์ชันใหม่มีการ rename/ย้าย/ลบไฟล์ ต้องลบไฟล์เก่าที่ตกค้างเองก่อน extract ทับ ไม่งั้น build จะพังแบบ "two parallel pages that resolve to the same path" — ดู `git diff --diff-filter=D --name-only <เวอร์ชันเดิม> <เวอร์ชันใหม่>` เพื่อหารายชื่อไฟล์ที่ต้องลบ
 
 ### 3. ติดตั้ง dependencies
 
@@ -130,16 +133,24 @@ Prisma Client (`lib/generated/prisma/`) ถูก `.gitignore` ตัดออ�
 
 ### อัปเดตเวอร์ชันใหม่ (วิธี A)
 
+**ต้องหยุด `run-loop.ps1` ก่อนเสมอ** ก่อนรัน `npm run build` — ไฟล์ที่ process เดิมเปิดค้างไว้ (`.next\standalone\server.js`) จะทำให้ build ลบโฟลเดอร์เพื่อสร้างใหม่ไม่ได้ (`EBUSY: resource busy or locked`) `stop-run-loop.ps1` ด้านล่างจัดการเรื่องนี้ให้แล้ว แค่อย่าข้ามขั้นตอนนี้ไป:
+
 ```powershell
-cd C:\apps\expense-billing-app
+cd C:\Apps\expense-billing-app-deploy-git   # หรือ path ที่ clone ไว้จริง
 .\deploy\windows\stop-run-loop.ps1
-# คัดลอกโค้ดใหม่ทับ (หรือ git pull)
-npm ci
-npx prisma migrate deploy
+
+git pull
+npm ci                       # เฉพาะตอน package.json เปลี่ยน
+npx prisma migrate deploy    # เฉพาะตอนมี migration ใหม่
 npm run build
 .\deploy\windows\stage-standalone.ps1
-.\deploy\windows\run-loop.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
+
+$dbUrl = (Get-Content .env | Select-String "^DATABASE_URL=").ToString().Split("=",2)[1].Trim('"')
+$sessionSecret = (Get-Content .env | Select-String "^SESSION_SECRET=").ToString().Split("=",2)[1].Trim('"')
+.\deploy\windows\run-loop.ps1 -DatabaseUrl $dbUrl -SessionSecret $sessionSecret
 ```
+
+(อ่านค่า `DATABASE_URL`/`SESSION_SECRET` จาก `.env` ตรงๆ แทนการพิมพ์รหัสผ่านจริงลงคำสั่ง — ไม่มีความลับโผล่บนหน้าจอ/ประวัติคำสั่ง)
 
 ---
 
@@ -170,16 +181,26 @@ nssm status ExpenseBillingApp
 
 ### อัปเดตเวอร์ชันใหม่ (วิธี B)
 
+**ต้อง `nssm stop ExpenseBillingApp` ก่อน `npm run build` เสมอ** — service เดิมเปิด `.next\standalone\server.js` ค้างไว้ ถ้าไม่หยุดก่อน `next build` จะลบโฟลเดอร์นั้นเพื่อสร้างใหม่ไม่ได้ (`EBUSY: resource busy or locked, rmdir '...\.next\standalone'`) `install-service.ps1` ท้ายสุดจะ stop/remove/ติดตั้งใหม่ให้เองก็จริง แต่นั่นเกิด**หลัง** build แล้ว สายเกินไป ต้องหยุดเองก่อนตั้งแต่ต้น:
+
 ```powershell
-cd C:\apps\expense-billing-app
-npm ci
-npx prisma migrate deploy
+cd C:\Apps\expense-billing-app-deploy-git   # หรือ path ที่ clone ไว้จริง
+nssm stop ExpenseBillingApp
+
+git pull
+npm ci                       # เฉพาะตอน package.json เปลี่ยน
+npx prisma migrate deploy    # เฉพาะตอนมี migration ใหม่
 npm run build
 .\deploy\windows\stage-standalone.ps1
-.\deploy\windows\install-service.ps1 -DatabaseUrl "postgresql://expense_billing:รหัสผ่านจริง@localhost:5432/expense_billing" -SessionSecret "ค่าจริงจากขั้นตอนที่ 4"
+
+$dbUrl = (Get-Content .env | Select-String "^DATABASE_URL=").ToString().Split("=",2)[1].Trim('"')
+$sessionSecret = (Get-Content .env | Select-String "^SESSION_SECRET=").ToString().Split("=",2)[1].Trim('"')
+.\deploy\windows\install-service.ps1 -DatabaseUrl $dbUrl -SessionSecret $sessionSecret
 ```
 
-`install-service.ps1` รันซ้ำได้อย่างปลอดภัย — จะ stop/remove service เดิมแล้วติดตั้งใหม่ทับให้เอง
+(อ่านค่า `DATABASE_URL`/`SESSION_SECRET` จาก `.env` ตรงๆ แทนการพิมพ์รหัสผ่านจริงลงคำสั่ง — ไม่มีความลับโผล่บนหน้าจอ/ประวัติคำสั่ง) `install-service.ps1` รันซ้ำได้อย่างปลอดภัย — จะ stop/remove service เดิม (ถ้ายังไม่ได้หยุด) แล้วติดตั้งใหม่ทับ + สตาร์ทให้เองท้ายสุด
+
+**Rollback ด่วน:** สลับกลับไปโฟลเดอร์เวอร์ชันก่อนหน้า (เช่น `C:\Apps\expense-billing-app-deploy` ถ้ายังเก็บไว้) แล้วรัน `install-service.ps1` ชุดเดียวกันจากในนั้นแทน — service จะชี้กลับไปที่โค้ดเก่าทันที ไม่ต้อง build ใหม่
 
 ### หยุด / ถอนการติดตั้ง (วิธี B)
 
@@ -249,6 +270,67 @@ psql -U expense_billing -h localhost expense_billing -f backup-YYYYMMDD.sql
 ```
 
 (`pg_dump`/`psql` มาพร้อมตัวติดตั้ง PostgreSQL อยู่ที่ `C:\Program Files\PostgreSQL\<version>\bin\` — เพิ่มเข้า PATH หรือเรียก full path ก็ได้)
+
+## ตั้งเซิร์ฟเวอร์ใหม่ด้วย Git (ทำครั้งเดียวตอน setup เซิร์ฟเวอร์ใหม่)
+
+ทำหัวข้อนี้ครั้งเดียวตอนตั้งเซิร์ฟเวอร์ใหม่ (หรือเปลี่ยนจากวิธี zip เดิมมาเป็น git) แล้วใช้โฟลเดอร์ที่ได้แทน `C:\apps\expense-billing-app` ในทุกหัวข้อของเอกสารนี้ที่เหลือ
+
+### ก. สร้าง deploy key (ทำที่เครื่องไหนก็ได้ที่มี `ssh-keygen`)
+
+```powershell
+ssh-keygen -t ed25519 -C "deploy@<ชื่อเซิร์ฟเวอร์>" -f expense-billing-app-deploy-key -N ""
+```
+
+ได้ไฟล์ 2 ไฟล์: `expense-billing-app-deploy-key` (private — **เก็บเป็นความลับ ห้าม commit เข้า repo**) และ `expense-billing-app-deploy-key.pub` (public — เอาไปวางบน GitHub ได้)
+
+### ข. เพิ่ม public key บน GitHub
+
+Repo settings → **Deploy keys** → **Add deploy key** → วางเนื้อหาไฟล์ `.pub` → ตั้งชื่อให้จำได้ (เช่น ชื่อเซิร์ฟเวอร์) → **อย่าติ๊ก "Allow write access"** (deploy key ควรเป็น read-only เสมอ — เซิร์ฟเวอร์แค่ดึงโค้ด ไม่เคย push) แยกกุญแจคนละดอกต่อเซิร์ฟเวอร์ ไม่ใช้ซ้ำกัน เผื่อต้องถอนสิทธิ์เครื่องใดเครื่องหนึ่งภายหลังโดยไม่กระทบเครื่องอื่น
+
+### ค. ติดตั้ง Git บนเซิร์ฟเวอร์
+
+```powershell
+winget install --id Git.Git -e --source winget
+```
+
+ถ้าเซิร์ฟเวอร์ไม่มี `winget` (พบบ่อยใน Windows Server รุ่นเก่า) ดาวน์โหลดตัวติดตั้งเองจาก `https://git-scm.com/download/win` แล้วรัน กด Next ด้วยค่า default ได้ทั้งหมด — สำคัญแค่ตอนเลือก "Adjusting your PATH environment" ต้องเป็น **"Git from the command line and also from 3rd-party software"** (ไม่ใช่ตัวที่มี "Unix tools" ต่อท้าย จะไปทับคำสั่ง Windows เดิม) ปิด PowerShell แล้วเปิดใหม่หลังติดตั้งเสร็จ (`git --version` เช็คว่าใช้ได้)
+
+### ง. ตั้งค่า SSH ให้ใช้ deploy key
+
+Copy ไฟล์ private key (**ไม่ใช่ไฟล์ `.pub`**) เข้าเซิร์ฟเวอร์ เช่นไปไว้ที่ `C:\Users\Administrator\.ssh\expense-billing-app-deploy-key` แล้วสร้างไฟล์ config:
+
+```powershell
+@"
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile C:\Users\Administrator\.ssh\expense-billing-app-deploy-key
+  IdentitiesOnly yes
+"@ | Set-Content -Encoding ascii -Path "$env:USERPROFILE\.ssh\config"
+```
+
+**ต้องใช้ `-Encoding ascii`** — `Out-File -Encoding utf8` บน Windows PowerShell 5.1 (ค่า default ของเครื่อง Windows Server ส่วนใหญ่) จะแปะ BOM ไว้หน้าไฟล์ ทำให้ SSH อ่านคำว่า `Host` ผิดเพี้ยนเป็น error `Bad configuration option`
+
+ทดสอบว่าเชื่อมต่อได้:
+
+```powershell
+ssh -T git@github.com
+```
+
+เจอ prompt ถาม fingerprint ครั้งแรกให้พิมพ์ `yes` ผลลัพธ์ที่ถูกต้องคือ `Hi <org>/<repo>! You've successfully authenticated, but GitHub does not provide shell access.`
+
+### จ. Clone repo
+
+```powershell
+cd C:\Apps
+git clone git@github.com:Phusit-w/Monthly-expense-billing-web-app-handoff.git expense-billing-app-deploy-git
+cd expense-billing-app-deploy-git
+git log --oneline -1   # เช็คว่าได้ commit ล่าสุดจริง
+```
+
+จากนี้ไปทำตามเอกสารต่อตั้งแต่หัวข้อ **"3. ติดตั้ง dependencies"** ได้เลย โดยใช้โฟลเดอร์นี้แทน `C:\apps\expense-billing-app` ทุกที่
+
+**ถ้ากำลังย้ายจากวิธี zip เดิม (มีเซิร์ฟเวอร์รันอยู่แล้ว):** clone ไปโฟลเดอร์ **ใหม่** แยกจากโฟลเดอร์ zip เดิม (อย่า clone ทับ) — คัดลอก `.env`/`backups`/`logs` จากโฟลเดอร์เดิมมาที่โฟลเดอร์ใหม่ก่อน แล้วค่อยรัน `install-service.ps1`/`run-loop.ps1` จากโฟลเดอร์ใหม่เพื่อสลับ service มาชี้ที่นี่ — โฟลเดอร์ zip เดิมเก็บไว้เป็น instant-rollback ได้ (แค่รัน `install-service.ps1`/`run-loop.ps1` จากในนั้นซ้ำถ้าต้องย้อนกลับ) ไม่ต้องลบทิ้งจนกว่าจะมั่นใจว่าวิธีใหม่เสถียรดีแล้ว
 
 ## หมายเหตุ
 
