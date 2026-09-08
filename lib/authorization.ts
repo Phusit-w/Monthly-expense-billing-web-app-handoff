@@ -16,7 +16,10 @@ export async function requireRole(role: "ADMIN") {
 export async function authorizeExpenseRecord(recordId: string) {
   const actor = await requireActor();
   const record = await prisma.expenseRecord.findUnique({ where: { id: recordId } });
-  if (!record || record.deletedAt || (actor.role !== "ADMIN" && record.ownerId !== actor.id)) throw new Error("NOT_FOUND");
+  // record.ownerId === null means it predates per-user ownership — treated
+  // as visible to everyone, same as listRecords in actions/records.ts.
+  const ownedByOther = record?.ownerId !== null && record?.ownerId !== actor.id;
+  if (!record || record.deletedAt || (actor.role !== "ADMIN" && ownedByOther)) throw new Error("NOT_FOUND");
   return { actor, record };
 }
 
