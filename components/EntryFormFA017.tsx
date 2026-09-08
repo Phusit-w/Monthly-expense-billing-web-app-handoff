@@ -188,6 +188,9 @@ export default function EntryFormFA017({
   // draft left in someone's browser tab from before an EmployeeSnapshot/
   // FA017Item shape change shouldn't be able to inject unexpected fields.
   useEffect(() => {
+    // Flips a readiness flag once the sessionStorage read below (a real side
+    // effect, not derivable at render time) has had its one chance to run.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRestored(true);
     if (restoreAppliedRef.current) return;
     restoreAppliedRef.current = true;
@@ -208,7 +211,6 @@ export default function EntryFormFA017({
       setItems(draft.items.map((it) => ({ ...emptyItemFA017(), ...it })));
     }
     if (typeof draft.dateISO === "string" && draft.dateISO) setDateISO(draft.dateISO);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handoff from TravelCalculator ("ส่งไปฟอร์ม FA017") — see
@@ -243,6 +245,9 @@ export default function EntryFormFA017({
       desc: entry.desc ?? "",
       transport: entry.amount.toFixed(2),
     };
+    // One-time mount handoff from the travel calculator (sessionStorage read
+    // above), not something derivable at render time.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems((its) => {
       const idx = its.findIndex(isFA017ItemEmpty);
       if (idx === -1) return [...its, filledRow];
@@ -250,7 +255,6 @@ export default function EntryFormFA017({
       next[idx] = filledRow;
       return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persists on every change so a subsequent unmount (real navigation away,

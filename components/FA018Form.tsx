@@ -196,6 +196,11 @@ export default function FA018Form({
           el.style.height = `${el.scrollHeight}px`;
         });
       });
+      // `remeasure` is a hoisted function declaration and this only ever runs
+      // async (after document.fonts.ready), well after the component body —
+      // and thus `remeasure` itself — has finished evaluating. Reordering it
+      // risks the pagination/focus logic below (see its own doc comment).
+      // eslint-disable-next-line react-hooks/immutability
       remeasure();
     });
     return () => {
