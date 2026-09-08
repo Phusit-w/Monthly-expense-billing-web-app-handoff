@@ -11,8 +11,8 @@ import {
 } from "@/components/icons";
 
 // Single source of truth for the app-shell sidebar. Add a route (a future
-// subsystem, a settings page) = add one entry here. `disabled` entries
-// render greyed-out with a "เร็วๆ นี้" tooltip and no navigation.
+// subsystem, a settings page) = add one entry here. `disabled` entries are
+// hidden from the sidebar entirely (still routable directly by URL).
 export interface NavItem {
   href: string;
   label: string;
