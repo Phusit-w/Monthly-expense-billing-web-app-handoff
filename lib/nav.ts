@@ -7,6 +7,7 @@ import {
   SettingsIcon,
   ClipboardCheckIcon,
   ShieldUserIcon,
+  SearchIcon,
   type IconProps,
 } from "@/components/icons";
 
@@ -57,6 +58,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "ใบรับรองแทนใบเสร็จ",
     icon: FileCheckIcon,
     match: (p) => p.startsWith("/bill/entry/fa018"),
+  },
+  {
+    href: "/project-card",
+    label: "ค้นหาโครงการ",
+    icon: SearchIcon,
+    match: (p) => p.startsWith("/project-card"),
   },
   {
     href: "/soc",

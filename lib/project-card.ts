@@ -1,0 +1,92 @@
+import { timingSafeEqual } from "node:crypto";
+
+// Project Card ingest has no browser session to check — the extraction
+// script that crawls the `PS` share runs off this app's server entirely
+// (see docs/adr/0005-project-card-push-based-ingest.md) and authenticates
+// with a single shared key instead. Checked both in proxy.ts (so a bad key
+// gets a clean 401 instead of a redirect to /login) and again in the route
+// handler itself (proxy.ts skips all auth in dev — see its NODE_ENV check —
+// so the route can't rely on proxy.ts alone).
+export function requireIngestKey(request: Request): void {
+  const header = request.headers.get("authorization") || "";
+  const [scheme, token] = header.split(" ");
+  if (scheme !== "Bearer" || !token) throw new Error("UNAUTHORIZED");
+
+  const expected = process.env.PROJECT_CARD_INGEST_KEY;
+  if (!expected) throw new Error("UNAUTHORIZED");
+
+  const expectedBuf = Buffer.from(expected);
+  const actualBuf = Buffer.from(token);
+  if (expectedBuf.length !== actualBuf.length || !timingSafeEqual(expectedBuf, actualBuf)) {
+    throw new Error("UNAUTHORIZED");
+  }
+}
+
+// One ingest request re-pushes the full current state of every project the
+// crawler found this run (see ADR 0005's "re-index re-pushes everything"
+// note) — a generous but finite cap just to reject an obviously malformed
+// request instead of a real crawl size.
+export const MAX_PROJECTS_PER_REQUEST = 5000;
+
+export interface ProjectCardInput {
+  folderPath: string;
+  client: string;
+  projectName: string;
+  descriptionTh: string;
+  descriptionEn: string;
+  budgetAmount: number | null;
+  year: number | null;
+}
+
+function requireNonEmptyString(value: unknown, field: string): string {
+  if (typeof value !== "string" || value.trim() === "") throw new Error(`"${field}" must be a non-empty string`);
+  return value;
+}
+
+// Unlike client/projectName/folderPath (always known from the folder
+// structure itself), descriptions depend on an AI provider that starts
+// disabled by default (see project-card-crawler/ai_provider.py, mirroring
+// soc-worker/ai_provider.py's fail-closed pattern) — until one is approved
+// and wired up, every crawl produces blank descriptions. Blank is valid
+// input, not a validation failure; a person can fill it in by hand later
+// (see CONTEXT.md's Description entry).
+function optionalString(value: unknown, field: string): string {
+  if (value === undefined || value === null) return "";
+  if (typeof value !== "string") throw new Error(`"${field}" must be a string`);
+  return value;
+}
+
+// Folder names under `PS` embed the year (`_Project 2018-2025`, `_Project
+// 2026`) as a plain Gregorian year, not Buddhist Era — extracted `year`
+// values follow the same convention.
+const MIN_YEAR = 2000;
+const MAX_YEAR = 2100;
+
+export function validateProjectCardInput(raw: unknown): ProjectCardInput {
+  if (typeof raw !== "object" || raw === null) throw new Error("Record must be an object");
+  const r = raw as Record<string, unknown>;
+
+  const folderPath = requireNonEmptyString(r.folderPath, "folderPath");
+  const client = requireNonEmptyString(r.client, "client");
+  const projectName = requireNonEmptyString(r.projectName, "projectName");
+  const descriptionTh = optionalString(r.descriptionTh, "descriptionTh");
+  const descriptionEn = optionalString(r.descriptionEn, "descriptionEn");
+
+  let budgetAmount: number | null = null;
+  if (r.budgetAmount !== undefined && r.budgetAmount !== null) {
+    if (typeof r.budgetAmount !== "number" || !Number.isFinite(r.budgetAmount) || r.budgetAmount < 0) {
+      throw new Error('"budgetAmount" must be a non-negative number');
+    }
+    budgetAmount = r.budgetAmount;
+  }
+
+  let year: number | null = null;
+  if (r.year !== undefined && r.year !== null) {
+    if (!Number.isInteger(r.year) || (r.year as number) < MIN_YEAR || (r.year as number) > MAX_YEAR) {
+      throw new Error(`"year" must be an integer between ${MIN_YEAR} and ${MAX_YEAR}`);
+    }
+    year = r.year as number;
+  }
+
+  return { folderPath, client, projectName, descriptionTh, descriptionEn, budgetAmount, year };
+}

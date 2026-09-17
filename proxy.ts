@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { requireIngestKey } from "@/lib/project-card";
 
 // Per-user login (see actions/auth.ts, lib/auth.ts, lib/session.ts,
 // app/login/page.tsx): every request needs a valid signed session cookie or
@@ -19,6 +20,14 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
 // to the Node.js runtime (not Edge) — see that same doc's "Runtime"
 // section — which is why lib/auth.ts can use node:crypto directly.
 const LOGIN_PATH = "/login";
+
+// The Project Card ingest script is an external crawler, not a browser —
+// it has no session cookie to check and never will (see
+// docs/adr/0005-project-card-push-based-ingest.md). Checked here, ahead of
+// the session-cookie check below, so a bad/missing key gets a clean 401
+// instead of being redirected to /login like every other unauthenticated
+// route.
+const PROJECT_CARD_INGEST_PATH = "/api/project-card/ingest";
 
 // Per-IP rate limit — a plain sliding-ish window counter kept in memory.
 // Checked BEFORE the session check below so it also throttles someone
@@ -84,6 +93,15 @@ export function proxy(request: NextRequest) {
   // in (redirecting here would just redirect right back).
   if (request.nextUrl.pathname === LOGIN_PATH) {
     return NextResponse.next();
+  }
+
+  if (request.nextUrl.pathname === PROJECT_CARD_INGEST_PATH) {
+    try {
+      requireIngestKey(request);
+      return NextResponse.next();
+    } catch {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
   }
 
   const session = verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
