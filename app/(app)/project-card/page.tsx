@@ -7,10 +7,10 @@ import CopyButton from "@/components/CopyButton";
 
 export const dynamic = "force-dynamic";
 
-// A v1 catalog cap, not real pagination — see CONTEXT.md, there's no
-// pagination decision on record yet and this app has no other paginated
-// list either. Revisit once a real crawl's card count approaches this.
-const RESULT_LIMIT = 200;
+// No cap on the query, deliberately — matches this app's other main list
+// (actions/records.ts's listRecords, also uncapped) rather than inventing
+// this app's first pagination UI for a few hundred rows. Revisit only if
+// the catalog grows enough for that to become a real cost.
 
 // Flat access (docs/adr/0006-project-card-flat-access-control.md): any
 // signed-in user, no extra role check — same as every other screen in this
@@ -36,7 +36,6 @@ export default async function ProjectCardPage({
         }
       : undefined,
     orderBy: { updatedAt: "desc" },
-    take: RESULT_LIMIT,
   });
 
   return (
@@ -59,13 +58,6 @@ export default async function ProjectCardPage({
           placeholder="เช่น Solarcell, RFID, MEA"
         />
       </form>
-
-      {cards.length === RESULT_LIMIT ? (
-        <p className="text-xs text-muted">
-          แสดง {RESULT_LIMIT} รายการแรกเท่านั้น อาจมีโครงการเพิ่มเติมที่ไม่แสดงในรายการนี้ —
-          ลองค้นหาให้เจาะจงขึ้น
-        </p>
-      ) : null}
 
       <div className="overflow-hidden rounded-card bg-surface shadow-card">
         {cards.length ? (
