@@ -48,6 +48,11 @@ export default function ProjectCardBudgetForm({
         });
       }}
     >
+      {budgetAmount ? (
+        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">
+          AI แนะนำ ยังไม่ยืนยัน
+        </span>
+      ) : null}
       <input
         type="number"
         min={0}

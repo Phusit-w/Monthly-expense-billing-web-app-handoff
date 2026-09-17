@@ -60,6 +60,13 @@ export default async function ProjectCardPage({
         />
       </form>
 
+      {cards.length === RESULT_LIMIT ? (
+        <p className="text-xs text-muted">
+          แสดง {RESULT_LIMIT} รายการแรกเท่านั้น อาจมีโครงการเพิ่มเติมที่ไม่แสดงในรายการนี้ —
+          ลองค้นหาให้เจาะจงขึ้น
+        </p>
+      ) : null}
+
       <div className="overflow-hidden rounded-card bg-surface shadow-card">
         {cards.length ? (
           <ul className="divide-y divide-line">
