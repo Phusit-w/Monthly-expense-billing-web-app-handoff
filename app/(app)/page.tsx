@@ -5,6 +5,7 @@ import {
   CalculatorIcon,
   ListIcon,
   ClipboardCheckIcon,
+  SearchIcon,
 } from "@/components/icons";
 
 // The Applications launcher — the portal front door. Matches Claude Design
@@ -57,6 +58,14 @@ const TILES: Tile[] = [
     desc: "บิลที่บันทึกไว้ทั้งหมด ค้นหา แก้ไข ทำซ้ำ และพิมพ์",
     cta: "เปิดรายการ →",
     icon: ListIcon,
+    tile: "bg-chip text-ink",
+  },
+  {
+    href: "/project-card",
+    title: "ค้นหาโครงการ",
+    desc: "ค้นหาโครงการจากคลังไฟล์ PS ด้วยชื่อลูกค้า โปรเจกต์ หรือคำอธิบาย",
+    cta: "เปิดเครื่องมือ →",
+    icon: SearchIcon,
     tile: "bg-chip text-ink",
   },
   {
