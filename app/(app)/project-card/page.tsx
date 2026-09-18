@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/lib/generated/prisma/client";
 import { requireActor } from "@/lib/authorization";
 import Field from "@/components/ui/Field";
 import { SearchIcon } from "@/components/icons";
@@ -15,49 +16,125 @@ export const dynamic = "force-dynamic";
 // Flat access (docs/adr/0006-project-card-flat-access-control.md): any
 // signed-in user, no extra role check — same as every other screen in this
 // app.
+// Parses a query-string number param, returning undefined for anything
+// blank or non-numeric rather than throwing — a stray/garbled filter value
+// should just be ignored, not 500 the page.
+function parseIntParam(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function parseFloatParam(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const n = Number.parseFloat(value);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
 export default async function ProjectCardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; year?: string; budgetMin?: string; budgetMax?: string }>;
 }) {
   await requireActor();
-  const { q } = await searchParams;
+  const { q, year: yearParam, budgetMin: budgetMinParam, budgetMax: budgetMaxParam } = await searchParams;
   const query = q?.trim() ?? "";
+  const year = parseIntParam(yearParam);
+  const budgetMin = parseFloatParam(budgetMinParam);
+  const budgetMax = parseFloatParam(budgetMaxParam);
 
-  const cards = await prisma.projectCard.findMany({
-    where: query
-      ? {
-          OR: [
-            { client: { contains: query, mode: "insensitive" } },
-            { projectName: { contains: query, mode: "insensitive" } },
-            { descriptionTh: { contains: query, mode: "insensitive" } },
-            { descriptionEn: { contains: query, mode: "insensitive" } },
-          ],
-        }
-      : undefined,
-    orderBy: { updatedAt: "desc" },
-  });
+  const filters: Prisma.ProjectCardWhereInput[] = [];
+  if (query) {
+    filters.push({
+      OR: [
+        { client: { contains: query, mode: "insensitive" } },
+        { projectName: { contains: query, mode: "insensitive" } },
+        { descriptionTh: { contains: query, mode: "insensitive" } },
+        { descriptionEn: { contains: query, mode: "insensitive" } },
+      ],
+    });
+  }
+  if (year !== undefined) filters.push({ year });
+  if (budgetMin !== undefined) filters.push({ budgetAmount: { gte: budgetMin } });
+  if (budgetMax !== undefined) filters.push({ budgetAmount: { lte: budgetMax } });
+
+  const [cards, availableYears] = await Promise.all([
+    prisma.projectCard.findMany({
+      where: filters.length ? { AND: filters } : undefined,
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.projectCard.findMany({
+      where: { year: { not: null } },
+      distinct: ["year"],
+      select: { year: true },
+      orderBy: { year: "desc" },
+    }),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-display text-[28px] font-bold">ค้นหาโครงการ</h1>
         <p className="mt-1 text-sm text-muted">
-          ค้นหาจากลูกค้า ชื่อโครงการ หรือคำอธิบาย — ข้อมูลมาจากการ crawl share{" "}
+          ค้นหาจากลูกค้า ชื่อโครงการ หรือคำอธิบาย พร้อมกรองตามปีและงบประมาณ — ข้อมูลมาจากการ crawl share{" "}
           <code className="text-xs">PS</code> ด้วยมือ (ดู{" "}
           <code className="text-xs">project-card-crawler/README.md</code>)
         </p>
       </div>
 
-      <form method="get" className="max-w-md">
+      <form method="get" className="flex flex-wrap items-end gap-4">
         <Field
           label="ค้นหา"
           name="q"
           defaultValue={query}
           leftIcon={<SearchIcon size={18} />}
           placeholder="เช่น Solarcell, RFID, MEA"
+          containerClassName="min-w-[240px] flex-1"
         />
+        <div className="min-w-[140px]">
+          <label className="mb-1.5 block text-[13px] font-medium text-label">ปี</label>
+          <select
+            name="year"
+            defaultValue={year !== undefined ? String(year) : ""}
+            className="h-[52px] w-full rounded-field border border-line bg-surface px-4 text-sm"
+          >
+            <option value="">ทุกปี</option>
+            {availableYears.map(({ year: y }) => (
+              <option key={y} value={y ?? ""}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Field
+          label="งบประมาณ ตั้งแต่ (บาท)"
+          name="budgetMin"
+          type="number"
+          min={0}
+          step="any"
+          defaultValue={budgetMin !== undefined ? String(budgetMin) : ""}
+          placeholder="0"
+          containerClassName="w-[180px]"
+        />
+        <Field
+          label="งบประมาณ ถึง (บาท)"
+          name="budgetMax"
+          type="number"
+          min={0}
+          step="any"
+          defaultValue={budgetMax !== undefined ? String(budgetMax) : ""}
+          placeholder="ไม่จำกัด"
+          containerClassName="w-[180px]"
+        />
+        <button
+          type="submit"
+          className="h-[52px] rounded-field bg-ink px-6 text-sm font-medium text-white"
+        >
+          ค้นหา
+        </button>
       </form>
+
+      <p className="text-sm text-muted">พบ {cards.length.toLocaleString("th-TH")} โครงการ</p>
 
       <div className="overflow-hidden rounded-card bg-surface shadow-card">
         {cards.length ? (
@@ -102,10 +179,10 @@ export default async function ProjectCardPage({
         ) : (
           <div className="p-12 text-center">
             <div className="font-display text-lg font-semibold">
-              {query ? "ไม่พบโครงการที่ค้นหา" : "ยังไม่มีข้อมูลโครงการ"}
+              {filters.length ? "ไม่พบโครงการที่ค้นหา" : "ยังไม่มีข้อมูลโครงการ"}
             </div>
             <p className="mt-2 text-sm text-muted">
-              {query ? "ลองคำค้นอื่น" : "รันสคริปต์ crawler เพื่อดึงข้อมูลจาก share ก่อน"}
+              {filters.length ? "ลองปรับคำค้นหรือตัวกรอง" : "รันสคริปต์ crawler เพื่อดึงข้อมูลจาก share ก่อน"}
             </p>
           </div>
         )}
