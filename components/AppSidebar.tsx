@@ -175,7 +175,12 @@ export default function AppSidebar({ role }: { role: string }) {
         </div>
 
         <ul className="flex flex-col gap-2">
-          {NAV_ITEMS.filter((item) => !item.disabled && (!item.adminOnly || role === "ADMIN")).map((item) => {
+          {NAV_ITEMS.filter(
+            (item) =>
+              !item.disabled &&
+              (!item.adminOnly || role === "ADMIN") &&
+              (!item.hiddenUnlessActive || isNavItemActive(item, pathname)),
+          ).map((item) => {
             const active = isNavItemActive(item, pathname);
             const Icon = item.icon;
 
@@ -220,13 +225,13 @@ export default function AppSidebar({ role }: { role: string }) {
           }
           disabled={loggingOut}
           title="ออกจากระบบ"
-          className="ui-btn group mt-auto flex min-w-0 items-center gap-3 bg-transparent px-4 disabled:opacity-60"
+          className="ui-btn group mt-auto flex items-center gap-3 bg-transparent px-4 disabled:opacity-60"
         >
           <span className="grid size-12 shrink-0 place-items-center rounded-chip text-[#8b8b8b] transition-colors group-hover:bg-[#B3261E] group-hover:text-white">
             <LogOutIcon size={22} />
           </span>
           <span
-            className="min-w-0 flex-1 truncate text-sm font-medium text-[#c9c9c9] group-hover:text-[#B3261E]"
+            className="whitespace-nowrap text-sm font-medium text-[#c9c9c9] group-hover:text-[#B3261E]"
             style={labelStyle}
           >
             ออกจากระบบ

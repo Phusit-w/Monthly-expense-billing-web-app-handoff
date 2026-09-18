@@ -23,6 +23,11 @@ export interface NavItem {
   match?: (pathname: string) => boolean;
   disabled?: boolean;
   adminOnly?: boolean;
+  // Reachable from the homepage app-launcher's tile grid (app/(app)/page.tsx),
+  // not the sidebar rail — the sidebar only shows this item's icon while the
+  // user is actually on one of its pages (i.e. while `match` is true), so
+  // the rail stays short when browsing elsewhere.
+  hiddenUnlessActive?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -44,6 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "คำนวณค่าเดินทาง",
     icon: CalculatorIcon,
     match: (p) => p.startsWith("/travel"),
+    hiddenUnlessActive: true,
   },
   {
     // Short label to fit the 230px expanded rail — the mockup uses
@@ -52,18 +58,21 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Expense Claim",
     icon: BanknoteIcon,
     match: (p) => p.startsWith("/bill/entry/fa017"),
+    hiddenUnlessActive: true,
   },
   {
     href: "/bill/entry/fa018",
     label: "ใบรับรองแทนใบเสร็จ",
     icon: FileCheckIcon,
     match: (p) => p.startsWith("/bill/entry/fa018"),
+    hiddenUnlessActive: true,
   },
   {
     href: "/project-card",
     label: "ค้นหาโครงการ",
     icon: SearchIcon,
     match: (p) => p.startsWith("/project-card"),
+    hiddenUnlessActive: true,
   },
   {
     href: "/soc",
