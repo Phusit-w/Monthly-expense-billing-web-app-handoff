@@ -133,11 +133,19 @@ try {
 
     # 1. stop ------------------------------------------------------------
     Write-Host "==> [1/7] Stopping service..."
-    # 2>$null (not 2>&1) — merging stderr into the success stream turns
-    # each stderr line into an ErrorRecord, which $ErrorActionPreference =
-    # "Stop" (top of script) then treats as fatal even when nssm's exit
-    # code is 0 and the line was purely informational.
-    & $NssmPath stop $ServiceName confirm 2>$null | Out-Null
+    # nssm writes "STOP: The service has not been started" through some
+    # channel that PowerShell's own stream redirection (2>$null, 2>&1,
+    # $PSNativeCommandUseErrorActionPreference) can't suppress — observed
+    # live, it kept surfacing as a fatal NativeCommandError under
+    # $ErrorActionPreference = "Stop" no matter which of those was tried.
+    # Sidestep it entirely: only ask nssm to stop the service if Windows
+    # itself reports it's actually running. A prior failed redeploy can
+    # leave the service already stopped, which isn't an error condition.
+    if ((Get-Service -Name $ServiceName).Status -eq "Running") {
+        & $NssmPath stop $ServiceName confirm 2>$null | Out-Null
+    } else {
+        Write-Host "    (already stopped, skipping)"
+    }
 
     # 2. npm ci (only when dependencies actually changed) ---------------
     $nm     = Join-Path $root "node_modules"
