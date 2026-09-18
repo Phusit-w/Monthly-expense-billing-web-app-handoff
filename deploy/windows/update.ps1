@@ -68,6 +68,17 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# PowerShell 7.3+ defaults this to $true, which auto-promotes ANY native
+# .exe's non-zero exit code into a terminating error under
+# $ErrorActionPreference = "Stop" — including nssm returning non-zero for
+# a perfectly normal "stop an already-stopped service" (observed live:
+# killed step 1/7 on a redeploy attempt right after a previous run had
+# already stopped the service, which isn't a real failure). This script
+# already does its own explicit `if ($LASTEXITCODE -ne 0) { throw ... }`
+# checks wherever a native command's exit code actually needs to gate the
+# deploy, so that's the real pass/fail signal — this flag just stops
+# PowerShell from also second-guessing every native call on its own.
+$PSNativeCommandUseErrorActionPreference = $false
 
 # This script lives in deploy\windows\ — the project root (package.json,
 # .next\, etc.) is TWO levels up.
