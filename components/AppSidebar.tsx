@@ -192,7 +192,7 @@ export default function AppSidebar({ role }: { role: string }) {
                     }
                   }}
                   onClick={() => setExpanded(false)}
-                  className="group flex items-center gap-3 px-4"
+                  className="group flex min-w-0 items-center gap-3 px-4"
                 >
                   <span
                     className={`grid size-12 shrink-0 place-items-center rounded-chip transition-colors
@@ -201,8 +201,9 @@ export default function AppSidebar({ role }: { role: string }) {
                     <Icon size={22} />
                   </span>
                   <span
-                    className={`whitespace-nowrap text-sm font-medium ${active ? "text-white" : "text-[#c9c9c9] group-hover:text-white"}`}
+                    className={`min-w-0 flex-1 truncate text-sm font-medium ${active ? "text-white" : "text-[#c9c9c9] group-hover:text-white"}`}
                     style={labelStyle}
+                    title={item.label}
                   >
                     {item.label}
                   </span>
@@ -219,13 +220,13 @@ export default function AppSidebar({ role }: { role: string }) {
           }
           disabled={loggingOut}
           title="ออกจากระบบ"
-          className="ui-btn group mt-auto flex items-center gap-3 bg-transparent px-4 disabled:opacity-60"
+          className="ui-btn group mt-auto flex min-w-0 items-center gap-3 bg-transparent px-4 disabled:opacity-60"
         >
           <span className="grid size-12 shrink-0 place-items-center rounded-chip text-[#8b8b8b] transition-colors group-hover:bg-[#B3261E] group-hover:text-white">
             <LogOutIcon size={22} />
           </span>
           <span
-            className="whitespace-nowrap text-sm font-medium text-[#c9c9c9] group-hover:text-[#B3261E]"
+            className="min-w-0 flex-1 truncate text-sm font-medium text-[#c9c9c9] group-hover:text-[#B3261E]"
             style={labelStyle}
           >
             ออกจากระบบ
