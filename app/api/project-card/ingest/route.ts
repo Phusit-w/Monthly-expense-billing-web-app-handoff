@@ -51,6 +51,14 @@ export async function POST(request: Request) {
   // person confirms it]"). Re-crawls still refresh the rest of the card.
   let skippedVerifiedBudget = 0;
 
+  // Prisma's interactive-transaction default timeout (5000ms) isn't enough
+  // once the batch is large: the real PS share crawl pushes ~205-210
+  // records in one request, each needing a findUnique + create/update round
+  // trip, which took just over 5s against this app's single-connection pool
+  // (lib/prisma.ts's max: 1) and threw P2028 mid-run — found by testing
+  // against the actual crawl output, not a hypothetical. 60s gives ample
+  // headroom over today's real volume without over-provisioning for the
+  // 5000-record defensive cap above, which isn't real expected load.
   await prisma.$transaction(async (tx) => {
     for (const project of validated) {
       const existing = await tx.projectCard.findUnique({ where: { folderPath: project.folderPath } });
@@ -84,7 +92,7 @@ export async function POST(request: Request) {
       });
       updated++;
     }
-  });
+  }, { timeout: 60_000 });
 
   return NextResponse.json({ created, updated, skippedVerifiedBudget, rejected: errors.length, errors });
 }
