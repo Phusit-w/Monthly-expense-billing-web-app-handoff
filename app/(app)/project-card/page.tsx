@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { requireActor } from "@/lib/authorization";
 import Field from "@/components/ui/Field";
+import Button from "@/components/ui/Button";
 import { SearchIcon } from "@/components/icons";
 import ProjectCardBudgetForm from "@/components/ProjectCardBudgetForm";
 import CopyButton from "@/components/CopyButton";
@@ -126,12 +127,9 @@ export default async function ProjectCardPage({
           placeholder="ไม่จำกัด"
           containerClassName="w-[180px]"
         />
-        <button
-          type="submit"
-          className="h-[52px] rounded-field bg-ink px-6 text-sm font-medium text-white"
-        >
+        <Button type="submit" variant="dark" className="h-[52px]">
           ค้นหา
-        </button>
+        </Button>
       </form>
 
       <p className="text-sm text-muted">พบ {cards.length.toLocaleString("th-TH")} โครงการ</p>
