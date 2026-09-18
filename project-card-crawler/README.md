@@ -24,8 +24,17 @@ python main.py --ps-root "\\192.168.99.1\PS" --dry-run
 # Push for real:
 python main.py --ps-root "\\192.168.99.1\PS" `
   --api-url https://psaidemo.icn21.local/api/project-card/ingest `
-  --api-key <PROJECT_CARD_INGEST_KEY from the server's .env>
+  --api-key <PROJECT_CARD_INGEST_KEY> `
+  --insecure
 ```
+
+`--api-key` is set on the production Windows service's own environment
+(`nssm get ExpenseBillingApp AppEnvironmentExtra`), not in a `.env` file —
+the running service never reads `.env` at all (see
+docs/DEPLOY-WINDOWS.md). `--insecure` skips TLS certificate verification,
+needed because `psaidemo.icn21.local` uses a self-signed cert (see its
+reverse-proxy setup in docs/DEPLOY-WINDOWS.md) — omit it if that ever
+changes to a real certificate.
 
 Re-index is a manual step for v1 (not scheduled) — see the grill doc's
 R4-Q1. Run it again whenever the share has new/changed projects worth

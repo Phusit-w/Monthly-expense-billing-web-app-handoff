@@ -29,6 +29,11 @@ def main() -> int:
     parser.add_argument("--api-url", help="Ingest endpoint, e.g. https://psaidemo.icn21.local/api/project-card/ingest")
     parser.add_argument("--api-key", help="PROJECT_CARD_INGEST_KEY — required unless --dry-run")
     parser.add_argument("--dry-run", action="store_true", help="Discover and summarize only; print the payload instead of pushing it")
+    parser.add_argument(
+        "--insecure",
+        action="store_true",
+        help="Skip TLS certificate verification — needed for psaidemo.icn21.local's self-signed cert",
+    )
     args = parser.parse_args()
 
     if not args.dry_run and (not args.api_url or not args.api_key):
@@ -56,7 +61,13 @@ def main() -> int:
         print(json.dumps(payloads, ensure_ascii=False, indent=2))
         return 0
 
-    result = push_projects(args.api_url, args.api_key, payloads)
+    if args.insecure:
+        import urllib3
+
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        print("WARNING: --insecure set, skipping TLS certificate verification.", file=sys.stderr)
+
+    result = push_projects(args.api_url, args.api_key, payloads, verify_tls=not args.insecure)
     print(
         f"Pushed: {result.created} created, {result.updated} updated, "
         f"{result.skipped_verified_budget} verified budgets preserved, {result.rejected} rejected."

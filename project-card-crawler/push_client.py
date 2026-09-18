@@ -20,17 +20,30 @@ class PushResult:
     errors: list[dict]
 
 
-def push_projects(api_url: str, api_key: str, projects: list[dict], timeout_seconds: int = 120) -> PushResult:
+def push_projects(
+    api_url: str,
+    api_key: str,
+    projects: list[dict],
+    timeout_seconds: int = 120,
+    verify_tls: bool = True,
+) -> PushResult:
     """`projects` is already in the ingest API's wire shape (folderPath,
     client, projectName, descriptionTh, descriptionEn, budgetAmount, year) —
     see lib/project-card.ts's ProjectCardInput for the authoritative shape
     this must match.
+
+    `verify_tls=False` is for psaidemo.icn21.local's self-signed cert (see
+    docs/DEPLOY-WINDOWS.md's reverse-proxy setup) — main.py only exposes
+    this via an explicit --insecure flag, never a silent default, since
+    this same function would also be used against any future properly-
+    certificated target.
     """
     response = requests.post(
         api_url,
         json={"projects": projects},
         headers={"Authorization": f"Bearer {api_key}"},
         timeout=timeout_seconds,
+        verify=verify_tls,
     )
     response.raise_for_status()
     body = response.json()
