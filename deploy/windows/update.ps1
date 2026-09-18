@@ -90,13 +90,17 @@ if (-not $svc) {
 
 # --- read the service's current environment (single source of truth so
 #     the password / SESSION_SECRET never has to be retyped here) ---
-# nssm can emit a blank line between each real KEY=VALUE entry of a
-# multi-string AppEnvironmentExtra value (observed on this app's server —
-# harmless for a human reading `nssm get` directly, but it corrupts the
-# join/split below into scanning past real lines if not filtered first).
-$envRaw = & $NssmPath get $ServiceName AppEnvironmentExtra 2>$null
-$envLines = $envRaw | Where-Object { $_ -and $_.Trim() -ne "" }
-$envText = ($envLines -join "`n") -replace "`r", ""
+# Read straight from the registry instead of parsing `nssm get`'s text
+# output — on this app's production server that output's line-splitting
+# behaved inconsistently between an interactive prompt and this script
+# (env vars nssm itself reported correctly still came back unparseable
+# here), and REG_MULTI_SZ values under the service's Parameters key are
+# nssm's actual on-disk storage for AppEnvironmentExtra, so this can't
+# drift from whatever nssm's own text formatting happens to do.
+$paramsPath = "HKLM:\SYSTEM\CurrentControlSet\Services\$ServiceName\Parameters"
+$envLines = (Get-ItemProperty -Path $paramsPath -Name AppEnvironmentExtra -ErrorAction SilentlyContinue).AppEnvironmentExtra
+if (-not $envLines) { $envLines = @() }
+$envText = ($envLines -join "`n")
 $dbUrl = ($envText -split "`n" | Where-Object { $_ -match '^DATABASE_URL=' }) -replace '^DATABASE_URL=', ''
 $port  = ($envText -split "`n" | Where-Object { $_ -match '^PORT=' })         -replace '^PORT=', ''
 if (-not $port)  { $port = "3000" }
