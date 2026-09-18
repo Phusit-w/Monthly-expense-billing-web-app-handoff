@@ -90,8 +90,13 @@ if (-not $svc) {
 
 # --- read the service's current environment (single source of truth so
 #     the password / SESSION_SECRET never has to be retyped here) ---
+# nssm can emit a blank line between each real KEY=VALUE entry of a
+# multi-string AppEnvironmentExtra value (observed on this app's server —
+# harmless for a human reading `nssm get` directly, but it corrupts the
+# join/split below into scanning past real lines if not filtered first).
 $envRaw = & $NssmPath get $ServiceName AppEnvironmentExtra 2>$null
-$envText = ($envRaw -join "`n") -replace "`r", ""
+$envLines = $envRaw | Where-Object { $_ -and $_.Trim() -ne "" }
+$envText = ($envLines -join "`n") -replace "`r", ""
 $dbUrl = ($envText -split "`n" | Where-Object { $_ -match '^DATABASE_URL=' }) -replace '^DATABASE_URL=', ''
 $port  = ($envText -split "`n" | Where-Object { $_ -match '^PORT=' })         -replace '^PORT=', ''
 if (-not $port)  { $port = "3000" }
