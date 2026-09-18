@@ -122,7 +122,11 @@ try {
 
     # 1. stop ------------------------------------------------------------
     Write-Host "==> [1/7] Stopping service..."
-    & $NssmPath stop $ServiceName confirm 2>&1 | Out-Null
+    # 2>$null (not 2>&1) — merging stderr into the success stream turns
+    # each stderr line into an ErrorRecord, which $ErrorActionPreference =
+    # "Stop" (top of script) then treats as fatal even when nssm's exit
+    # code is 0 and the line was purely informational.
+    & $NssmPath stop $ServiceName confirm 2>$null | Out-Null
 
     # 2. npm ci (only when dependencies actually changed) ---------------
     $nm     = Join-Path $root "node_modules"
@@ -155,7 +159,15 @@ try {
 
     # 3. migrations ----------------------------------------------------
     Write-Host "==> [3/7] npx prisma migrate deploy ..."
+    # Same ErrorRecord-from-stderr issue as step 1/7 above, but this call
+    # needs 2>&1 (both streams captured together into $migOut for the
+    # "have been applied" check below), so relax ErrorActionPreference for
+    # just this line instead of dropping the merge — $LASTEXITCODE right
+    # after is still the real pass/fail signal.
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     $migOut = & npx prisma migrate deploy 2>&1
+    $ErrorActionPreference = $prevEAP
     $migOut | ForEach-Object { Write-Host "    $_" }
     if ($LASTEXITCODE -ne 0) { throw "prisma migrate deploy failed (exit $LASTEXITCODE)" }
     if ($migOut -match "have been applied|following migration") {
@@ -178,7 +190,7 @@ try {
 
     # 7. start --------------------------------------------------------
     Write-Host "==> [7/7] Starting service..."
-    & $NssmPath start $ServiceName 2>&1 | Out-Null
+    & $NssmPath start $ServiceName 2>$null | Out-Null
 }
 finally {
     Pop-Location
